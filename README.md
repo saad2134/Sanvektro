@@ -2,6 +2,12 @@
   ⚡ Sanvektro
 </h1>
 
+<h3 align="center"> 
+<i>
+Guide your 30-day cash vector ✦ simulate financial decisions before you swipe.
+</i>
+</h3>
+
 > <p align="center"><strong>A predictive personal finance simulation engine and decision cockpit for Gen Z managing a ₹10,000 budget across 30 days. Sanvektro connects liquid balance, daily safe burn allowances, fixed commitments, subscription guillotine controls, savings goals pacing, unexpected expense shocks, financial risk, and financial health into a real-time reactive model. Simulate financial decisions before you spend.</strong></p>
 
 <div align="center">
@@ -11,7 +17,7 @@
 [![Vite](https://img.shields.io/badge/Vite-v8.3-1e293b?style=flat&logo=vite&logoColor=646cff&labelColor=0f172a)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.3-1e293b?style=flat&logo=tailwindcss&logoColor=38bdf8&labelColor=0f172a)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-1e293b?style=flat&logo=opensourceinitiative&logoColor=white&labelColor=10b981)](LICENSE)
-[![Author](https://img.shields.io/badge/Author-Saaduddin_Mohammed-1e293b?style=flat&logo=github&logoColor=white&labelColor=6366f1)](https://github.com/saad2134)
+[![Author](https://img.shields.io/badge/Author-Saad_M.-1e293b?style=flat&logo=github&logoColor=white&labelColor=6366f1)](https://github.com/saad2134)
 
 </div>
 
