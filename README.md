@@ -4,7 +4,7 @@
 
 <div align="center">
 
-# ⚡ Sanvektro
+# 📈 Sanvektro
 ### The World's First Predictive Personal Finance Simulator for Gen Z
 
 [![React](https://img.shields.io/badge/React-v19.0-61dafb?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
