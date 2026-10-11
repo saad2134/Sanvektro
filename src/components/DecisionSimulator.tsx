@@ -250,9 +250,22 @@ export const DecisionSimulator: React.FC<DecisionSimulatorProps> = ({
                 Interconnected Consequence Analysis
               </span>
             </div>
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300">
-              {diff.impactVerdict}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                diff.severity === 'CRITICAL'
+                  ? 'bg-rose-500/20 text-rose-400 border-rose-500/40 animate-pulse'
+                  : diff.severity === 'SEVERE'
+                  ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
+                  : diff.severity === 'MODERATE'
+                  ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                  : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+              }`}>
+                Severity: {diff.severity}
+              </span>
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                {diff.impactVerdict}
+              </span>
+            </div>
           </div>
 
           {/* Side-by-side metric shift grid */}
@@ -312,6 +325,50 @@ export const DecisionSimulator: React.FC<DecisionSimulatorProps> = ({
               </span>
             </div>
 
+          </div>
+
+          {/* Multi-System Chain: Bills Buffer & Goals Ripple */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            {/* Committed Bills Buffer */}
+            <div className="p-3 rounded-lg bg-slate-950/80 border border-slate-800/90 text-xs">
+              <div className="flex items-center justify-between text-slate-300 font-semibold mb-1">
+                <span>Committed Bills Shield</span>
+                <span className={`font-mono font-bold ${diff.committedBillsBuffer > 500 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                  ₹{diff.committedBillsBuffer.toLocaleString('en-IN')} buffer
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed m-0">
+                Net liquid margin remaining after all pending monthly rent, Wi-Fi, and active recurring subscriptions are settled.
+              </p>
+            </div>
+
+            {/* Savings Goals Ripple */}
+            <div className="p-3 rounded-lg bg-slate-950/80 border border-slate-800/90 text-xs">
+              <div className="flex items-center justify-between text-slate-300 font-semibold mb-1">
+                <span>Savings Goals Ripple</span>
+                <span className="font-mono text-cyan-400 font-bold">
+                  {diff.affectedGoals ? diff.affectedGoals.filter(g => g.stillOnTrack).length : 0} of {diff.affectedGoals?.length ?? 0} On Track
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5 pt-0.5">
+                {diff.affectedGoals && diff.affectedGoals.length > 0 ? (
+                  diff.affectedGoals.map(g => (
+                    <span 
+                      key={g.goalId} 
+                      className={`text-[10px] px-2 py-0.5 rounded-md font-mono ${
+                        g.stillOnTrack
+                          ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                          : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
+                      }`}
+                    >
+                      {g.goalName}: {g.stillOnTrack ? 'On Track' : `+${g.delayDays}d delay`}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-[11px] text-slate-500">No active goals affected.</span>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Gen Z Trade-off Translator */}

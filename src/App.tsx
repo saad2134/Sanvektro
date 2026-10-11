@@ -95,8 +95,8 @@ export function AppContent() {
 
   const diff = useMemo(() => {
     if (!simulationDraft || !simulatedMetrics) return null;
-    return calculateConsequenceDiff(baselineMetrics, simulatedMetrics, simulationDraft.amount);
-  }, [baselineMetrics, simulatedMetrics, simulationDraft]);
+    return calculateConsequenceDiff(baselineMetrics, simulatedMetrics, simulationDraft.amount, financialState);
+  }, [baselineMetrics, simulatedMetrics, simulationDraft, financialState]);
 
   const trajectoryPoints = useMemo(() => {
     return generateTrajectoryPoints(financialState, simulationDraft);

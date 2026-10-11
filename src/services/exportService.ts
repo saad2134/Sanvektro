@@ -98,3 +98,39 @@ export function printMonthlyStatement(): void {
     window.print();
   }
 }
+
+/**
+ * Safely parses and validates an exported JSON financial state file
+ */
+export function importStateFromJSON(rawJson: string): { valid: boolean; state?: FinancialState; error?: string } {
+  try {
+    const parsed = JSON.parse(rawJson);
+    const candidate = parsed.financialState ?? parsed;
+    
+    // Check for schema validity
+    if (!candidate || typeof candidate !== 'object') {
+      return { valid: false, error: 'JSON does not contain a valid financial state payload' };
+    }
+
+    if (
+      typeof candidate.startingBudget !== 'number' ||
+      typeof candidate.currentDay !== 'number' ||
+      !Array.isArray(candidate.transactions) ||
+      !Array.isArray(candidate.commitments) ||
+      !Array.isArray(candidate.subscriptions) ||
+      !Array.isArray(candidate.savingsGoals)
+    ) {
+      return { valid: false, error: 'State payload is missing required schema fields' };
+    }
+
+    return {
+      valid: true,
+      state: candidate as FinancialState
+    };
+  } catch (err) {
+    return {
+      valid: false,
+      error: err instanceof Error ? err.message : 'Invalid JSON string'
+    };
+  }
+}

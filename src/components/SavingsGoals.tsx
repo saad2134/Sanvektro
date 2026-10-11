@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { SavingsGoal, FinancialState } from '../types/finance';
-import { calculateSavingsLockboxRipple } from '../utils/calculations';
-import { Target, Plus, CheckCircle2, Lock, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { calculateSavingsLockboxRipple, calculateGoalFeasibility } from '../utils/calculations';
+import { Target, Plus, CheckCircle2, Lock, ShieldCheck, AlertTriangle, Clock } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface SavingsGoalsProps {
@@ -25,6 +25,9 @@ export const SavingsGoals: React.FC<SavingsGoalsProps> = ({
   const lockboxRipple = financialState
     ? calculateSavingsLockboxRipple(financialState, lockboxAmount)
     : null;
+
+  const currentDailyAllowance = lockboxRipple?.currentDailyAllowance ?? 250;
+  const currentDay = financialState?.currentDay ?? 1;
 
   const handleContribute = (goal: SavingsGoal) => {
     const boost = 250;
@@ -74,6 +77,7 @@ export const SavingsGoals: React.FC<SavingsGoalsProps> = ({
           const progressPercent = Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100));
           const isComplete = goal.currentAmount >= goal.targetAmount;
           const isAtRisk = projectedSurplus < (goal.targetAmount - goal.currentAmount);
+          const feasibility = calculateGoalFeasibility(goal, currentDay, projectedSurplus, currentDailyAllowance);
 
           return (
             <div
@@ -105,13 +109,32 @@ export const SavingsGoals: React.FC<SavingsGoalsProps> = ({
                 </div>
 
                 {/* Progress bar */}
-                <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mb-3">
+                <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mb-2.5">
                   <div
                     className={`h-full transition-all duration-500 ${
                       isComplete ? 'bg-emerald-400' : isAtRisk ? 'bg-amber-400' : 'bg-cyan-400'
                     }`}
                     style={{ width: `${progressPercent}%` }}
                   />
+                </div>
+
+                {/* Feasibility horizon & pacing details */}
+                <div className="grid grid-cols-2 gap-1.5 py-1.5 px-2 rounded-lg bg-slate-950/60 border border-slate-800/80 mb-2.5 text-[10px] font-mono">
+                  <div>
+                    <span className="text-slate-500 block">Required Burn</span>
+                    <span className="text-slate-300 font-semibold">
+                      {isComplete ? 'Target Met' : `₹${feasibility.dailyRequired}/day`}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 flex items-center gap-1">
+                      <Clock className="w-2.5 h-2.5 text-slate-500" />
+                      Projected Finish
+                    </span>
+                    <span className={feasibility.projectedCompletionDay ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>
+                      {isComplete ? 'Achieved' : feasibility.projectedCompletionDay ? `Day ${feasibility.projectedCompletionDay}` : 'Next Cycle'}
+                    </span>
+                  </div>
                 </div>
               </div>
 

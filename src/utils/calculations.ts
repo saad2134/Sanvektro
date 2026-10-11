@@ -12,7 +12,8 @@ import type {
   ExpenseCategory,
   ScenarioComparison,
   DailyHeatmapPoint,
-  SavingsLockboxRipple
+  SavingsLockboxRipple,
+  SavingsGoal
 } from '../types/finance';
 
 /**
@@ -312,12 +313,72 @@ export function calculateMetrics(
 }
 
 /**
+ * Safe floating-point addition rounded to 2 decimal places.
+ */
+export function safeAdd(a: number, b: number): number {
+  return Math.round((a + b) * 100) / 100;
+}
+
+/**
+ * Safe floating-point subtraction rounded to 2 decimal places, never dropping below 0.
+ */
+export function safeSub(a: number, b: number): number {
+  return Math.max(0, Math.round((a - b) * 100) / 100);
+}
+
+/**
+ * Calculates feasibility metrics for a savings goal: daily required, completion horizon, and on-track status.
+ */
+export function calculateGoalFeasibility(
+  goal: SavingsGoal,
+  currentDay: number,
+  projectedSurplus: number,
+  dailyAllowance: number
+): {
+  dailyRequired: number;
+  projectedCompletionDay: number | null;
+  onTrack: boolean;
+} {
+  const remaining = Math.max(0, goal.targetAmount - goal.currentAmount);
+  if (remaining === 0) {
+    return {
+      dailyRequired: 0,
+      projectedCompletionDay: currentDay,
+      onTrack: true
+    };
+  }
+
+  const daysLeft = Math.max(1, goal.targetDay - currentDay);
+  const dailyRequired = Math.ceil(remaining / daysLeft);
+  const onTrack = projectedSurplus >= remaining;
+
+  let projectedCompletionDay: number | null = null;
+  if (dailyAllowance > 0) {
+    // Sustainable daily savings allocation (20% of safe daily allowance, min ₹25/day)
+    const dailyAllocationRate = Math.max(25, Math.round(dailyAllowance * 0.2));
+    const daysToFinish = Math.ceil(remaining / dailyAllocationRate);
+    const estimatedDay = currentDay + daysToFinish;
+    if (estimatedDay <= 30) {
+      projectedCompletionDay = estimatedDay;
+    }
+  }
+
+  return {
+    dailyRequired,
+    projectedCompletionDay,
+    onTrack
+  };
+}
+
+/**
  * Calculates consequence differences between baseline and a simulated transaction.
+ * Includes severity classification, committed bills protection buffer, and affected goals.
  */
 export function calculateConsequenceDiff(
   baseline: ConsequenceMetrics,
   simulated: ConsequenceMetrics,
-  draftAmount: number
+  draftAmount: number,
+  state?: FinancialState
 ): ConsequenceDiff {
   const balanceDelta = simulated.balance - baseline.balance;
   const allowanceDelta = simulated.dailyAllowance - baseline.dailyAllowance;
@@ -349,6 +410,55 @@ export function calculateConsequenceDiff(
     tradeOffSummary += ` Shortens monthly runway by ${Math.abs(runwayDeltaDays)} days.`;
   }
 
+  // Multi-tier Consequence Severity Classification
+  let severity: 'NEGLIGIBLE' | 'MODERATE' | 'SEVERE' | 'CRITICAL' = 'NEGLIGIBLE';
+  if (simulated.runwayDepletionDay !== null || simulated.balance < 0 || simulated.dailyAllowance <= 40) {
+    severity = 'CRITICAL';
+  } else if (healthScoreDelta <= -15 || riskChanged || simulated.goalsAchievableCount < baseline.goalsAchievableCount || simulated.dailyAllowance < 75) {
+    severity = 'SEVERE';
+  } else if (healthScoreDelta <= -6 || allowanceDelta <= -25) {
+    severity = 'MODERATE';
+  } else {
+    severity = 'NEGLIGIBLE';
+  }
+
+  // Committed Recurring Bills Protection Buffer
+  let committedBillsBuffer = Math.max(0, simulated.balance);
+  const affectedGoals: {
+    goalId: string;
+    goalName: string;
+    delayDays: number;
+    stillOnTrack: boolean;
+  }[] = [];
+
+  if (state) {
+    const pendingCommitments = state.commitments
+      .filter(c => c.dueDay > state.currentDay && !c.isPaid)
+      .reduce((s, c) => s + c.amount, 0);
+
+    const pendingSubs = state.subscriptions
+      .filter(s => s.isActive && s.billingDay > state.currentDay)
+      .reduce((sum, sub) => sum + sub.amount, 0);
+
+    const totalUpcomingBills = pendingCommitments + pendingSubs;
+    committedBillsBuffer = Math.max(0, simulated.balance - totalUpcomingBills);
+
+    // Track goal impact ripple
+    state.savingsGoals.forEach(goal => {
+      const remainingTarget = Math.max(0, goal.targetAmount - goal.currentAmount);
+      const isCompromised = simulated.projectedDay30Balance < remainingTarget && baseline.projectedDay30Balance >= remainingTarget;
+      const delayDays = isCompromised ? Math.min(10, Math.ceil((draftAmount / Math.max(1, simulated.dailyAllowance)) * 0.5)) : 0;
+      const stillOnTrack = simulated.projectedDay30Balance >= remainingTarget;
+
+      affectedGoals.push({
+        goalId: goal.id,
+        goalName: goal.name,
+        delayDays,
+        stillOnTrack
+      });
+    });
+  }
+
   return {
     balanceDelta,
     allowanceDelta,
@@ -358,7 +468,10 @@ export function calculateConsequenceDiff(
     newRisk: simulated.riskLevel,
     runwayDeltaDays,
     impactVerdict,
-    tradeOffSummary
+    tradeOffSummary,
+    severity,
+    committedBillsBuffer,
+    affectedGoals
   };
 }
 
@@ -819,7 +932,7 @@ export function generateComparisonScenarios(
     day: currentDay
   };
   const metricsBuyNow = calculateMetrics(state, draftBuyNow);
-  const diffBuyNow = calculateConsequenceDiff(baseline, metricsBuyNow, originalAmount);
+  const diffBuyNow = calculateConsequenceDiff(baseline, metricsBuyNow, originalAmount, state);
 
   // Scenario B: Delay 14 Days
   const delayedDay = Math.min(30, currentDay + 14);
@@ -830,7 +943,7 @@ export function generateComparisonScenarios(
     day: delayedDay
   };
   const metricsDelay = calculateMetrics(state, draftDelay);
-  const diffDelay = calculateConsequenceDiff(baseline, metricsDelay, originalAmount);
+  const diffDelay = calculateConsequenceDiff(baseline, metricsDelay, originalAmount, state);
 
   // Scenario C: Smart Alternative (-55%)
   const altAmount = Math.round(originalAmount * 0.45);
@@ -841,7 +954,7 @@ export function generateComparisonScenarios(
     day: currentDay
   };
   const metricsAlt = calculateMetrics(state, draftAlt);
-  const diffAlt = calculateConsequenceDiff(baseline, metricsAlt, altAmount);
+  const diffAlt = calculateConsequenceDiff(baseline, metricsAlt, altAmount, state);
 
   return [
     {

@@ -490,6 +490,72 @@ describe('Sanvektro Financial Calculations Engine', () => {
       audit.pillars.resilience.weightPct;
     expect(totalWeight).toBe(100);
   });
+
+  it('guarantees safe floating-point arithmetic with safeAdd and safeSub', async () => {
+    const { safeAdd, safeSub } = await import('../utils/calculations');
+    expect(safeAdd(0.1, 0.2)).toBe(0.3);
+    expect(safeAdd(199.99, 0.01)).toBe(200);
+    expect(safeSub(100, 30.5)).toBe(69.5);
+    expect(safeSub(10, 20)).toBe(0); // clamped at zero floor
+  });
+
+  it('calculates savings goal feasibility horizon and daily required amounts', async () => {
+    const { calculateGoalFeasibility } = await import('../utils/calculations');
+    const activeGoal = {
+      id: 'g1',
+      name: 'Goa Trip Fund',
+      targetAmount: 3000,
+      currentAmount: 2400,
+      targetDay: 25,
+      emoji: '🏖️',
+      priority: 'HIGH' as const
+    };
+
+    const feasibility = calculateGoalFeasibility(activeGoal, 10, 2500, 200);
+    expect(feasibility.dailyRequired).toBe(Math.ceil(600 / 15)); // ₹40/day
+    expect(feasibility.onTrack).toBe(true); // 2500 surplus >= 600 needed
+    expect(feasibility.projectedCompletionDay).toBe(25);
+
+    // Far goal that exceeds 30-day horizon
+    const farGoal = { ...activeGoal, currentAmount: 200 };
+    const farFeas = calculateGoalFeasibility(farGoal, 10, 500, 200);
+    expect(farFeas.projectedCompletionDay).toBeNull();
+
+    // Completed goal
+    const completedGoal = { ...activeGoal, currentAmount: 3000 };
+    const completedFeas = calculateGoalFeasibility(completedGoal, 10, 2500, 200);
+    expect(completedFeas.dailyRequired).toBe(0);
+    expect(completedFeas.projectedCompletionDay).toBe(10);
+    expect(completedFeas.onTrack).toBe(true);
+  });
+
+  it('classifies consequence diff severity and computes committed bills protection buffer', () => {
+    const baseline = calculateMetrics(DEFAULT_HOSTEL_HUSTLER);
+    
+    // Minor expense: ₹100
+    const minorDraft: SimulationDraft = {
+      title: 'Cafe Chai',
+      amount: 100,
+      category: 'Food & Dining',
+      day: DEFAULT_HOSTEL_HUSTLER.currentDay
+    };
+    const minorSim = calculateMetrics(DEFAULT_HOSTEL_HUSTLER, minorDraft);
+    const minorDiff = calculateConsequenceDiff(baseline, minorSim, minorDraft.amount, DEFAULT_HOSTEL_HUSTLER);
+    expect(minorDiff.severity).toBe('NEGLIGIBLE');
+    expect(minorDiff.committedBillsBuffer).toBeGreaterThan(0);
+    expect(minorDiff.affectedGoals.length).toBe(DEFAULT_HOSTEL_HUSTLER.savingsGoals.length);
+
+    // Critical expense: ₹8,000
+    const majorDraft: SimulationDraft = {
+      title: 'Luxury Watch',
+      amount: 8000,
+      category: 'Shopping & Quick-Commerce',
+      day: DEFAULT_HOSTEL_HUSTLER.currentDay
+    };
+    const majorSim = calculateMetrics(DEFAULT_HOSTEL_HUSTLER, majorDraft);
+    const majorDiff = calculateConsequenceDiff(baseline, majorSim, majorDraft.amount, DEFAULT_HOSTEL_HUSTLER);
+    expect(['SEVERE', 'CRITICAL']).toContain(majorDiff.severity);
+  });
 });
 
 

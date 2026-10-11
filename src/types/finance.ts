@@ -38,6 +38,9 @@ export interface SavingsGoal {
   targetDay: number;
   emoji: string;
   priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  dailyRequired?: number;
+  projectedCompletionDay?: number | null;
+  onTrack?: boolean;
 }
 
 export interface Transaction {
@@ -102,6 +105,14 @@ export interface ConsequenceDiff {
   runwayDeltaDays: number;
   impactVerdict: string;
   tradeOffSummary: string;
+  severity: 'NEGLIGIBLE' | 'MODERATE' | 'SEVERE' | 'CRITICAL';
+  committedBillsBuffer: number;
+  affectedGoals: {
+    goalId: string;
+    goalName: string;
+    delayDays: number;
+    stillOnTrack: boolean;
+  }[];
 }
 
 export interface PersonaPreset {
