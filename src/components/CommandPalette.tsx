@@ -319,14 +319,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   });
 
   useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
-
-  useEffect(() => {
     if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-      setQuery('');
-      setSelectedIndex(0);
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+        setQuery('');
+        setSelectedIndex(0);
+      }, 50);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -382,7 +381,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             aria-autocomplete="list"
             placeholder="Type a command, simulate expense, switch persona, or jump to section..."
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
             className="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none font-medium"
           />
           <button

@@ -19,11 +19,7 @@ export const TheLens: React.FC<TheLensProps> = ({ isActive, onToggle }) => {
   const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
-    if (!isActive) {
-      setLensData(null);
-      setIsHovering(false);
-      return;
-    }
+    if (!isActive) return;
 
     let rafId: number;
 

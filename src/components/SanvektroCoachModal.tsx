@@ -43,23 +43,21 @@ export const SanvektroCoachModal: React.FC<SanvektroCoachModalProps> = ({
   onStageSimulation
 }) => {
   const [query, setQuery] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const msgCounterRef = useRef(0);
+  const [messages, setMessages] = useState<Message[]>(() => [
+    {
+      id: 'init-coach',
+      sender: 'assistant',
+      text: `Hey! I'm your Sanvektro Decision Coach. I evaluate your financial dilemmas directly against your ₹${state.startingBudget.toLocaleString('en-IN')} budget, ₹${metrics.dailyAllowance}/day safe allowance, and ₹${metrics.balance.toLocaleString('en-IN')} liquid cash. Click a dilemma below or type any purchase question!`
+    }
+  ]);
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize greeting on open
   useEffect(() => {
     if (isOpen) {
-      if (messages.length === 0) {
-        setMessages([
-          {
-            id: 'init-coach',
-            sender: 'assistant',
-            text: `Hey! I'm your Sanvektro Decision Coach. I evaluate your financial dilemmas directly against your ₹${state.startingBudget.toLocaleString('en-IN')} budget, ₹${metrics.dailyAllowance}/day safe allowance, and ₹${metrics.balance.toLocaleString('en-IN')} liquid cash. Click a dilemma below or type any purchase question!`
-          }
-        ]);
-      }
-      setTimeout(() => inputRef.current?.focus(), 150);
+      const timer = setTimeout(() => inputRef.current?.focus(), 150);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -67,21 +65,21 @@ export const SanvektroCoachModal: React.FC<SanvektroCoachModalProps> = ({
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  if (!isOpen) return null;
-
   const handleSend = (userText: string) => {
     if (!userText.trim()) return;
 
     const evaluation = evaluateCoachQuery(state, userText, metrics);
 
+    msgCounterRef.current += 1;
     const userMsg: Message = {
-      id: `usr-${Date.now()}`,
+      id: `usr-${msgCounterRef.current}`,
       sender: 'user',
       text: userText
     };
 
+    msgCounterRef.current += 1;
     const botMsg: Message = {
-      id: `bot-${Date.now() + 1}`,
+      id: `bot-${msgCounterRef.current}`,
       sender: 'assistant',
       text: evaluation.response,
       evaluation
@@ -104,6 +102,8 @@ export const SanvektroCoachModal: React.FC<SanvektroCoachModalProps> = ({
     onStageSimulation(draft);
     onClose();
   };
+
+  if (!isOpen) return null;
 
   return (
     <div 

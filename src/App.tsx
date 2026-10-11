@@ -349,7 +349,7 @@ export function AppContent() {
       setIsCommandPaletteOpen(false);
       setIsCoachOpen(false);
     }
-  }), [financialState, simulatedMetrics, baselineMetrics, handleDayChange, handleSelectPreset, handleToggleMute, handleFocusSimulator, playToggle]);
+  }), [financialState, simulatedMetrics, baselineMetrics, handleDayChange, handleSelectPreset, handleToggleMute, handleFocusSimulator]);
 
   useKeyboardShortcuts(shortcutActions);
 
