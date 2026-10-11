@@ -629,6 +629,36 @@ describe('Sanvektro Financial Calculations Engine', () => {
     expect(strainedPersonality.id).toBe('thrillseeker');
     expect(strainedPersonality.traits.riskVelocity).toBeGreaterThanOrEqual(50);
   });
+
+  it('calculates 7-day forward cash pressure radar for scheduled obligations', async () => {
+    const { calculateCashPressureRadar } = await import('../utils/calculations');
+
+    const sampleCommitments = [
+      { id: 'c1', name: 'Hostel Wi-Fi', amount: 400, dueDay: 14, category: 'Utilities', isPaid: false, essential: true },
+      { id: 'c2', name: 'Mess Food Fee', amount: 2200, dueDay: 16, category: 'Food', isPaid: false, essential: true },
+      { id: 'c3', name: 'Gym Pass', amount: 500, dueDay: 28, category: 'Fitness', isPaid: false, essential: false },
+      { id: 'c4', name: 'Early Paid Bill', amount: 800, dueDay: 12, category: 'Bills', isPaid: true, essential: true }
+    ];
+
+    // Current day = Day 10 (window is Day 11 to 17)
+    // Bills in window: c1 (Day 14, ₹400), c2 (Day 16, ₹2200). Total = ₹2600 (> ₹2000 => ALERT)
+    const radarAtDay10 = calculateCashPressureRadar(sampleCommitments, 10);
+    expect(radarAtDay10.upcoming7DaysTotal).toBe(2600);
+    expect(radarAtDay10.upcomingCount).toBe(2);
+    expect(radarAtDay10.status).toBe('ALERT');
+    expect(radarAtDay10.nextDueItem?.name).toBe('Hostel Wi-Fi');
+    expect(radarAtDay10.nextDueItem?.dueDay).toBe(14);
+    expect(radarAtDay10.descriptor).toContain('Severe Cash Pressure');
+
+    // Current day = Day 17 (window is Day 18 to 24)
+    // No bills in window (c3 is Day 28)
+    const radarAtDay17 = calculateCashPressureRadar(sampleCommitments, 17);
+    expect(radarAtDay17.upcoming7DaysTotal).toBe(0);
+    expect(radarAtDay17.upcomingCount).toBe(0);
+    expect(radarAtDay17.status).toBe('CLEAR');
+    expect(radarAtDay17.nextDueItem).toBeNull();
+    expect(radarAtDay17.descriptor).toContain('Clear Horizon');
+  });
 });
 
 

@@ -248,4 +248,10 @@ export interface MoneyPersonality {
     riskVelocity: number;
   };
 }
-
+export interface CashPressureRadar {
+  upcoming7DaysTotal: number;
+  upcomingCount: number;
+  nextDueItem: { name: string; amount: number; dueDay: number } | null;
+  status: 'CLEAR' | 'WATCH' | 'ALERT';
+  descriptor: string;
+}

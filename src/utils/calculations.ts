@@ -14,7 +14,9 @@ import type {
   DailyHeatmapPoint,
   SavingsLockboxRipple,
   SavingsGoal,
-  MoneyPersonality
+  MoneyPersonality,
+  Commitment,
+  CashPressureRadar
 } from '../types/finance';
 
 /**
@@ -1221,6 +1223,50 @@ export function calculateMoneyPersonality(
       frugalEngineering: Math.min(45, frugalEngineering),
       riskVelocity: Math.max(70, riskVelocity)
     }
+  };
+}
+
+/**
+ * Calculates a forward-looking 7-day cash pressure radar for scheduled obligations.
+ * Flags upcoming due dates, cumulative burden, and liquidity pressure status.
+ */
+export function calculateCashPressureRadar(
+  commitments: Commitment[],
+  currentDay: number
+): CashPressureRadar {
+  const upcoming7Days = commitments.filter(
+    c => !c.isPaid && c.dueDay > currentDay && c.dueDay <= currentDay + 7
+  );
+
+  const upcoming7DaysTotal = upcoming7Days.reduce((sum, c) => sum + c.amount, 0);
+  const upcomingCount = upcoming7Days.length;
+
+  const sortedUpcoming = [...upcoming7Days].sort((a, b) => a.dueDay - b.dueDay);
+  const nextDue = sortedUpcoming.length > 0 ? sortedUpcoming[0] : null;
+
+  const nextDueItem = nextDue ? {
+    name: nextDue.name,
+    amount: nextDue.amount,
+    dueDay: nextDue.dueDay
+  } : null;
+
+  let status: 'CLEAR' | 'WATCH' | 'ALERT' = 'CLEAR';
+  let descriptor = 'Clear Horizon ✦ Zero obligations due in the next 7 days';
+
+  if (upcoming7DaysTotal > 2000) {
+    status = 'ALERT';
+    descriptor = `Severe Cash Pressure ✦ ₹${upcoming7DaysTotal.toLocaleString('en-IN')} due within 7 days`;
+  } else if (upcoming7DaysTotal > 0) {
+    status = 'WATCH';
+    descriptor = `Moderate Pacing ✦ ₹${upcoming7DaysTotal.toLocaleString('en-IN')} due across ${upcomingCount} upcoming bill${upcomingCount === 1 ? '' : 's'}`;
+  }
+
+  return {
+    upcoming7DaysTotal,
+    upcomingCount,
+    nextDueItem,
+    status,
+    descriptor
   };
 }
 
