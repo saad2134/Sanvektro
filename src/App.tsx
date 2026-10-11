@@ -373,6 +373,7 @@ export function AppContent() {
             {/* The Core Feature: "What-If" Decision Simulator Sandbox */}
             <DecisionSimulator
               currentDay={financialState.currentDay}
+              financialState={financialState}
               baselineMetrics={baselineMetrics}
               simulatedMetrics={simulatedMetrics}
               diff={diff}

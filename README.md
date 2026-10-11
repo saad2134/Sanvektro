@@ -19,7 +19,8 @@
 
 ## ✨ Key Features
 
-- 🧪 **"What-If" Decision Simulator (Pre-Spend Sandbox)** ✦ Stage discretionary expenses (e.g., ₹480 Swiggy treat, ₹1,500 concert ticket, ₹999 thrift drop) before committing to preview immediate ripple effects on your daily allowance, savings goals, monthly forecast, and financial health score.
+- 🧪 **"What-If" Decision Simulator (Pre-Spend Sandbox)** ✦ Stage discretionary expenses (e.g., ₹480 Swiggy treat, ₹1,500 headphones, ₹2,200 sneaker drop) before committing to preview immediate ripple effects on your daily allowance, savings goals, monthly forecast, and financial health score. Includes **9 curated Gen Z impulse presets**.
+- 🔀 **3-Way Strategic Decision Comparison Matrix** ✦ Side-by-side consequence preview comparing **Scenario A (Buy Now)** vs **Scenario B (Delay 14 Days to protect liquidity)** vs **Scenario C (Smart Alternative ✦ -55% thrift discount)** with 1-click scenario adoption.
 - 🎛️ **4-Pillar Financial Health Cockpit** ✦ Real-time tracking of Liquid Balance, Dynamic Safe Daily Burn Allowance, Composite Financial Health Score (0-100), and 4-tier Financial Risk Classification (Optimal, Moderate, Elevated, Critical).
 - 🗓️ **30-Day Calendar Time Scrubber** ✦ Move between Day 1 and Day 30 manually or activate Auto-Advance playback to watch compounding cashflow, scheduled commitment settlements, and subscription billings trigger in real time.
 - 📈 **Interactive 30-Day Trajectory Forecast Curve** ✦ High-resolution SVG burn chart comparing actual cash trajectory against a safe corridor band, projected month-end balance, and pulsing simulated delta paths.
@@ -31,14 +32,14 @@
 - 📊 **30-Day Capital Allocation Corridor** ✦ Interactive stacked visual breakdown showing Spent to Date, Locked in Goals, Reserved for Bills, and Safe Discretionary Cushion.
 - 🩺 **"Audit Math" Health Diagnostics Modal** ✦ Clickable 4-pillar algorithmic audit detailing exact point scores, positive health highlights, and active diagnostic risk flags.
 - 🚨 **Dynamic Deficit & Solvency Alert Banner** ✦ Real-time alert banner warning of liquid cash shortfalls or runway exhaustion with instant sandbox fix actions.
-- 🗂️ **Outflow by Category Spend Breakdown** ✦ Aggregated distribution across Food & Dining, Transit, Shopping, and Tech with percentage meters and transaction counts.
+- 🗂️ **Category Budget Limits & Outflow Pacing** ✦ Per-category spending allocations vs actual burn with ARIA-accessible progress bars, 80% amber threshold alerts, and >100% overspend indicators.
 - 💡 **Actionable Optimization Recommendations** ✦ Context-aware levers providing calculated daily runway gains (e.g., *"Trimming 15% off Food & Dining lifts daily allowance by +₹7/day"*).
 - 🔄 **Bidirectional Savings Goal Actions** ✦ Micro-contributions with confetti milestones and safe fund unlocks back into the liquid wallet.
 - 🔊 **Web Audio Synthesizer Haptics** ✦ Zero-latency acoustic feedback using browser Web Audio oscillators for tactile timeline clicks, goal fanfare chimes, and warning alerts with one-click mute.
 - ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
 - 💾 **Multi-Format Financial Exports** ✦ Instant export to Tabular CSV (30-day transactions), Full State JSON (audit logs & metrics), and formatted physical Print Statement.
 - 🛡️ **Defensive Security & Prototype Pollution Shield** ✦ DOMPurify XSS scrubbing on all user inputs, prototype pollution defense, bounded arithmetic clamping, and top-level ErrorBoundary resilience.
-- 🧪 **Vitest Unit & Integration Test Suite** ✦ 17 automated test suites covering financial calculations, capital allocation, security sanitization, and fault recovery.
+- 🧪 **Vitest Unit & Integration Test Suite** ✦ 26 automated tests across 4 suites covering mathematical invariants, 3-way scenario comparisons, category budget caps, security sanitization, and fault recovery.
 
 ---
 

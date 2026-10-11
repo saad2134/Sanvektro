@@ -1,6 +1,6 @@
 import React from 'react';
 import type { CategoryOutflow } from '../types/finance';
-import { Layers } from 'lucide-react';
+import { Layers, AlertCircle, ShieldAlert } from 'lucide-react';
 
 interface CategoryBreakdownProps {
   outflows: CategoryOutflow[];
@@ -11,28 +11,33 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
   outflows,
   totalSpent
 }) => {
+  const totalBudgetCap = outflows.reduce((sum, o) => sum + o.budgetCap, 0);
+  const totalPacingPct = totalBudgetCap > 0 ? Math.round((totalSpent / totalBudgetCap) * 100) : 0;
+
   return (
     <div className="bg-[#0b0f19] border border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-xl relative overflow-hidden">
-      <div className="flex items-center justify-between gap-2 mb-3.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 aspect-square rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
             <Layers className="w-4 h-4" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-white font-['Plus_Jakarta_Sans'] m-0 flex items-center gap-2">
-              <span>Outflow by Category</span>
+              <span>Category Budget Limits & Outflow</span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                ₹{totalSpent.toLocaleString('en-IN')} Total
+                ₹{totalSpent.toLocaleString('en-IN')} / ₹{totalBudgetCap.toLocaleString('en-IN')}
               </span>
             </h3>
             <p className="text-[11px] text-slate-400">
-              Aggregated distribution across realized expenditure channels
+              Pacing caps vs actual burn with 80% amber alerts and 100% cap breach warnings
             </p>
           </div>
         </div>
-        <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
-          {outflows.length} active categories
-        </span>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-slate-300">
+            {totalPacingPct}% Total Utilization
+          </span>
+        </div>
       </div>
 
       {/* Multi-color category distribution strip */}
@@ -52,35 +57,75 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
             ))}
           </div>
 
-          <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-            {outflows.map((outflow, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between p-2 rounded-xl bg-slate-900/60 border border-slate-800/60 text-xs hover:border-slate-700/80 transition-colors"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div
-                    className="w-2.5 h-2.5 aspect-square rounded-[4px] shrink-0"
-                    style={{ backgroundColor: outflow.color }}
-                  />
-                  <div className="truncate">
-                    <span className="font-medium text-slate-200">{outflow.category}</span>
-                    <span className="text-[10px] text-slate-500 ml-1.5 font-mono">
-                      ({outflow.transactionCount} {outflow.transactionCount === 1 ? 'tx' : 'txs'})
-                    </span>
+          <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+            {outflows.map((outflow, idx) => {
+              const capRatio = Math.min(100, outflow.utilizationPct);
+              return (
+                <div
+                  key={idx}
+                  className={`p-2.5 rounded-xl border transition-colors ${
+                    outflow.isOverBudget
+                      ? 'bg-rose-950/20 border-rose-500/30'
+                      : outflow.isNearBudget
+                      ? 'bg-amber-950/20 border-amber-500/30'
+                      : 'bg-slate-900/60 border-slate-800/60 hover:border-slate-700/80'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 text-xs mb-1.5">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div
+                        className="w-2.5 h-2.5 aspect-square rounded-[4px] shrink-0"
+                        style={{ backgroundColor: outflow.color }}
+                      />
+                      <div className="truncate flex items-center gap-1.5">
+                        <span className="font-semibold text-slate-200">{outflow.category}</span>
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          ({outflow.transactionCount} {outflow.transactionCount === 1 ? 'tx' : 'txs'})
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 font-mono">
+                      <span className="font-bold text-slate-100">
+                        ₹{outflow.amount.toLocaleString('en-IN')}
+                      </span>
+                      <span className="text-[10px] text-slate-400">
+                        / ₹{outflow.budgetCap.toLocaleString('en-IN')}
+                      </span>
+                      {outflow.isOverBudget ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
+                          <ShieldAlert className="w-3 h-3" />
+                          +₹{(outflow.amount - outflow.budgetCap).toLocaleString('en-IN')}
+                        </span>
+                      ) : outflow.isNearBudget ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                          <AlertCircle className="w-3 h-3" />
+                          {outflow.utilizationPct}%
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-500">
+                          {outflow.utilizationPct}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Micro progress bar towards category budget cap */}
+                  <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        outflow.isOverBudget
+                          ? 'bg-rose-500'
+                          : outflow.isNearBudget
+                          ? 'bg-amber-400'
+                          : 'bg-emerald-500/80'
+                      }`}
+                      style={{ width: `${capRatio}%` }}
+                    />
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2.5 shrink-0 font-mono">
-                  <span className="font-bold text-slate-100">
-                    ₹{outflow.amount.toLocaleString('en-IN')}
-                  </span>
-                  <span className="text-[10px] text-slate-400 w-8 text-right font-medium">
-                    {outflow.percentage}%
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </>
       ) : (
@@ -91,3 +136,4 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
     </div>
   );
 };
+

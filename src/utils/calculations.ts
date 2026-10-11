@@ -8,7 +8,8 @@ import type {
   CategoryOutflow,
   HealthScoreAudit,
   OptimizationTip,
-  ExpenseCategory
+  ExpenseCategory,
+  ScenarioComparison
 } from '../types/finance';
 
 /**
@@ -419,8 +420,19 @@ const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
   'Other': '#64748b'
 };
 
+export const CATEGORY_BUDGET_CAPS: Record<ExpenseCategory, number> = {
+  'Food & Dining': 3500,
+  'Transit & Commute': 1500,
+  'Shopping & Quick-Commerce': 1500,
+  'Entertainment & Social': 1000,
+  'Academic & Tech': 1000,
+  'Health & Emergency': 1000,
+  'Commitments': 2000,
+  'Other': 500
+};
+
 /**
- * Aggregates realized spending across categories with percentage distribution.
+ * Aggregates realized spending across categories with percentage distribution and budget cap utilization.
  */
 export function calculateCategoryOutflow(state: FinancialState): CategoryOutflow[] {
   const { transactions } = state;
@@ -441,12 +453,21 @@ export function calculateCategoryOutflow(state: FinancialState): CategoryOutflow
     const category = cat as ExpenseCategory;
     const amount = data?.amount ?? 0;
     const percentage = totalSpent > 0 ? Math.round((amount / totalSpent) * 100) : 0;
+    const budgetCap = CATEGORY_BUDGET_CAPS[category] || 1000;
+    const utilizationPct = budgetCap > 0 ? Math.round((amount / budgetCap) * 100) : 0;
+    const isOverBudget = amount > budgetCap;
+    const isNearBudget = !isOverBudget && utilizationPct >= 80;
+
     return {
       category,
       amount,
       percentage,
       transactionCount: data?.count ?? 0,
-      color: CATEGORY_COLORS[category] || '#64748b'
+      color: CATEGORY_COLORS[category] || '#64748b',
+      budgetCap,
+      utilizationPct,
+      isOverBudget,
+      isNearBudget
     };
   });
 
@@ -659,5 +680,88 @@ export function generateOptimizationTips(
   }
 
   return tips;
+}
+
+/**
+ * Generates 3 Isolated Comparison Scenarios for any draft expense:
+ * 1. Scenario A: Buy Now (immediate execution on current day)
+ * 2. Scenario B: Delay 14 Days (liquidity preservation; scheduled on Day min(30, currentDay + 14))
+ * 3. Scenario C: Smart Alternative (-55% thrift / curated refurbished discount at 45% price)
+ */
+export function generateComparisonScenarios(
+  state: FinancialState,
+  draft: SimulationDraft
+): ScenarioComparison[] {
+  const currentDay = state.currentDay || 1;
+  const originalAmount = Math.max(0, draft.amount);
+  const baseline = calculateMetrics(state, null);
+
+  // Scenario A: Buy Now
+  const draftBuyNow: SimulationDraft = {
+    title: `${draft.title} (Immediate)`,
+    amount: originalAmount,
+    category: draft.category,
+    day: currentDay
+  };
+  const metricsBuyNow = calculateMetrics(state, draftBuyNow);
+  const diffBuyNow = calculateConsequenceDiff(baseline, metricsBuyNow, originalAmount);
+
+  // Scenario B: Delay 14 Days
+  const delayedDay = Math.min(30, currentDay + 14);
+  const draftDelay: SimulationDraft = {
+    title: `${draft.title} (Deferred to Day ${delayedDay})`,
+    amount: originalAmount,
+    category: draft.category,
+    day: delayedDay
+  };
+  const metricsDelay = calculateMetrics(state, draftDelay);
+  const diffDelay = calculateConsequenceDiff(baseline, metricsDelay, originalAmount);
+
+  // Scenario C: Smart Alternative (-55%)
+  const altAmount = Math.round(originalAmount * 0.45);
+  const draftAlt: SimulationDraft = {
+    title: `${draft.title} (Curated Alternative ✦ -55%)`,
+    amount: altAmount,
+    category: draft.category,
+    day: currentDay
+  };
+  const metricsAlt = calculateMetrics(state, draftAlt);
+  const diffAlt = calculateConsequenceDiff(baseline, metricsAlt, altAmount);
+
+  return [
+    {
+      id: 'buy_now',
+      title: 'Scenario A ✦ Buy Now',
+      tagline: 'Immediate Execution',
+      description: `Spend ₹${originalAmount.toLocaleString('en-IN')} right now on Day ${currentDay}. Direct liquid reduction.`,
+      amount: originalAmount,
+      day: currentDay,
+      metrics: metricsBuyNow,
+      diff: diffBuyNow,
+      isRecommended: false
+    },
+    {
+      id: 'delay_14d',
+      title: 'Scenario B ✦ Delay 14 Days',
+      tagline: 'Liquidity Preservation',
+      description: `Defer purchase to Day ${delayedDay}. Protects immediate runway while scheduled bills and commitments clear.`,
+      amount: originalAmount,
+      day: delayedDay,
+      metrics: metricsDelay,
+      diff: diffDelay,
+      isRecommended: false
+    },
+    {
+      id: 'smart_alt',
+      title: 'Scenario C ✦ Smart Alternative (-55%)',
+      tagline: 'Optimized Value',
+      description: `Opt for a refurbished, thrifted, or coupon-discounted alternative at ₹${altAmount.toLocaleString('en-IN')}. Saves ₹${(originalAmount - altAmount).toLocaleString('en-IN')} instantly.`,
+      amount: altAmount,
+      day: currentDay,
+      metrics: metricsAlt,
+      diff: diffAlt,
+      isRecommended: true
+    }
+  ];
 }
 

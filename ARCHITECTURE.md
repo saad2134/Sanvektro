@@ -60,7 +60,7 @@ Sanvektro enforces strict separation of concerns across six decoupled architectu
 │ State immutability, optimistic draft sandboxing, hotkey dispatchers     │
 ├─────────────────────────────────────────────────────────────────────────┤
 │ Layer 3: Deterministic Financial Mathematics (calculations.ts)          │
-│ Pure functions, zero DOM dependencies, 17/17 automated test coverage    │
+│ Pure functions, zero DOM dependencies, 26/26 automated test coverage    │
 ├─────────────────────────────────────────────────────────────────────────┤
 │ Layer 4: Defensive Security & Input Sanitization (security.ts)          │
 │ DOMPurify XSS scrubbing, prototype pollution defense, range clamping   │
@@ -88,6 +88,8 @@ Sanvektro enforces strict separation of concerns across six decoupled architectu
 3. **Deterministic Financial Mathematics (`src/utils/calculations.ts`)**:
    - 100% pure TypeScript functions with zero side effects.
    - Computes daily safe-to-spend burn allowance, runway depletion day, shock resilience, and a 4-pillar composite health score (0 to 100).
+   - Generates 3-way isolated strategic scenario comparisons (`generateComparisonScenarios`).
+   - Tracks per-category budget caps vs actual spend with utilization pacing and 80%/100% alerts.
 
 4. **Defensive Security (`src/services/security.ts`)**:
    - Strict XSS protection via `DOMPurify` for all user-entered transaction titles, commitment labels, and categories.
@@ -185,19 +187,19 @@ Sanvektro includes a comprehensive test suite running under Vitest and `@testing
 
 | Test Suite | File Path | Focus & Assertions |
 |---|---|---|
-| **Financial Calculations & Analytics** | `src/__tests__/calculations.test.ts` | 8 tests: ₹10k budget baseline, safe burn allowance, consequence diffs, 30-day trajectory points, critical runway depletion risk, capital allocation distribution, category outflow aggregation, and 4-pillar health audit diagnostics. |
+| **Financial Calculations & Analytics** | `src/__tests__/calculations.test.ts` | 17 tests: ₹10k budget baseline, safe burn allowance, consequence diffs, 30-day trajectory points, critical runway depletion risk, capital allocation distribution, category outflow aggregation, 4-pillar health audit diagnostics, 3 isolated comparison scenarios, category budget caps & 80%/100% alerts, extreme deficit resilience, non-mutating simulation immutability, savings goal allocation integrity, subscription cancellation without fake income, realized expense/inflow balance updates, transaction editing runway recalculation, and transaction deletion liquidity restoration. |
 | **Defensive Security** | `src/__tests__/security.test.ts` | 4 tests: Prototype pollution detection, object cleansing, DOMPurify XSS stripping, and boundary number clamping. |
 | **Fault Recovery** | `src/__tests__/ErrorBoundary.test.tsx` | 2 tests: ErrorBoundary rendering, error capture, fallback display, and child recovery. |
 | **End-to-End App Integration** | `src/__tests__/App.test.tsx` | 3 tests: 4-pillar metric cards mounting, persona switching, and reactive consequence rendering. |
 
-To execute the test suite (17/17 tests passing):
+To execute the test suite (26/26 tests passing):
 ```bash
-npx vitest run
+npm test
 ```
 
 To execute full type checking and bundle production build:
 ```bash
-npm run build
+npm run ci
 ```
 
 ---

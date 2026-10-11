@@ -3,8 +3,10 @@ import type {
   SimulationDraft, 
   ExpenseCategory, 
   ConsequenceMetrics, 
-  ConsequenceDiff 
+  ConsequenceDiff,
+  FinancialState
 } from '../types/finance';
+import { generateComparisonScenarios } from '../utils/calculations';
 import { 
   SlidersHorizontal, 
   Sparkles, 
@@ -17,6 +19,7 @@ import {
 
 interface DecisionSimulatorProps {
   currentDay: number;
+  financialState?: FinancialState;
   baselineMetrics: ConsequenceMetrics;
   simulatedMetrics: ConsequenceMetrics | null;
   diff: ConsequenceDiff | null;
@@ -36,14 +39,19 @@ const CATEGORIES: ExpenseCategory[] = [
 
 const QUICK_SIMULATIONS = [
   { title: 'Swiggy Midnight Pizza Feast', amount: 480, category: 'Food & Dining' as ExpenseCategory },
-  { title: 'Weekend Rooftop Cafe with Friends', amount: 750, category: 'Entertainment & Social' as ExpenseCategory },
+  { title: 'Weekend Rooftop Cafe', amount: 750, category: 'Entertainment & Social' as ExpenseCategory },
   { title: 'Sneaker Drop Pre-order', amount: 2200, category: 'Shopping & Quick-Commerce' as ExpenseCategory },
-  { title: 'Concert Entry Pass', amount: 1500, category: 'Entertainment & Social' as ExpenseCategory },
-  { title: 'Blinkit Instant Grocery Run', amount: 320, category: 'Shopping & Quick-Commerce' as ExpenseCategory }
+  { title: 'ANC Wireless Headphones', amount: 1500, category: 'Academic & Tech' as ExpenseCategory },
+  { title: 'Blinkit Instant Grocery Run', amount: 320, category: 'Shopping & Quick-Commerce' as ExpenseCategory },
+  { title: 'OTT & Music Annual Pass', amount: 1199, category: 'Entertainment & Social' as ExpenseCategory },
+  { title: 'Screen Repair Emergency', amount: 1000, category: 'Health & Emergency' as ExpenseCategory },
+  { title: 'Concert VIP Pass', amount: 1800, category: 'Entertainment & Social' as ExpenseCategory },
+  { title: 'Late-Night Cab Surge', amount: 380, category: 'Transit & Commute' as ExpenseCategory }
 ];
 
 export const DecisionSimulator: React.FC<DecisionSimulatorProps> = ({
   currentDay,
+  financialState,
   baselineMetrics,
   simulatedMetrics,
   diff,
@@ -104,6 +112,9 @@ export const DecisionSimulator: React.FC<DecisionSimulatorProps> = ({
   };
 
   const isSimulating = simulationDraft !== null && simulationDraft.amount > 0 && simulatedMetrics !== null;
+  const comparisonScenarios = isSimulating && financialState && simulationDraft
+    ? generateComparisonScenarios(financialState, simulationDraft)
+    : [];
 
   return (
     <section 
@@ -311,6 +322,82 @@ export const DecisionSimulator: React.FC<DecisionSimulatorProps> = ({
               {diff.tradeOffSummary}
             </div>
           </div>
+
+          {/* 3 Isolated Strategic Scenarios Comparison */}
+          {comparisonScenarios.length > 0 && (
+            <div className="mt-5 pt-4 border-t border-slate-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-400 m-0">
+                    3-Way Strategic Decision Comparison
+                  </h4>
+                </div>
+                <span className="text-[11px] text-slate-400">
+                  Side-by-side consequence preview of alternative paths
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {comparisonScenarios.map(sc => (
+                  <div
+                    key={sc.id}
+                    className={`p-3.5 rounded-xl border flex flex-col justify-between transition-all ${
+                      sc.isRecommended
+                        ? 'bg-emerald-950/20 border-emerald-500/40 shadow-lg shadow-emerald-500/10 ring-1 ring-emerald-500/20'
+                        : 'bg-slate-950/70 border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-1 mb-1">
+                        <span className="text-xs font-bold text-white truncate">{sc.title}</span>
+                        {sc.isRecommended && (
+                          <span className="text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
+                            Recommended
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-400 line-clamp-2 mb-3 leading-relaxed">
+                        {sc.description}
+                      </p>
+
+                      <div className="space-y-1.5 bg-slate-900/70 p-2.5 rounded-lg border border-slate-800/80 mb-3 text-xs font-mono">
+                        <div className="flex justify-between items-center text-slate-300">
+                          <span className="text-[10px] text-slate-400">Execution Day:</span>
+                          <span className="font-bold text-white">Day {sc.day}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-slate-300">
+                          <span className="text-[10px] text-slate-400">Cost:</span>
+                          <span className="font-bold text-slate-100">₹{sc.amount.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-slate-300">
+                          <span className="text-[10px] text-slate-400">Daily Allowance:</span>
+                          <span className="text-emerald-400 font-bold">₹{sc.metrics.dailyAllowance}/day</span>
+                        </div>
+                        <div className="flex justify-between items-center text-slate-300">
+                          <span className="text-[10px] text-slate-400">Month-End Finish:</span>
+                          <span className="text-cyan-400 font-bold">₹{sc.metrics.projectedDay30Balance}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => triggerSimulation(sc.title, sc.amount, category, sc.day)}
+                      id={`btn-stage-scenario-${sc.id}`}
+                      className={`w-full py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                        sc.isRecommended
+                          ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md shadow-emerald-500/20'
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
+                      }`}
+                    >
+                      <span>Stage This Path</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Action buttons */}
           <div className="mt-4 flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-slate-800">

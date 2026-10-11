@@ -126,6 +126,22 @@ export interface CategoryOutflow {
   percentage: number;
   transactionCount: number;
   color: string;
+  budgetCap: number;
+  utilizationPct: number;
+  isOverBudget: boolean;
+  isNearBudget: boolean;
+}
+
+export interface ScenarioComparison {
+  id: 'buy_now' | 'delay_14d' | 'smart_alt';
+  title: string;
+  tagline: string;
+  description: string;
+  amount: number;
+  day: number;
+  metrics: ConsequenceMetrics;
+  diff: ConsequenceDiff;
+  isRecommended?: boolean;
 }
 
 export interface PillarScore {

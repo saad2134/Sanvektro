@@ -104,5 +104,210 @@ describe('Sanvektro Financial Calculations Engine', () => {
     expect(audit.positiveHighlights.length).toBeGreaterThan(0);
     expect(tips.length).toBeGreaterThan(0);
   });
+
+  it('generates 3 isolated strategic scenarios for any draft expense', async () => {
+    const { generateComparisonScenarios } = await import('../utils/calculations');
+    const draft: SimulationDraft = {
+      title: 'Sneaker Drop Pre-order',
+      amount: 2000,
+      category: 'Shopping & Quick-Commerce',
+      day: DEFAULT_HOSTEL_HUSTLER.currentDay
+    };
+
+    const scenarios = generateComparisonScenarios(DEFAULT_HOSTEL_HUSTLER, draft);
+    expect(scenarios).toHaveLength(3);
+
+    const [scenarioA, scenarioB, scenarioC] = scenarios;
+    // Scenario A: Buy Now (full price today)
+    expect(scenarioA.id).toBe('buy_now');
+    expect(scenarioA.amount).toBe(2000);
+    expect(scenarioA.day).toBe(DEFAULT_HOSTEL_HUSTLER.currentDay);
+    expect(scenarioA.isRecommended).toBe(false);
+
+    // Scenario B: Delay 14 Days (full price at day + 14)
+    expect(scenarioB.id).toBe('delay_14d');
+    expect(scenarioB.amount).toBe(2000);
+    expect(scenarioB.day).toBe(Math.min(30, DEFAULT_HOSTEL_HUSTLER.currentDay + 14));
+    expect(scenarioB.metrics.balance).toBe(calculateMetrics(DEFAULT_HOSTEL_HUSTLER).balance); // current liquid balance untouched today!
+
+    // Scenario C: Smart Alternative (-55% price = 45% of 2000 = 900)
+    expect(scenarioC.id).toBe('smart_alt');
+    expect(scenarioC.amount).toBe(900);
+    expect(scenarioC.day).toBe(DEFAULT_HOSTEL_HUSTLER.currentDay);
+    expect(scenarioC.isRecommended).toBe(true);
+    expect(scenarioC.metrics.dailyAllowance).toBeGreaterThan(scenarioA.metrics.dailyAllowance);
+  });
+
+  it('computes category budget caps and triggers 80% amber and 100% breach flags', async () => {
+    const { calculateCategoryOutflow } = await import('../utils/calculations');
+    
+    // State with Food spending exceeding budget cap
+    const overspentState: FinancialState = {
+      ...DEFAULT_HOSTEL_HUSTLER,
+      transactions: [
+        { id: 'tx-food-1', title: 'Luxury Dineout', amount: 3800, day: 2, category: 'Food & Dining' },
+        { id: 'tx-transit-1', title: 'Monthly Metro', amount: 1250, day: 3, category: 'Transit & Commute' }, // 1250/1500 = 83.3% (near budget)
+        { id: 'tx-tech-1', title: 'Cable', amount: 300, day: 4, category: 'Academic & Tech' } // 300/1000 = 30% (normal)
+      ]
+    };
+
+    const outflows = calculateCategoryOutflow(overspentState);
+    const food = outflows.find(o => o.category === 'Food & Dining');
+    const transit = outflows.find(o => o.category === 'Transit & Commute');
+    const tech = outflows.find(o => o.category === 'Academic & Tech');
+
+    expect(food).toBeDefined();
+    expect(food!.isOverBudget).toBe(true);
+    expect(food!.utilizationPct).toBeGreaterThan(100);
+
+    expect(transit).toBeDefined();
+    expect(transit!.isNearBudget).toBe(true);
+    expect(transit!.isOverBudget).toBe(false);
+    expect(transit!.utilizationPct).toBeGreaterThanOrEqual(80);
+
+    expect(tech).toBeDefined();
+    expect(tech!.isOverBudget).toBe(false);
+    expect(tech!.isNearBudget).toBe(false);
+  });
+
+  it('guarantees daily allowance is never negative or NaN across extreme deficits', () => {
+    const bankruptState: FinancialState = {
+      ...DEFAULT_HOSTEL_HUSTLER,
+      currentDay: 28,
+      startingBudget: 1000,
+      emergencyBuffer: 2000,
+      transactions: [
+        { id: 'tx-huge', title: 'Catastrophic Drain', amount: 5000, day: 1, category: 'Other' }
+      ],
+      inflows: [],
+      commitments: [],
+      subscriptions: []
+    };
+
+    const metrics = calculateMetrics(bankruptState);
+    expect(metrics.dailyAllowance).toBe(0);
+    expect(isNaN(metrics.dailyAllowance)).toBe(false);
+    expect(isFinite(metrics.dailyAllowance)).toBe(true);
+  });
+
+  it('preserves non-mutating immutability when evaluating simulation drafts', () => {
+    const originalBalance = calculateMetrics(DEFAULT_HOSTEL_HUSTLER).balance;
+    const testDraft: SimulationDraft = {
+      title: 'Impulse Headphones',
+      amount: 1500,
+      category: 'Academic & Tech',
+      day: DEFAULT_HOSTEL_HUSTLER.currentDay
+    };
+
+    const simMetrics = calculateMetrics(DEFAULT_HOSTEL_HUSTLER, testDraft);
+    expect(simMetrics.balance).toBe(originalBalance - 1500);
+
+    // Active state remains completely untouched
+    const freshMetrics = calculateMetrics(DEFAULT_HOSTEL_HUSTLER, null);
+    expect(freshMetrics.balance).toBe(originalBalance);
+  });
+
+  it('handles goal contribution allocations without double-counting expense burn', () => {
+    const baseBalance = calculateMetrics(DEFAULT_HOSTEL_HUSTLER).balance;
+    
+    // Contributing to a goal increases goal currentAmount but does NOT duplicate a transaction
+    const updatedGoalsState: FinancialState = {
+      ...DEFAULT_HOSTEL_HUSTLER,
+      savingsGoals: DEFAULT_HOSTEL_HUSTLER.savingsGoals.map(g => 
+        g.id === 'g1' ? { ...g, currentAmount: g.currentAmount + 500 } : g
+      )
+    };
+
+    const metrics = calculateMetrics(updatedGoalsState);
+    // Liquid balance remains unchanged because goal allocation protects cash
+    expect(metrics.balance).toBe(baseBalance);
+    expect(metrics.shockResilienceScore).toBeGreaterThanOrEqual(0);
+  });
+
+  it('cancelling a subscription removes future cycle obligations without fabricating income', () => {
+    const activeSubCost = DEFAULT_HOSTEL_HUSTLER.subscriptions
+      .filter(s => s.isActive && s.billingDay > DEFAULT_HOSTEL_HUSTLER.currentDay)
+      .reduce((sum, s) => sum + s.amount, 0);
+
+    const cancelledState: FinancialState = {
+      ...DEFAULT_HOSTEL_HUSTLER,
+      subscriptions: DEFAULT_HOSTEL_HUSTLER.subscriptions.map(s => 
+        s.billingDay > DEFAULT_HOSTEL_HUSTLER.currentDay ? { ...s, isActive: false } : s
+      )
+    };
+
+    const baseMetrics = calculateMetrics(DEFAULT_HOSTEL_HUSTLER);
+    const cancelledMetrics = calculateMetrics(cancelledState);
+
+    // Liquid cash today is identical (no fake refund)
+    expect(cancelledMetrics.balance).toBe(baseMetrics.balance);
+    // Discretionary daily allowance improves because future drain is removed
+    if (activeSubCost > 0) {
+      expect(cancelledMetrics.dailyAllowance).toBeGreaterThanOrEqual(baseMetrics.dailyAllowance);
+    }
+  });
+
+  it('adding realized expense lowers balance; adding inflow increases it', () => {
+    const baseMetrics = calculateMetrics(DEFAULT_HOSTEL_HUSTLER);
+
+    // Add ₹1,200 expense today
+    const withExpense: FinancialState = {
+      ...DEFAULT_HOSTEL_HUSTLER,
+      transactions: [
+        ...DEFAULT_HOSTEL_HUSTLER.transactions,
+        { id: 'tx-new', title: 'Books', amount: 1200, day: DEFAULT_HOSTEL_HUSTLER.currentDay, category: 'Academic & Tech' }
+      ]
+    };
+    const afterExpense = calculateMetrics(withExpense);
+    expect(afterExpense.balance).toBe(baseMetrics.balance - 1200);
+
+    // Add ₹3,000 inflow today
+    const withInflow: FinancialState = {
+      ...withExpense,
+      inflows: [
+        ...withExpense.inflows,
+        { id: 'inf-bonus', title: 'Freelance Gig', amount: 3000, day: DEFAULT_HOSTEL_HUSTLER.currentDay }
+      ]
+    };
+    const afterInflow = calculateMetrics(withInflow);
+    expect(afterInflow.balance).toBe(afterExpense.balance + 3000);
+  });
+
+  it('editing transaction amount correctly re-evaluates liquid runway', () => {
+    const baseState: FinancialState = {
+      ...DEFAULT_HOSTEL_HUSTLER,
+      transactions: [
+        { id: 'tx-edit-1', title: 'Stationery', amount: 400, day: 2, category: 'Academic & Tech' }
+      ]
+    };
+    const baseMetrics = calculateMetrics(baseState);
+
+    // Edit from ₹400 to ₹900
+    const editedState: FinancialState = {
+      ...baseState,
+      transactions: [
+        { id: 'tx-edit-1', title: 'Stationery', amount: 900, day: 2, category: 'Academic & Tech' }
+      ]
+    };
+    const editedMetrics = calculateMetrics(editedState);
+    expect(editedMetrics.balance).toBe(baseMetrics.balance - 500);
+  });
+
+  it('deleting an expense transaction restores liquid purchasing power', () => {
+    const baseState: FinancialState = {
+      ...DEFAULT_HOSTEL_HUSTLER,
+      transactions: [
+        { id: 'tx-del-1', title: 'Old Fee', amount: 800, day: 3, category: 'Other' }
+      ]
+    };
+    const beforeDelete = calculateMetrics(baseState);
+
+    const afterDeleteState: FinancialState = {
+      ...baseState,
+      transactions: []
+    };
+    const afterDelete = calculateMetrics(afterDeleteState);
+    expect(afterDelete.balance).toBe(beforeDelete.balance + 800);
+  });
 });
 
