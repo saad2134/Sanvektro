@@ -6,7 +6,7 @@ import type {
   ConsequenceDiff,
   FinancialState
 } from '../types/finance';
-import { generateComparisonScenarios } from '../utils/calculations';
+import { generateComparisonScenarios, calculateOpportunityCost } from '../utils/calculations';
 import { 
   SlidersHorizontal, 
   Sparkles, 
@@ -14,7 +14,9 @@ import {
   XCircle, 
   AlertTriangle, 
   ArrowRight,
-  Info
+  Info,
+  Clock,
+  ShieldAlert
 } from 'lucide-react';
 
 interface DecisionSimulatorProps {
@@ -329,6 +331,43 @@ export const DecisionSimulator: React.FC<DecisionSimulatorProps> = ({
             </div>
 
           </div>
+
+          {/* Gen Z Opportunity Cost & 24-Hour Cool-Off Advisor */}
+          {(() => {
+            const opportunityCost = calculateOpportunityCost(amount, baselineMetrics.dailyAllowance);
+            return (
+              <div 
+                data-testid="opportunity-cost-panel"
+                className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/90 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 aspect-square rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 shrink-0">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white tracking-wide">
+                        Student Opportunity Cost
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20">
+                        True Effort Trade-Off
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-0.5">
+                      Costs <strong className="text-white font-mono">{opportunityCost.hoursOfGigWork} hours</strong> of student freelance work (₹150/hr) ✦ Consumes <strong className="text-amber-400 font-mono">{opportunityCost.daysOfDailyAllowance} days</strong> of daily survival allowance.
+                    </p>
+                  </div>
+                </div>
+
+                {opportunityCost.isCoolOffRecommended && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-bold self-start sm:self-auto shrink-0">
+                    <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
+                    <span>24-Hour Cool-Off Recommended</span>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Multi-System Chain: Bills Buffer & Goals Ripple */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">

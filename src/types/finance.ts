@@ -254,4 +254,9 @@ export interface CashPressureRadar {
   nextDueItem: { name: string; amount: number; dueDay: number } | null;
   status: 'CLEAR' | 'WATCH' | 'ALERT';
   descriptor: string;
+}export interface OpportunityCostAnalysis {
+  hoursOfGigWork: number;
+  daysOfDailyAllowance: string;
+  isCoolOffRecommended: boolean;
+  advice: string;
 }

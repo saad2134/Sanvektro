@@ -198,6 +198,14 @@ Each target goal evaluates whether current savings surplus and safe daily burn r
 ### L. Zero-Dependency Runtime Schema Validator & State Integrity Engine
 Located in `src/services/security.ts`, strict runtime type guards validate expense drafts, savings goal updates, and imported JSON state files (`validateExpenseDraft`, `validateGoalPayload`, `validateFinancialStateSchema`, `importStateFromJSON`). Guarantees that corrupted payloads or malicious injection cannot induce unhandled exceptions or state desynchronization.
 
+### M. Student Opportunity Cost & 24-Hour Cool-Off Advisor
+For any simulated impulse purchase or discretionary expense $S_{\text{draft}}$:
+- **Student Work Hours Equivalent ($W_{\text{hours}}$)**: Calculated against a standard student tutoring/freelancing rate of ₹150/hr:
+  $$W_{\text{hours}} = \left\lceil \frac{S_{\text{draft}}}{150} \right\rceil$$
+- **Daily Allowance Burn Multiplier ($D_{\text{burn}}$)**: Measures the exact number of full daily safe-to-spend allowances consumed by the purchase:
+  $$D_{\text{burn}} = \frac{S_{\text{draft}}}{\max(1, A_t)}$$
+- **24-Hour Cool-Off Policy ($P_{\text{cooloff}}$)**: Automatically triggered when an impulse purchase consumes $\ge 2.0$ full days of safe allowance or exceeds ₹1,000, enforcing behavioral friction and emotional stabilization before capital commitment.
+
 ---
 
 ## 4. Security & Fault Tolerance Guarantees
@@ -238,14 +246,14 @@ Sanvektro includes a comprehensive test suite running under Vitest and `@testing
 
 | Test Suite | File Path | Focus & Assertions |
 |---|---|---|
-| **Financial Calculations & Analytics** | `src/__tests__/calculations.test.ts` | 33 tests: ₹10k budget baseline, safe burn allowance, consequence diffs, 30-day trajectory points, critical runway depletion risk, capital allocation distribution, category outflow aggregation, 4-pillar health audit diagnostics, 3 isolated comparison scenarios, category budget caps & 80%/100% alerts, extreme deficit resilience, non-mutating simulation immutability, savings goal allocation integrity, subscription cancellation without fake income, realized expense/inflow balance updates, transaction editing runway recalculation, transaction deletion liquidity restoration, 30-day spending intensity matrix heatmap, savings lockbox ripple trade-off, velocity risk tier benchmarks, integer currency rounding drift invariants, academic letter grade mapping (A+ to F), recency-weighted burn velocity (50/30/20 weights), multi-cone forecast curves (best/expected/worst), ConsequenceMetrics grade integration, empirical audit evidence verification on tips, radial health gauge pillar weight invariants, safe floating-point arithmetic (safeAdd, safeSub), goal feasibility horizon date projection, consequence severity categorization with committed bills protection buffer, integer paise conversion routines (rupeesToPaise, paiseToRupees) eliminating IEEE 754 precision drift, Gen Z Money Personality Archetype diagnosis (calculateMoneyPersonality), and 7-day forward cash pressure radar for scheduled obligations (calculateCashPressureRadar). |
+| **Financial Calculations & Analytics** | `src/__tests__/calculations.test.ts` | 34 tests: ₹10k budget baseline, safe burn allowance, consequence diffs, 30-day trajectory points, critical runway depletion risk, capital allocation distribution, category outflow aggregation, 4-pillar health audit diagnostics, 3 isolated comparison scenarios, category budget caps & 80%/100% alerts, extreme deficit resilience, non-mutating simulation immutability, savings goal allocation integrity, subscription cancellation without fake income, realized expense/inflow balance updates, transaction editing runway recalculation, transaction deletion liquidity restoration, 30-day spending intensity matrix heatmap, savings lockbox ripple trade-off, velocity risk tier benchmarks, integer currency rounding drift invariants, academic letter grade mapping (A+ to F), recency-weighted burn velocity (50/30/20 weights), multi-cone forecast curves (best/expected/worst), ConsequenceMetrics grade integration, empirical audit evidence verification on tips, radial health gauge pillar weight invariants, safe floating-point arithmetic (safeAdd, safeSub), goal feasibility horizon date projection, consequence severity categorization with committed bills protection buffer, integer paise conversion routines (rupeesToPaise, paiseToRupees) eliminating IEEE 754 precision drift, Gen Z Money Personality Archetype diagnosis (calculateMoneyPersonality), 7-day forward cash pressure radar for scheduled obligations (calculateCashPressureRadar), and student opportunity cost analysis & 24-hour cool-off advisor (calculateOpportunityCost) translating impulse purchases into tutoring hours and daily allowance burn. |
 | **Decision Coach Evaluation Engine** | `src/__tests__/coachEvaluator.test.ts` | 7 tests: Deterministic dilemma parsing, safe vs caution vs overdraft classifications, recurring subscription annual run-rate recovery, safe daily runway limits, and savings target feasibility. |
 | **Defensive Security & Validation** | `src/__tests__/security.test.ts` | 7 tests: Prototype pollution detection, object cleansing, DOMPurify XSS stripping, boundary number clamping, expense draft schema validation, goal payload validation, and full FinancialState schema JSON import verification. |
 | **Fault Recovery** | `src/__tests__/ErrorBoundary.test.tsx` | 2 tests: ErrorBoundary rendering, error capture, fallback display, and child recovery. |
 | **Accessibility & WCAG 2.1 AA** | `src/__tests__/a11y.test.ts` | 6 tests: Mathematical relative luminance & contrast ratio validation (dark canvas vs text >= 15:1, body >= 4.5:1, UI accents >= 3:1), sub-zero overdraft consequence invariants, and conflict-free keyboard shortcut uniqueness. |
 | **End-to-End App Integration** | `src/__tests__/App.test.tsx` | 3 tests: 4-pillar metric cards mounting, persona switching, and reactive consequence rendering. |
 
-To execute the test suite (58/58 tests passing):
+To execute the test suite (59/59 tests passing):
 ```bash
 npm test
 ```

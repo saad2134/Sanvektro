@@ -659,6 +659,29 @@ describe('Sanvektro Financial Calculations Engine', () => {
     expect(radarAtDay17.nextDueItem).toBeNull();
     expect(radarAtDay17.descriptor).toContain('Clear Horizon');
   });
+
+  it('calculates student opportunity cost and 24-hour cool-off splurge advisory', async () => {
+    const { calculateOpportunityCost } = await import('../utils/calculations');
+
+    // Major impulse: ₹1,500 hoodie with ₹250/day allowance (1500/150 = 10 hrs work, 1500/250 = 6.0 days allowance)
+    const majorCost = calculateOpportunityCost(1500, 250, 150);
+    expect(majorCost.hoursOfGigWork).toBe(10);
+    expect(majorCost.daysOfDailyAllowance).toBe('6.0');
+    expect(majorCost.isCoolOffRecommended).toBe(true);
+    expect(majorCost.advice).toContain('24-hour cool-off rule');
+
+    // Minor treat: ₹100 chai with ₹250/day allowance (100/150 = 1 hr work, 100/250 = 0.4 days allowance)
+    const minorCost = calculateOpportunityCost(100, 250, 150);
+    expect(minorCost.hoursOfGigWork).toBe(1);
+    expect(minorCost.daysOfDailyAllowance).toBe('0.4');
+    expect(minorCost.isCoolOffRecommended).toBe(false);
+    expect(minorCost.advice).toContain('Fits comfortably');
+
+    // Zero / edge amount
+    const zeroCost = calculateOpportunityCost(0, 250, 150);
+    expect(zeroCost.hoursOfGigWork).toBe(0);
+    expect(zeroCost.isCoolOffRecommended).toBe(false);
+  });
 });
 
 

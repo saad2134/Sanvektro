@@ -16,7 +16,8 @@ import type {
   SavingsGoal,
   MoneyPersonality,
   Commitment,
-  CashPressureRadar
+  CashPressureRadar,
+  OpportunityCostAnalysis
 } from '../types/finance';
 
 /**
@@ -1267,6 +1268,35 @@ export function calculateCashPressureRadar(
     nextDueItem,
     status,
     descriptor
+  };
+}
+
+/**
+ * Computes Gen Z opportunity cost: student gig work hours, daily allowance consumption,
+ * and 24-hour cool-off recommendations.
+ */
+export function calculateOpportunityCost(
+  amount: number,
+  dailyAllowance: number,
+  hourlyWage: number = 150
+): OpportunityCostAnalysis {
+  const safeAmount = Math.max(0, amount);
+  const hoursOfGigWork = Math.ceil(safeAmount / Math.max(1, hourlyWage));
+  const daysVal = dailyAllowance > 0 ? (safeAmount / dailyAllowance).toFixed(1) : '∞';
+  const isCoolOffRecommended = parseFloat(daysVal) >= 2.0 || safeAmount >= 1000;
+
+  let advice = 'Fits comfortably within your daily spending runway.';
+  if (isCoolOffRecommended) {
+    advice = `Consumes ${daysVal} days of allowance! We recommend a 24-hour cool-off rule before swiping.`;
+  } else if (parseFloat(daysVal) > 0.8) {
+    advice = `Takes away ${daysVal} days of your daily allowance. Proceed with caution.`;
+  }
+
+  return {
+    hoursOfGigWork,
+    daysOfDailyAllowance: daysVal,
+    isCoolOffRecommended,
+    advice
   };
 }
 

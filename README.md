@@ -32,6 +32,7 @@ Guide your 30-day cash vector ✦ simulate financial decisions before you swipe.
 - 🧭 **3-Stage Guided Onboarding Tour Modal** ✦ Interactive orientation introducing new evaluators to the ₹10,000 monthly living paradigm, the 3 capital buckets, and sandbox levers with hands-free hotkey access (`T`).
 - 📚 **Gen Z Financial Literacy Micro-Lessons** ✦ In-depth educational modules embedded in the Architecture guide exploring Safe Daily Burn Math vs Naive Division, Stealth Subscription Drain, the ₹2,000 Emergency Buffer Rule, and Simulation vs Rearview Tracking.
 - 🧪 **"What-If" Decision Simulator (Pre-Spend Sandbox)** ✦ Stage discretionary expenses (e.g., ₹480 Swiggy treat, ₹1,500 headphones, ₹2,200 sneaker drop) or inflow stipends before committing to preview immediate ripple effects on your daily allowance, savings goals, monthly forecast, and financial health score. Includes **10 curated Gen Z impulse presets** and automated evaluator test harnesses (`data-testid`).
+- ⏳ **Student Opportunity Cost & 24-Hour Cool-Off Advisor** ✦ Translates simulated expense drafts into real-world student gig work hours ($\lceil \text{Amount} / 150 \rceil$ tutoring/freelance hours) and daily allowance consumption days ($S_{\text{draft}} / A_t$), automatically triggering a **24-Hour Cool-Off Rule** badge when purchases exceed 2.0 days of safe living allowance or ₹1,000 to halt impulse spending.
 - 🔀 **3-Way Strategic Decision Comparison Matrix** ✦ Side-by-side consequence preview comparing **Scenario A (Buy Now)** vs **Scenario B (Delay 14 Days to protect liquidity)** vs **Scenario C (Smart Alternative ✦ -55% thrift discount)** with 1-click scenario adoption.
 - ⚡ **Multi-Tier Consequence Severity & Ripple Chains** ✦ Automatic severity grading (**NEGLIGIBLE**, **MODERATE**, **SEVERE**, **CRITICAL**) with dedicated **Committed Bills Shield** (verifies remaining buffer after mandatory obligations) and **Savings Goals Ripple** (tracking goal delay days).
 - 🎛️ **4-Pillar Financial Health Cockpit & Academic Grade** ✦ Real-time tracking of Liquid Balance, Dynamic Safe Daily Burn Allowance, Academic Letter Grade (`A+` down to `F`), Recency-Weighted Burn Velocity, Composite Financial Health Score (0-100), and 4-tier Financial Risk Classification (Optimal, Moderate, Elevated, Critical).
@@ -55,7 +56,7 @@ Guide your 30-day cash vector ✦ simulate financial decisions before you swipe.
 - 💾 **Multi-Format Financial Exports & Schema-Guarded Imports** ✦ Instant export to Tabular CSV, Full State JSON, formatted physical Print Statement, and validated JSON restore capability.
 - 🛡️ **Defensive Security, Runtime Schema Validation & Integer Paise Engine** ✦ DOMPurify XSS scrubbing on all user inputs, runtime schema validation on all state payloads, prototype pollution defense, integer paise math (`rupeesToPaise`, `paiseToRupees`) with zero IEEE 754 precision drift, safe float arithmetic (`safeAdd`, `safeSub`), bounded number clamping, and top-level ErrorBoundary resilience.
 - ♿ **WCAG 2.1 AA Mathematical Contrast & Accessibility Verification** ✦ Programmatic validation of relative luminance and high-contrast tokens ($\ge 4.5:1$ body, $\ge 3:1$ UI accents) with accessible ARIA dialog contracts.
-- 🧪 **Vitest Unit & Integration Test Suite** ✦ 58 automated tests across 6 suites covering mathematical invariants, safe float arithmetic, integer paise conversions, money personality diagnosis, 7-day cash pressure radar, letter grade appraisal, recency-weighted burn velocity, multi-cone forecast curves, 3-way scenario comparisons, category budget caps, spending heatmaps, lockbox ripples, goal feasibility horizons, consequence severity rankings, empirical evidence verification, schema validation, WCAG 2.1 AA contrast math, overdraft invariants, decision coach dilemma parsing, and fault recovery.
+- 🧪 **Vitest Unit & Integration Test Suite** ✦ 59 automated tests across 6 suites covering mathematical invariants, safe float arithmetic, integer paise conversions, money personality diagnosis, 7-day cash pressure radar, student opportunity cost and 24-hour cool-off policy, letter grade appraisal, recency-weighted burn velocity, multi-cone forecast curves, 3-way scenario comparisons, category budget caps, spending heatmaps, lockbox ripples, goal feasibility horizons, consequence severity rankings, empirical evidence verification, schema validation, WCAG 2.1 AA contrast math, overdraft invariants, decision coach dilemma parsing, and fault recovery.
 
 ---
 
@@ -129,7 +130,7 @@ flowchart TB
 - **Framework:** [React 19](https://react.dev/) + [Vite 8](https://vite.dev/)
 - **Language:** [TypeScript 6](https://www.typescriptlang.org/) (Strict type safety, verbatim module syntax)
 - **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) (CSS-first `@theme` design tokens, glassmorphic dark theme)
-- **Testing:** [Vitest 5](https://vitest.dev/) + [@testing-library/react](https://testing-library.com/) + [jsdom](https://github.com/jsdom/jsdom) (14/14 automated tests)
+- **Testing:** [Vitest 5](https://vitest.dev/) + [@testing-library/react](https://testing-library.com/) + [jsdom](https://github.com/jsdom/jsdom) (59/59 automated tests)
 - **Security:** [DOMPurify](https://github.com/cure53/DOMPurify) (Zero XSS injection, prototype pollution defense)
 - **Audio:** Web Audio API (Client-side native acoustic synthesizers)
 - **Icons:** [Lucide React](https://lucide.dev/)
@@ -144,9 +145,11 @@ flowchart TB
 PromptRunOct/
 ├── ARCHITECTURE.md               # Complete 6-layer architecture & mathematical specifications
 ├── src/
-│   ├── __tests__/                # Vitest test suites (17 tests)
+│   ├── __tests__/                # Vitest test suites (59 tests across 6 suites)
+│   │   ├── a11y.test.ts              # Mathematical WCAG contrast & keyboard shortcut tests
 │   │   ├── App.test.tsx              # Component integration & persona switching
 │   │   ├── calculations.test.ts      # Pure math, allocation & diagnostic tests
+│   │   ├── coachEvaluator.test.ts    # Dilemma parsing & financial coach logic
 │   │   ├── ErrorBoundary.test.tsx    # Crash containment & recovery verification
 │   │   └── security.test.ts          # DOMPurify XSS & prototype pollution tests
 │   ├── components/

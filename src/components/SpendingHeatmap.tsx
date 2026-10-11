@@ -82,7 +82,7 @@ export const SpendingHeatmap: React.FC<SpendingHeatmapProps> = ({
             >
               <span className="font-mono text-[10px] opacity-75">D{point.day}</span>
               <span className="font-mono font-bold text-[11px] mt-0.5 truncate w-full text-center">
-                {point.isFuture ? '—' : point.amount > 0 ? `₹${point.amount}` : '₹0'}
+                {point.isFuture ? '✦' : point.amount > 0 ? `₹${point.amount}` : '₹0'}
               </span>
             </button>
           );
