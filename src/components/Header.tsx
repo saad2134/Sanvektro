@@ -14,7 +14,8 @@ import {
   Printer,
   ChevronDown,
   Award,
-  Compass
+  Compass,
+  Search
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -32,6 +33,7 @@ interface HeaderProps {
   onOpenReportCard?: () => void;
   letterGrade?: string;
   onOpenTour?: () => void;
+  onOpenCommandPalette?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -48,7 +50,8 @@ export const Header: React.FC<HeaderProps> = ({
   onPrintStatement,
   onOpenReportCard,
   letterGrade,
-  onOpenTour
+  onOpenTour,
+  onOpenCommandPalette
 }) => {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
@@ -259,6 +262,22 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <Compass className="w-3.5 h-3.5 text-emerald-400" />
                 <span className="hidden sm:inline">Tour</span>
+              </button>
+            )}
+
+            {/* Command Palette Button */}
+            {onOpenCommandPalette && (
+              <button
+                onClick={onOpenCommandPalette}
+                id="btn-open-command-palette"
+                className="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-xs font-medium text-slate-300 border border-slate-800 hover:border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="Command Palette & Quick Actions (Ctrl+K or K)"
+              >
+                <Search className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="hidden sm:inline">Search</span>
+                <kbd className="hidden md:inline text-[9px] font-mono px-1 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                  ⌘K
+                </kbd>
               </button>
             )}
 

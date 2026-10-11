@@ -38,6 +38,8 @@ import { HealthAuditModal } from './components/HealthAuditModal';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import { MonthEndReportCardModal } from './components/MonthEndReportCardModal';
 import { OnboardingTourModal } from './components/OnboardingTourModal';
+import { TheLens } from './components/TheLens';
+import { CommandPalette } from './components/CommandPalette';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
@@ -77,6 +79,8 @@ export function AppContent() {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isReportCardOpen, setIsReportCardOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [isLensActive, setIsLensActive] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isMutedState, setIsMutedState] = useState<boolean>(() => isAudioMuted());
 
   const currentPreset = useMemo(() => {
@@ -324,14 +328,22 @@ export function AppContent() {
     onToggleTour: () => {
       setIsOnboardingOpen(prev => !prev);
     },
+    onToggleCommandPalette: () => {
+      setIsCommandPaletteOpen(prev => !prev);
+    },
+    onToggleLens: () => {
+      playToggle();
+      setIsLensActive(prev => !prev);
+    },
     onCloseModals: () => {
       setIsModalOpen(false);
       setIsHealthAuditOpen(false);
       setIsShortcutsOpen(false);
       setIsReportCardOpen(false);
       setIsOnboardingOpen(false);
+      setIsCommandPaletteOpen(false);
     }
-  }), [financialState, simulatedMetrics, baselineMetrics, handleDayChange, handleSelectPreset, handleToggleMute, handleFocusSimulator]);
+  }), [financialState, simulatedMetrics, baselineMetrics, handleDayChange, handleSelectPreset, handleToggleMute, handleFocusSimulator, playToggle]);
 
   useKeyboardShortcuts(shortcutActions);
 
@@ -354,6 +366,7 @@ export function AppContent() {
         onOpenReportCard={() => setIsReportCardOpen(true)}
         letterGrade={activeMetrics.letterGrade}
         onOpenTour={() => setIsOnboardingOpen(true)}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       />
 
       {/* Main Container */}
@@ -515,6 +528,40 @@ export function AppContent() {
         isOpen={isOnboardingOpen}
         onClose={() => setIsOnboardingOpen(false)}
         onStartSandbox={handleFocusSimulator}
+      />
+
+      {/* The Lens ✦ Interactive Mathematical Inspector */}
+      <TheLens
+        isActive={isLensActive}
+        onToggle={() => {
+          playToggle();
+          setIsLensActive(prev => !prev);
+        }}
+      />
+
+      {/* Global Command Palette */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSelectPreset={handleSelectPreset}
+        onStageSimulation={(draft) => {
+          setSimulationDraft(draft);
+          handleFocusSimulator();
+        }}
+        onExportCSV={() => exportLedgerAsCSV(financialState)}
+        onExportJSON={() => exportStateAsJSON(financialState, simulatedMetrics ?? baselineMetrics)}
+        onPrint={printMonthlyStatement}
+        onOpenReportCard={() => setIsReportCardOpen(true)}
+        onOpenHealthAudit={() => setIsHealthAuditOpen(true)}
+        onOpenOnboarding={() => setIsOnboardingOpen(true)}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
+        onToggleLens={() => {
+          playToggle();
+          setIsLensActive(p => !p);
+        }}
+        onToggleMute={handleToggleMute}
+        isMuted={isMutedState}
+        isLensActive={isLensActive}
       />
 
       {/* Footer */}

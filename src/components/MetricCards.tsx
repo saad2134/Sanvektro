@@ -76,6 +76,10 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       <div 
         id="metric-balance-card" 
         data-testid="metric-balance-card"
+        data-lens-title="Liquid Cash Balance (B_t)"
+        data-lens-formula="B_t = StartBudget + Inflows - RealizedSpend - PaidBills - RealizedSubs"
+        data-lens-explanation="Direct disposable currency available in wallet and accounts right now, strictly guarded against overdraft."
+        data-lens-value={metrics.isOverdraft ? `-₹${metrics.overdraftAmount} (OVERDRAFT)` : `₹${metrics.balance.toLocaleString('en-IN')}`}
         className="relative overflow-hidden rounded-2xl bg-[#0d121e] border border-slate-800/80 p-5 shadow-xl transition-all hover:border-slate-700/80 group"
       >
         <div className="flex items-center justify-between text-slate-400 mb-2">
@@ -89,10 +93,17 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
           <span 
             id="metric-balance" 
             data-testid="metric-balance"
-            className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-mono"
+            className={`text-2xl sm:text-3xl font-extrabold tracking-tight font-mono ${
+              metrics.isOverdraft ? 'text-rose-400 animate-pulse' : 'text-white'
+            }`}
           >
             ₹{metrics.balance.toLocaleString('en-IN')}
           </span>
+          {metrics.isOverdraft && (
+            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+              Overdraft
+            </span>
+          )}
           {diff && diff.balanceDelta !== 0 && (
             <span 
               id="diff-balance-delta"
@@ -109,7 +120,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
         <div className="mt-3 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/60 pt-2.5">
           <span>Baseline: ₹{startingBudget.toLocaleString('en-IN')}</span>
           <span className="font-mono text-slate-300">
-            {Math.round((metrics.balance / startingBudget) * 100)}% left
+            {metrics.isOverdraft ? 'Deficit' : `${Math.round((metrics.balance / startingBudget) * 100)}% left`}
           </span>
         </div>
       </div>
@@ -118,6 +129,10 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       <div 
         id="metric-daily-allowance-card" 
         data-testid="metric-daily-allowance-card"
+        data-lens-title="Safe Daily Burn Allowance (A_t)"
+        data-lens-formula="A_t = max(0, floor(DiscretionaryPool / max(1, 30 - currentDay + 1)))"
+        data-lens-explanation="The safe daily ceiling you can spend each day without incurring debt, defaulting on scheduled bills, or breaching emergency buffers."
+        data-lens-value={`₹${metrics.dailyAllowance}/day`}
         className="relative overflow-hidden rounded-2xl bg-[#0d121e] border border-slate-800/80 p-5 shadow-xl transition-all hover:border-slate-700/80 group"
       >
         <div className="flex items-center justify-between text-slate-400 mb-2">
@@ -163,6 +178,10 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       <div 
         id="metric-health-score-card" 
         data-testid="metric-health-score-card"
+        data-lens-title="Composite Health Index (0-100)"
+        data-lens-formula="Health = Runway(35%) + Commitments(25%) + Allowance(20%) + Resilience(20%)"
+        data-lens-explanation="Holistic solvency metric assessing multi-pillar budget strength, emergency reserve shield, and spending variance discipline."
+        data-lens-value={`${metrics.healthScore}/100 (Grade ${metrics.letterGrade})`}
         className="relative overflow-hidden rounded-2xl bg-[#0d121e] border border-slate-800/80 p-5 shadow-xl transition-all hover:border-slate-700/80 group"
       >
         <div className="flex items-center justify-between text-slate-400 mb-2">
@@ -225,6 +244,10 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       <div 
         id="metric-risk-card" 
         data-testid="metric-risk-card"
+        data-lens-title="Financial Risk Classification"
+        data-lens-formula="Risk = f(RunwayDepletion, DailyAllowance, BillCoverage, ShockBuffer)"
+        data-lens-explanation="Real-time four-tier hazard categorization (OPTIMAL, MODERATE, ELEVATED, CRITICAL) indicating proximity to cash exhaustion."
+        data-lens-value={metrics.riskLevel}
         className="relative overflow-hidden rounded-2xl bg-[#0d121e] border border-slate-800/80 p-5 shadow-xl transition-all hover:border-slate-700/80 group"
       >
         <div className="flex items-center justify-between text-slate-400 mb-2">

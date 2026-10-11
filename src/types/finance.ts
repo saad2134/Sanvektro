@@ -93,6 +93,8 @@ export interface ConsequenceMetrics {
   goalsAchievableCount: number;
   totalGoalsCount: number;
   shockResilienceScore: number; // 0-100
+  isOverdraft: boolean;
+  overdraftAmount: number;
 }
 
 export interface ConsequenceDiff {

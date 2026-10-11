@@ -11,12 +11,21 @@ interface ShortcutActions {
   onToggleShortcutsModal: () => void;
   onToggleReportCard?: () => void;
   onToggleTour?: () => void;
+  onToggleCommandPalette?: () => void;
+  onToggleLens?: () => void;
   onCloseModals: () => void;
 }
 
 export function useKeyboardShortcuts(actions: ShortcutActions) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Global Ctrl+K / Cmd+K Command Palette trigger
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        actions.onToggleCommandPalette?.();
+        return;
+      }
+
       // Do not intercept if user is typing in an input, textarea, or select
       const target = e.target as HTMLElement | null;
       const isInput =
@@ -51,6 +60,16 @@ export function useKeyboardShortcuts(actions: ShortcutActions) {
         case 'S':
           e.preventDefault();
           actions.onFocusSimulator();
+          break;
+        case 'k':
+        case 'K':
+          e.preventDefault();
+          actions.onToggleCommandPalette?.();
+          break;
+        case 'l':
+        case 'L':
+          e.preventDefault();
+          actions.onToggleLens?.();
           break;
         case 'r':
         case 'R':

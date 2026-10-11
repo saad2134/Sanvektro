@@ -19,6 +19,9 @@
 
 ## ✨ Key Features
 
+- 🔍 **"The Lens" Interactive Mathematical Inspector Loupe** ✦ Floating formula loupe mode (`L`) revealing exact mathematical invariants ($B_t$, $A_t$, Health Index, Financial Risk) with dynamic variable breakdowns and plain-language interpretations directly over cockpit cards.
+- ⌨️ **Global Command Palette Quick Launcher (`Ctrl+K` / `K`)** ✦ Instant keyboard-driven fuzzy search launcher for rapid persona switching, 1-click impulse simulations, data exports, and deep-section navigation.
+- 🚨 **Explicit Overdraft Deficit Modeling** ✦ Sub-zero liquidity tracking (`isOverdraft`, `overdraftAmount`) with prominent red overdraft warning badges and critical severity classification.
 - 🧭 **3-Stage Guided Onboarding Tour Modal** ✦ Interactive orientation introducing new evaluators to the ₹10,000 monthly living paradigm, the 3 capital buckets, and sandbox levers with hands-free hotkey access (`T`).
 - 🧪 **"What-If" Decision Simulator (Pre-Spend Sandbox)** ✦ Stage discretionary expenses (e.g., ₹480 Swiggy treat, ₹1,500 headphones, ₹2,200 sneaker drop) before committing to preview immediate ripple effects on your daily allowance, savings goals, monthly forecast, and financial health score. Includes **9 curated Gen Z impulse presets**.
 - 🔀 **3-Way Strategic Decision Comparison Matrix** ✦ Side-by-side consequence preview comparing **Scenario A (Buy Now)** vs **Scenario B (Delay 14 Days to protect liquidity)** vs **Scenario C (Smart Alternative ✦ -55% thrift discount)** with 1-click scenario adoption.
@@ -40,10 +43,11 @@
 - 💡 **Actionable Optimization Recommendations with Empirical Evidence** ✦ Context-aware levers providing calculated daily runway gains backed by verifiable audit evidence lines (`Evidence:`).
 - 🔄 **Bidirectional Savings Goal Actions** ✦ Micro-contributions with confetti milestones and safe fund unlocks back into the liquid wallet.
 - 🔊 **Web Audio Synthesizer Haptics** ✦ Zero-latency acoustic feedback using browser Web Audio oscillators for tactile timeline clicks, goal fanfare chimes, and warning alerts with one-click mute.
-- ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `R`, `T`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
+- ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `K`, `L`, `R`, `T`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
 - 💾 **Multi-Format Financial Exports & Schema-Guarded Imports** ✦ Instant export to Tabular CSV, Full State JSON, formatted physical Print Statement, and validated JSON restore capability.
 - 🛡️ **Defensive Security, Runtime Schema Validation & Prototype Shield** ✦ DOMPurify XSS scrubbing on all user inputs, runtime schema validation on all state payloads, prototype pollution defense, safe float arithmetic (`safeAdd`, `safeSub`), bounded number clamping, and top-level ErrorBoundary resilience.
-- 🧪 **Vitest Unit & Integration Test Suite** ✦ 42 automated tests across 4 suites covering mathematical invariants, safe float arithmetic, letter grade appraisal, recency-weighted burn velocity, multi-cone forecast curves, 3-way scenario comparisons, category budget caps, spending heatmaps, lockbox ripples, goal feasibility horizons, consequence severity rankings, empirical evidence verification, schema validation, and fault recovery.
+- ♿ **WCAG 2.1 AA Mathematical Contrast & Accessibility Verification** ✦ Programmatic validation of relative luminance and high-contrast tokens ($\ge 4.5:1$ body, $\ge 3:1$ UI accents) with accessible ARIA dialog contracts.
+- 🧪 **Vitest Unit & Integration Test Suite** ✦ 48 automated tests across 5 suites covering mathematical invariants, safe float arithmetic, letter grade appraisal, recency-weighted burn velocity, multi-cone forecast curves, 3-way scenario comparisons, category budget caps, spending heatmaps, lockbox ripples, goal feasibility horizons, consequence severity rankings, empirical evidence verification, schema validation, WCAG 2.1 AA contrast math, overdraft invariants, and fault recovery.
 
 ---
 

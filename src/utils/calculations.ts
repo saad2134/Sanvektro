@@ -296,6 +296,9 @@ export function calculateMetrics(
   const weightedBurnVelocity = calculateWeightedBurnVelocity(allTxsForVelocity, currentDay);
   const { grade: letterGrade, descriptor: gradeDescriptor } = getHealthLetterGrade(healthScore);
 
+  const isOverdraft = currentBalance < 0;
+  const overdraftAmount = isOverdraft ? Math.abs(Math.round(currentBalance)) : 0;
+
   return {
     balance: Math.round(currentBalance),
     dailyAllowance,
@@ -308,7 +311,9 @@ export function calculateMetrics(
     projectedDay30Balance,
     goalsAchievableCount: achievableCount,
     totalGoalsCount: savingsGoals.length,
-    shockResilienceScore
+    shockResilienceScore,
+    isOverdraft,
+    overdraftAmount
   };
 }
 
