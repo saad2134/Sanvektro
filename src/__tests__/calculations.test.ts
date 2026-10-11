@@ -587,6 +587,48 @@ describe('Sanvektro Financial Calculations Engine', () => {
     expect(totalPaise).toBe(10000); // exactly 10,000 paise
     expect(paiseToRupees(totalPaise)).toBe(100); // exactly ₹100.00
   });
+
+  it('diagnoses Gen Z Money Personality Archetype and enforces bounded 0-100 quantitative traits', async () => {
+    const { calculateMoneyPersonality } = await import('../utils/calculations');
+    const metrics = calculateMetrics(DEFAULT_HOSTEL_HUSTLER);
+    const personality = calculateMoneyPersonality(DEFAULT_HOSTEL_HUSTLER, metrics);
+
+    expect(['alchemist', 'fortress', 'softlife', 'thrillseeker']).toContain(personality.id);
+    expect(personality.title).toBeTruthy();
+    expect(personality.quote).toBeTruthy();
+    expect(personality.survivalTip).toBeTruthy();
+
+    // Verify 5-trait boundaries (0 to 100)
+    expect(personality.traits.impulseResistance).toBeGreaterThanOrEqual(0);
+    expect(personality.traits.impulseResistance).toBeLessThanOrEqual(100);
+
+    expect(personality.traits.cushionLoyalty).toBeGreaterThanOrEqual(0);
+    expect(personality.traits.cushionLoyalty).toBeLessThanOrEqual(100);
+
+    expect(personality.traits.treatAllocation).toBeGreaterThanOrEqual(0);
+    expect(personality.traits.treatAllocation).toBeLessThanOrEqual(100);
+
+    expect(personality.traits.frugalEngineering).toBeGreaterThanOrEqual(0);
+    expect(personality.traits.frugalEngineering).toBeLessThanOrEqual(100);
+
+    expect(personality.traits.riskVelocity).toBeGreaterThanOrEqual(0);
+    expect(personality.traits.riskVelocity).toBeLessThanOrEqual(100);
+
+    // Strained state triggers Thrillseeker with urgent guidance
+    const strainedState: FinancialState = {
+      ...DEFAULT_HOSTEL_HUSTLER,
+      currentDay: 20,
+      emergencyBuffer: 100,
+      savingsGoals: [],
+      transactions: [
+        { id: 'tx-big', title: 'Heavy Outflow', amount: 8000, day: 15, category: 'Shopping & Quick-Commerce' }
+      ]
+    };
+    const strainedMetrics = calculateMetrics(strainedState);
+    const strainedPersonality = calculateMoneyPersonality(strainedState, strainedMetrics);
+    expect(strainedPersonality.id).toBe('thrillseeker');
+    expect(strainedPersonality.traits.riskVelocity).toBeGreaterThanOrEqual(50);
+  });
 });
 
 

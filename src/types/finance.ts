@@ -231,3 +231,21 @@ export interface CoachEvaluationResult {
   };
 }
 
+export interface MoneyPersonality {
+  id: 'alchemist' | 'softlife' | 'fortress' | 'thrillseeker';
+  title: string;
+  tagline: string;
+  quote: string;
+  description: string;
+  avatarIcon: string;
+  badgeClass: string;
+  survivalTip: string;
+  traits: {
+    impulseResistance: number;
+    cushionLoyalty: number;
+    treatAllocation: number;
+    frugalEngineering: number;
+    riskVelocity: number;
+  };
+}
+

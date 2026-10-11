@@ -21,6 +21,7 @@ export const SavingsGoals: React.FC<SavingsGoalsProps> = ({
 }) => {
   const [lockboxAmount, setLockboxAmount] = useState<number>(500);
   const [isLockboxOpen, setIsLockboxOpen] = useState<boolean>(false);
+  const [isCoinDropping, setIsCoinDropping] = useState<boolean>(false);
 
   const lockboxRipple = financialState
     ? calculateSavingsLockboxRipple(financialState, lockboxAmount)
@@ -29,8 +30,13 @@ export const SavingsGoals: React.FC<SavingsGoalsProps> = ({
   const currentDailyAllowance = lockboxRipple?.currentDailyAllowance ?? 250;
   const currentDay = financialState?.currentDay ?? 1;
 
-  const handleContribute = (goal: SavingsGoal) => {
-    const boost = 250;
+  const totalLocked = goals.reduce((sum, g) => sum + g.currentAmount, 0);
+  const totalTarget = goals.reduce((sum, g) => sum + g.targetAmount, 0);
+  const vaultProgressPct = totalTarget > 0 ? Math.min(100, Math.round((totalLocked / totalTarget) * 100)) : 0;
+
+  const handleContribute = (goal: SavingsGoal, boost: number = 250) => {
+    setIsCoinDropping(true);
+    setTimeout(() => setIsCoinDropping(false), 700);
     onContributeGoal(goal.id, boost);
     if (goal.currentAmount + boost >= goal.targetAmount) {
       confetti({
@@ -70,6 +76,77 @@ export const SavingsGoals: React.FC<SavingsGoalsProps> = ({
             ₹{projectedSurplus}
           </span>
         </div>
+      </div>
+
+      {/* Dimensional Glass Money Vault ✦ Tactile Money Jar */}
+      <div 
+        data-testid="interactive-money-vault"
+        className="mb-4 p-4 rounded-xl bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-emerald-950/20 border border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4"
+      >
+        <div className="flex items-center gap-3.5 w-full sm:w-auto">
+          {/* Dimensional Glass Jar with Slot & Liquid/Coin Fill */}
+          <div className="relative w-14 h-16 aspect-square rounded-2xl bg-gradient-to-b from-slate-800/90 via-slate-900/95 to-slate-950 border-2 border-emerald-500/40 p-1 flex flex-col justify-end overflow-hidden shadow-[inset_0_2px_4px_rgba(255,255,255,0.1),0_4px_12px_rgba(16,185,129,0.15)] shrink-0">
+            {/* Metallic Coin Slot Lid */}
+            <div className="absolute top-1 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full bg-slate-700 border border-emerald-400/50 shadow-inner" />
+            
+            {/* Dropping Coin Animation */}
+            {isCoinDropping && (
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-amber-400 border border-amber-300 shadow-lg animate-bounce flex items-center justify-center text-[7px] font-black text-slate-950 z-20">
+                ₹
+              </div>
+            )}
+
+            {/* Glowing Liquid/Coin Fill */}
+            <div 
+              className="w-full bg-gradient-to-t from-emerald-500/50 to-teal-400/30 rounded-xl transition-all duration-700 relative overflow-hidden"
+              style={{ height: `${Math.max(12, vaultProgressPct)}%` }}
+            >
+              <div className="absolute inset-0 bg-emerald-400/20 animate-pulse" />
+            </div>
+
+            {/* Glass Specular Reflection Highlight */}
+            <div className="absolute top-2 left-1.5 w-1 h-8 rounded-full bg-white/20 blur-[0.5px] pointer-events-none" />
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-white tracking-wide">
+                Tactile Capital Vault ✦ Money Jar
+              </span>
+              <span 
+                data-testid="vault-progress-pct"
+                className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+              >
+                {vaultProgressPct}% Locked
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Accumulated ₹{totalLocked.toLocaleString('en-IN')} of ₹{totalTarget.toLocaleString('en-IN')} student target reserve.
+            </p>
+          </div>
+        </div>
+
+        {/* Quick Top-Up Actions */}
+        {goals.length > 0 && (
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <span className="text-[11px] text-slate-500 font-mono hidden md:inline">Quick Deposit:</span>
+            <button
+              onClick={() => handleContribute(goals[0], 100)}
+              disabled={goals[0].currentAmount >= goals[0].targetAmount}
+              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-emerald-300 text-xs font-semibold border border-slate-700/80 transition-all shadow-[0_2px_0px_#064e3b] active:shadow-none active:translate-y-0.5 flex items-center gap-1 cursor-pointer"
+            >
+              <span>+₹100</span>
+            </button>
+            <button
+              onClick={() => handleContribute(goals[0], 250)}
+              disabled={goals[0].currentAmount >= goals[0].targetAmount}
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-40 text-white text-xs font-bold transition-all shadow-[0_2px_0px_#064e3b] active:shadow-none active:translate-y-0.5 flex items-center gap-1 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Deposit ₹250</span>
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">

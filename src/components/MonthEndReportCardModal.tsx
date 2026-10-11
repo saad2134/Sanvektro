@@ -11,9 +11,11 @@ import {
   Flame,
   Target,
   Sparkles,
-  BookOpen
+  BookOpen,
+  Compass
 } from 'lucide-react';
 import { playTick, playChime } from '../services/audioService';
+import { calculateMoneyPersonality } from '../utils/calculations';
 
 interface MonthEndReportCardModalProps {
   isOpen: boolean;
@@ -109,6 +111,7 @@ export const MonthEndReportCardModal: React.FC<MonthEndReportCardModalProps> = (
   };
 
   const archetype = getArchetype(metrics.letterGrade);
+  const personality = calculateMoneyPersonality(state, metrics);
 
   // Top 3 highest expenses to date
   const topExpenses = [...state.transactions]
@@ -129,6 +132,7 @@ export const MonthEndReportCardModal: React.FC<MonthEndReportCardModalProps> = (
       `**Persona**: ${presetName} | **Current Day**: Day ${state.currentDay} / 30`,
       `**Academic Grade**: ${metrics.letterGrade} (${metrics.healthScore}/100)`,
       `**Gen Z Archetype**: ${archetype.title} ✦ ${archetype.subtitle}`,
+      `**Money Personality**: ${personality.title} ✦ "${personality.quote}"`,
       `**Verdict**: ${metrics.gradeDescriptor}`,
       ``,
       `## ✦ Executive Summary Metrics`,
@@ -310,6 +314,92 @@ export const MonthEndReportCardModal: React.FC<MonthEndReportCardModalProps> = (
             <div className="text-[10px] text-slate-400 mt-0.5">
               Lockbox Targets
             </div>
+          </div>
+        </div>
+
+        {/* Gen Z Money Personality & Behavioral Profile */}
+        <div 
+          data-testid="money-personality-panel"
+          className="p-4 sm:p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 mb-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 aspect-square rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                <Compass className="w-4 h-4" />
+              </div>
+              <div>
+                <h4 
+                  data-testid="personality-title"
+                  className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white"
+                >
+                  {personality.title}
+                </h4>
+                <p className="text-[11px] text-slate-400 italic">
+                  "{personality.quote}"
+                </p>
+              </div>
+            </div>
+            <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border self-start sm:self-auto ${personality.badgeClass}`}>
+              Behavioral Archetype
+            </span>
+          </div>
+
+          <p className="text-xs text-slate-300 mb-3.5 leading-relaxed">
+            {personality.description}
+          </p>
+
+          {/* 5 Quantitative Trait Indicators */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 rounded-xl bg-slate-950/60 border border-slate-800/60 mb-3 text-[11px]">
+            <div>
+              <div className="flex justify-between text-slate-400 mb-1">
+                <span>Impulse Resistance</span>
+                <span data-testid="trait-impulse-resistance" className="font-mono font-bold text-white">{personality.traits.impulseResistance}%</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-400 rounded-full" style={{ width: `${personality.traits.impulseResistance}%` }} />
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-slate-400 mb-1">
+                <span>Cushion Loyalty</span>
+                <span className="font-mono font-bold text-white">{personality.traits.cushionLoyalty}%</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-cyan-400 rounded-full" style={{ width: `${personality.traits.cushionLoyalty}%` }} />
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-slate-400 mb-1">
+                <span>Treat Allocation</span>
+                <span className="font-mono font-bold text-white">{personality.traits.treatAllocation}%</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-amber-400 rounded-full" style={{ width: `${personality.traits.treatAllocation}%` }} />
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-slate-400 mb-1">
+                <span>Frugal Engineering</span>
+                <span className="font-mono font-bold text-white">{personality.traits.frugalEngineering}%</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-teal-400 rounded-full" style={{ width: `${personality.traits.frugalEngineering}%` }} />
+              </div>
+            </div>
+            <div className="sm:col-span-2">
+              <div className="flex justify-between text-slate-400 mb-1">
+                <span>Burn Velocity Risk Factor</span>
+                <span className="font-mono font-bold text-rose-300">{personality.traits.riskVelocity}%</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-rose-400 rounded-full" style={{ width: `${personality.traits.riskVelocity}%` }} />
+              </div>
+            </div>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-200">
+            <span className="font-bold text-purple-300">Tactical Survival Tip: </span>
+            {personality.survivalTip}
           </div>
         </div>
 

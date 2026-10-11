@@ -13,7 +13,8 @@ import type {
   ScenarioComparison,
   DailyHeatmapPoint,
   SavingsLockboxRipple,
-  SavingsGoal
+  SavingsGoal,
+  MoneyPersonality
 } from '../types/finance';
 
 /**
@@ -1100,6 +1101,126 @@ export function calculateSavingsLockboxRipple(
     remainingDays,
     lockedAmount: safeLock,
     isSustainable
+  };
+}
+
+/**
+ * Diagnoses the user's Gen Z Money Personality Archetype and quantitative trait profile
+ * based on live balance, burn velocity, emergency cushion adherence, and treat allocations.
+ */
+export function calculateMoneyPersonality(
+  state: FinancialState,
+  metrics: ConsequenceMetrics
+): MoneyPersonality {
+  const totalLockedGoals = state.savingsGoals.reduce((sum, g) => sum + g.currentAmount, 0);
+  const totalSpent = state.transactions
+    .filter(t => t.day <= state.currentDay)
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const discretionarySpent = state.transactions
+    .filter(t => t.day <= state.currentDay && (
+      t.category === 'Food & Dining' ||
+      t.category === 'Shopping & Quick-Commerce' ||
+      t.category === 'Entertainment & Social'
+    ))
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  // Quantitative Trait Ratios (0-100)
+  // 1. Cushion Loyalty: Buffer + Locked Goals vs Starting Budget
+  const cushionSum = state.emergencyBuffer + totalLockedGoals;
+  const cushionLoyalty = Math.min(100, Math.max(10, Math.round((cushionSum / state.startingBudget) * 100 * 1.5)));
+
+  // 2. Impulse Resistance: Inverse of risk and scaled with health score
+  const baseResistance = Math.round(metrics.healthScore * 0.85);
+  const impulseResistance = Math.min(100, Math.max(15, metrics.riskLevel === 'CRITICAL' ? Math.min(35, baseResistance) : baseResistance));
+
+  // 3. Treat Allocation: Discretionary share of realized spend
+  const treatPct = totalSpent > 0 ? (discretionarySpent / totalSpent) * 100 : 30;
+  const treatAllocation = Math.min(100, Math.max(10, Math.round(treatPct)));
+
+  // 4. Frugal Engineering: Efficiency of remaining allowance vs burn
+  const frugalEngineering = Math.min(100, Math.max(20, Math.round(100 - (metrics.weightedBurnVelocity / Math.max(1, metrics.dailyAllowance)) * 30)));
+
+  // 5. Risk Velocity: Burn pace speed vs allowance benchmark
+  const riskVelocity = Math.min(100, Math.max(10, Math.round((metrics.weightedBurnVelocity / 350) * 100)));
+
+  // Determine Archetype
+  if (metrics.riskLevel === 'OPTIMAL' && cushionLoyalty >= 65 && metrics.goalsAchievableCount >= 1) {
+    return {
+      id: 'alchemist',
+      title: 'The Strategic Alchemist',
+      tagline: 'Turns ₹10,000 into a masterclass in disciplined resourcefulness.',
+      quote: 'A rupee allocated before sunset is ten rupees saved in regret.',
+      description: 'You calculate runway velocity before every swipe. You protect your emergency cushion like a locked vault, yet gracefully fund campus essentials without panicking.',
+      avatarIcon: 'Sparkles',
+      badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+      survivalTip: `For Day ${state.currentDay} through Day 30: Keep your daily burn at ₹${metrics.dailyAllowance}/day, and allocate ₹150 for guilt-free social treats once a week.`,
+      traits: {
+        impulseResistance,
+        cushionLoyalty,
+        treatAllocation,
+        frugalEngineering,
+        riskVelocity
+      }
+    };
+  }
+
+  if (totalLockedGoals >= 1500 || state.emergencyBuffer >= 1500) {
+    return {
+      id: 'fortress',
+      title: 'The Fortress Builder',
+      tagline: 'Builds unbreachable financial moats before touching discretionary wants.',
+      quote: 'True peace of mind is knowing an unexpected ₹1,000 shock will bounce harmlessly.',
+      description: 'You believe survival comes from ringfenced reserves. Fixed commitments and emergency buffers are non-negotiable moats protecting your student peace of mind.',
+      avatarIcon: 'ShieldCheck',
+      badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
+      survivalTip: `Your buffer is formidable (₹${state.emergencyBuffer}). Ensure you do not overly restrict daily nutrition ✦ your ₹${metrics.dailyAllowance}/day cap is secure.`,
+      traits: {
+        impulseResistance: Math.max(75, impulseResistance),
+        cushionLoyalty: Math.max(85, cushionLoyalty),
+        treatAllocation: Math.min(40, treatAllocation),
+        frugalEngineering: Math.max(70, frugalEngineering),
+        riskVelocity: Math.min(45, riskVelocity)
+      }
+    };
+  }
+
+  if (metrics.dailyAllowance >= 160 && treatAllocation >= 35 && metrics.riskLevel !== 'CRITICAL') {
+    return {
+      id: 'softlife',
+      title: 'The Soft Life Realist',
+      tagline: 'Prioritizes daily joy and iced coffee, backed by strict mathematical limits.',
+      quote: 'Survival is pointless if the coffee and campus hangouts do not spark joy.',
+      description: 'You refuse to live in joyless student austerity. You sculpt your daily expenses around moments that nourish mental health while keeping the overall math in balance.',
+      avatarIcon: 'Coffee',
+      badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+      survivalTip: `Maintain your ₹${metrics.dailyAllowance}/day cap. Pair every discretionary weekend treat with a ₹50 transfer into your savings goals lockbox.`,
+      traits: {
+        impulseResistance: Math.max(50, impulseResistance),
+        cushionLoyalty,
+        treatAllocation: Math.max(65, treatAllocation),
+        frugalEngineering,
+        riskVelocity
+      }
+    };
+  }
+
+  return {
+    id: 'thrillseeker',
+    title: 'The Spontaneous Thrillseeker',
+    tagline: 'Lives in the vibrant moment, dancing on the edge of the daily allowance limit.',
+    quote: 'We will figure out tomorrow when tomorrow\'s canteen and quick-commerce bill arrives.',
+    description: 'You love late-night food orders, sudden group splits, and spontaneous outings. You thrive on clutch turnarounds, but need strict guardrails to prevent Day 26 cash depletion.',
+    avatarIcon: 'Zap',
+    badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
+    survivalTip: `Warning: Your burn velocity (₹${metrics.weightedBurnVelocity}/day) threatens the ₹${metrics.dailyAllowance}/day safe cap. Activate the Decision Simulator before any swipe above ₹200.`,
+    traits: {
+      impulseResistance: Math.min(50, impulseResistance),
+      cushionLoyalty: Math.min(50, cushionLoyalty),
+      treatAllocation: Math.max(60, treatAllocation),
+      frugalEngineering: Math.min(45, frugalEngineering),
+      riskVelocity: Math.max(70, riskVelocity)
+    }
   };
 }
 
