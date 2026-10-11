@@ -177,6 +177,7 @@ export interface OptimizationTip {
   type: 'SAVINGS' | 'SUBSCRIPTION' | 'DISCRETIONARY';
   impact: string;
   actionableText: string;
+  evidence?: string;
   badge: string;
 }
 

@@ -462,6 +462,34 @@ describe('Sanvektro Financial Calculations Engine', () => {
     expect(metrics.gradeDescriptor).toBeDefined();
     expect(metrics.weightedBurnVelocity).toBeGreaterThanOrEqual(0);
   });
+
+  it('provides empirical audit evidence for each generated optimization tip', async () => {
+    const { generateOptimizationTips } = await import('../utils/calculations');
+    const metrics = calculateMetrics(DEFAULT_HOSTEL_HUSTLER);
+    const tips = generateOptimizationTips(DEFAULT_HOSTEL_HUSTLER, metrics);
+
+    expect(tips.length).toBeGreaterThan(0);
+    tips.forEach(tip => {
+      expect(tip.evidence).toBeDefined();
+      expect(tip.evidence!.length).toBeGreaterThan(10);
+    });
+  });
+
+  it('evaluates radial health gauge score and pillar percentage weights strictly', async () => {
+    const { generateHealthScoreAudit } = await import('../utils/calculations');
+    const metrics = calculateMetrics(DEFAULT_HOSTEL_HUSTLER);
+    const audit = generateHealthScoreAudit(DEFAULT_HOSTEL_HUSTLER, metrics);
+
+    expect(audit.overallScore).toBeGreaterThanOrEqual(5);
+    expect(audit.overallScore).toBeLessThanOrEqual(100);
+
+    const totalWeight =
+      audit.pillars.runway.weightPct +
+      audit.pillars.commitments.weightPct +
+      audit.pillars.allowance.weightPct +
+      audit.pillars.resilience.weightPct;
+    expect(totalWeight).toBe(100);
+  });
 });
 
 

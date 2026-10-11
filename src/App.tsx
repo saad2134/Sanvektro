@@ -37,6 +37,7 @@ import { HowItEvaluatesModal } from './components/HowItEvaluatesModal';
 import { HealthAuditModal } from './components/HealthAuditModal';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import { MonthEndReportCardModal } from './components/MonthEndReportCardModal';
+import { OnboardingTourModal } from './components/OnboardingTourModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
@@ -75,6 +76,7 @@ export function AppContent() {
   const [isHealthAuditOpen, setIsHealthAuditOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isReportCardOpen, setIsReportCardOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isMutedState, setIsMutedState] = useState<boolean>(() => isAudioMuted());
 
   const currentPreset = useMemo(() => {
@@ -319,11 +321,15 @@ export function AppContent() {
     onToggleReportCard: () => {
       setIsReportCardOpen(prev => !prev);
     },
+    onToggleTour: () => {
+      setIsOnboardingOpen(prev => !prev);
+    },
     onCloseModals: () => {
       setIsModalOpen(false);
       setIsHealthAuditOpen(false);
       setIsShortcutsOpen(false);
       setIsReportCardOpen(false);
+      setIsOnboardingOpen(false);
     }
   }), [financialState, simulatedMetrics, baselineMetrics, handleDayChange, handleSelectPreset, handleToggleMute, handleFocusSimulator]);
 
@@ -347,6 +353,7 @@ export function AppContent() {
         onPrintStatement={printMonthlyStatement}
         onOpenReportCard={() => setIsReportCardOpen(true)}
         letterGrade={activeMetrics.letterGrade}
+        onOpenTour={() => setIsOnboardingOpen(true)}
       />
 
       {/* Main Container */}
@@ -501,6 +508,13 @@ export function AppContent() {
         metrics={activeMetrics}
         presetName={currentPreset.name}
         onPrintStatement={printMonthlyStatement}
+      />
+
+      {/* Interactive Onboarding Guided Tour Modal */}
+      <OnboardingTourModal
+        isOpen={isOnboardingOpen}
+        onClose={() => setIsOnboardingOpen(false)}
+        onStartSandbox={handleFocusSimulator}
       />
 
       {/* Footer */}

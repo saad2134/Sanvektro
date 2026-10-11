@@ -58,22 +58,60 @@ export const HealthAuditModal: React.FC<HealthAuditModalProps> = ({
           </div>
         </div>
 
-        {/* Score Hero Banner */}
-        <div className="p-4 rounded-xl bg-gradient-to-r from-slate-900 to-[#111726] border border-slate-800 flex items-center justify-between mb-5">
+        {/* Score Hero Banner with Radial Progress Gauge */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-[#0e1422] to-[#111726] border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
           <div className="flex items-center gap-4">
-            <div className="text-3xl font-black text-white font-mono tracking-tight">
-              {overallScore}
-              <span className="text-sm font-normal text-slate-500 ml-1">/ 100</span>
+            {/* SVG Radial Gauge */}
+            <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90 select-none" viewBox="0 0 80 80">
+                {/* Background track circle */}
+                <circle
+                  cx="40"
+                  cy="40"
+                  r="34"
+                  className="stroke-slate-800/80"
+                  strokeWidth="6"
+                  fill="transparent"
+                />
+                {/* Animated progress circle */}
+                <circle
+                  cx="40"
+                  cy="40"
+                  r="34"
+                  stroke={
+                    riskLevel === 'OPTIMAL'
+                      ? '#10b981'
+                      : riskLevel === 'MODERATE'
+                      ? '#06b6d4'
+                      : riskLevel === 'ELEVATED'
+                      ? '#f59e0b'
+                      : '#f43f5e'
+                  }
+                  strokeWidth="6"
+                  strokeDasharray={213.6}
+                  strokeDashoffset={213.6 - (Math.min(100, Math.max(0, overallScore)) / 100) * 213.6}
+                  strokeLinecap="round"
+                  fill="transparent"
+                  className="transition-all duration-700 ease-out"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center font-mono">
+                <span className="text-xl font-extrabold text-white leading-none">{overallScore}</span>
+                <span className="text-[9px] text-slate-500 uppercase font-sans font-bold">Index</span>
+              </div>
             </div>
+
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-slate-200">Vitality Index</span>
+                <span className="text-sm font-bold text-white font-['Plus_Jakarta_Sans']">
+                  {overallScore >= 80 ? 'Optimal Liquidity' : overallScore >= 60 ? 'Stable Solvency' : overallScore >= 45 ? 'Elevated Pacing' : 'Critical Depletion'}
+                </span>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${riskBadgeStyles[riskLevel] || ''}`}>
-                  {riskLevel}
+                  {riskLevel} Risk
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Weighted algorithmic evaluation across 30-day budget velocity
+              <p className="text-xs text-slate-400 mt-1 max-w-sm">
+                Deterministic 4-pillar index: Runway cushion, commitment coverage, allowance pacing, and emergency shock resilience.
               </p>
             </div>
           </div>

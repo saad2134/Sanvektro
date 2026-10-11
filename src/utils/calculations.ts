@@ -742,6 +742,7 @@ export function generateOptimizationTips(
       type: 'DISCRETIONARY',
       impact: 'Avoid Insolvency',
       actionableText: `Your funds are projected to deplete on Day ${metrics.runwayDepletionDay}. Cut discretionary burn or pause subscriptions to ensure solvency through Day 30.`,
+      evidence: `Projected cash-flow breaches ₹0 on Day ${metrics.runwayDepletionDay} with current burn velocity.`,
       badge: `Exhausts Day ${metrics.runwayDepletionDay}`
     });
   }
@@ -757,6 +758,7 @@ export function generateOptimizationTips(
       type: 'DISCRETIONARY',
       impact: `+₹${dailyBoost}/day`,
       actionableText: `Trimming 15% (₹${savings15}) from ${top.category} lifts your daily allowance by +₹${dailyBoost}/day across remaining ${remainingDays} days.`,
+      evidence: `${top.category} accounts for ${top.percentage}% (₹${top.amount}) of all realized outflow to date.`,
       badge: `${top.percentage}% of Spend`
     });
   }
@@ -773,6 +775,7 @@ export function generateOptimizationTips(
       type: 'SUBSCRIPTION',
       impact: `+₹${dailyReclaimed}/day`,
       actionableText: `You have ${activeSubs.length} active recurring subscriptions (₹${totalSubDrain}/mo). Pausing ${firstSub.name} frees ₹${firstSub.amount} instantly.`,
+      evidence: `${activeSubs.length} recurring services auto-debit ₹${totalSubDrain}/month (${Math.round((totalSubDrain / state.startingBudget) * 100)}% of initial budget).`,
       badge: `${activeSubs.length} Active`
     });
   }
@@ -786,6 +789,7 @@ export function generateOptimizationTips(
       type: 'SAVINGS',
       impact: '100% Shock Shield',
       actionableText: `Reserving an extra ₹${needed} into your emergency buffer maximizes shock resilience against unexpected hospital, transit, or hardware crises.`,
+      evidence: `Current buffer is ₹${state.emergencyBuffer}, leaving ₹${needed} vulnerability against unexpected emergency shocks.`,
       badge: `₹${state.emergencyBuffer}/₹1,000`
     });
   }

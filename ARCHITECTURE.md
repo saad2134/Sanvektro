@@ -173,6 +173,12 @@ In addition to the expected baseline projection, Sanvektro computes a dynamic fo
 2. **Expected Case (Active Velocity ✦ 1.0x baseline)**: Projects linear continuation of dynamic allowance $A_t$.
 3. **Worst Case (Impulse Leakage ✦ +35% burn)**: Simulates uncontained impulse spending with daily burn expanding to $1.35 \times A_t$.
 
+### H. Auditable Optimization Levers with Contextual Evidence
+Every recommendation emitted by the intelligence engine includes an immutable `evidence` payload detailing exact empirical proof (e.g. category percentage, days elapsed, subscription ratio vs initial budget, and remaining buffer vs shock thresholds), preventing opaque black-box recommendations.
+
+### I. Guided Onboarding Tour & Interactive Orientation
+A 3-stage interactive modal (`OnboardingTourModal.tsx`) introduces new evaluators and users to the ₹10,000 / 30-day decision paradigm, the 3 capital buckets (Spent, Ringfenced, Discretionary), and hands-free power hotkeys (`T`, `S`, `R`, `Space`, `1-3`).
+
 ---
 
 ## 4. Security & Fault Tolerance Guarantees
@@ -207,12 +213,12 @@ Sanvektro includes a comprehensive test suite running under Vitest and `@testing
 
 | Test Suite | File Path | Focus & Assertions |
 |---|---|---|
-| **Financial Calculations & Analytics** | `src/__tests__/calculations.test.ts` | 25 tests: ₹10k budget baseline, safe burn allowance, consequence diffs, 30-day trajectory points, critical runway depletion risk, capital allocation distribution, category outflow aggregation, 4-pillar health audit diagnostics, 3 isolated comparison scenarios, category budget caps & 80%/100% alerts, extreme deficit resilience, non-mutating simulation immutability, savings goal allocation integrity, subscription cancellation without fake income, realized expense/inflow balance updates, transaction editing runway recalculation, transaction deletion liquidity restoration, 30-day spending intensity matrix heatmap, savings lockbox ripple trade-off, velocity risk tier benchmarks, integer currency rounding drift invariants, academic letter grade mapping (A+ to F), recency-weighted burn velocity (50/30/20 weights), multi-cone forecast curves (best/expected/worst), and ConsequenceMetrics grade integration. |
+| **Financial Calculations & Analytics** | `src/__tests__/calculations.test.ts` | 27 tests: ₹10k budget baseline, safe burn allowance, consequence diffs, 30-day trajectory points, critical runway depletion risk, capital allocation distribution, category outflow aggregation, 4-pillar health audit diagnostics, 3 isolated comparison scenarios, category budget caps & 80%/100% alerts, extreme deficit resilience, non-mutating simulation immutability, savings goal allocation integrity, subscription cancellation without fake income, realized expense/inflow balance updates, transaction editing runway recalculation, transaction deletion liquidity restoration, 30-day spending intensity matrix heatmap, savings lockbox ripple trade-off, velocity risk tier benchmarks, integer currency rounding drift invariants, academic letter grade mapping (A+ to F), recency-weighted burn velocity (50/30/20 weights), multi-cone forecast curves (best/expected/worst), ConsequenceMetrics grade integration, empirical audit evidence verification on tips, and radial health gauge pillar weight invariants. |
 | **Defensive Security** | `src/__tests__/security.test.ts` | 4 tests: Prototype pollution detection, object cleansing, DOMPurify XSS stripping, and boundary number clamping. |
 | **Fault Recovery** | `src/__tests__/ErrorBoundary.test.tsx` | 2 tests: ErrorBoundary rendering, error capture, fallback display, and child recovery. |
 | **End-to-End App Integration** | `src/__tests__/App.test.tsx` | 3 tests: 4-pillar metric cards mounting, persona switching, and reactive consequence rendering. |
 
-To execute the test suite (34/34 tests passing):
+To execute the test suite (36/36 tests passing):
 ```bash
 npm test
 ```

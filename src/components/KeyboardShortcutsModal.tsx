@@ -13,6 +13,7 @@ const SHORTCUTS = [
   { key: '3', label: 'Switch to Freelance Creator Persona' },
   { key: 'S', label: 'Focus "What-If" Decision Simulator' },
   { key: 'R', label: 'Open 30-Day Executive Month-End Report Card' },
+  { key: 'T', label: 'Open Interactive Onboarding Guided Tour' },
   { key: 'E', label: 'Export 30-Day Ledger as CSV' },
   { key: 'J', label: 'Export State & Audit Log as JSON' },
   { key: 'P', label: 'Print Monthly Financial Statement' },

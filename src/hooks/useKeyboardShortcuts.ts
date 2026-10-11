@@ -10,6 +10,7 @@ interface ShortcutActions {
   onToggleMute: () => void;
   onToggleShortcutsModal: () => void;
   onToggleReportCard?: () => void;
+  onToggleTour?: () => void;
   onCloseModals: () => void;
 }
 
@@ -55,6 +56,11 @@ export function useKeyboardShortcuts(actions: ShortcutActions) {
         case 'R':
           e.preventDefault();
           actions.onToggleReportCard?.();
+          break;
+        case 't':
+        case 'T':
+          e.preventDefault();
+          actions.onToggleTour?.();
           break;
         case 'e':
         case 'E':

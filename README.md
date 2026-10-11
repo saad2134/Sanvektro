@@ -19,6 +19,7 @@
 
 ## ✨ Key Features
 
+- 🧭 **3-Stage Guided Onboarding Tour Modal** ✦ Interactive orientation introducing new evaluators to the ₹10,000 monthly living paradigm, the 3 capital buckets, and sandbox levers with hands-free hotkey access (`T`).
 - 🧪 **"What-If" Decision Simulator (Pre-Spend Sandbox)** ✦ Stage discretionary expenses (e.g., ₹480 Swiggy treat, ₹1,500 headphones, ₹2,200 sneaker drop) before committing to preview immediate ripple effects on your daily allowance, savings goals, monthly forecast, and financial health score. Includes **9 curated Gen Z impulse presets**.
 - 🔀 **3-Way Strategic Decision Comparison Matrix** ✦ Side-by-side consequence preview comparing **Scenario A (Buy Now)** vs **Scenario B (Delay 14 Days to protect liquidity)** vs **Scenario C (Smart Alternative ✦ -55% thrift discount)** with 1-click scenario adoption.
 - 🎛️ **4-Pillar Financial Health Cockpit & Academic Grade** ✦ Real-time tracking of Liquid Balance, Dynamic Safe Daily Burn Allowance, Academic Letter Grade (`A+` down to `F`), Recency-Weighted Burn Velocity, Composite Financial Health Score (0-100), and 4-tier Financial Risk Classification (Optimal, Moderate, Elevated, Critical).
@@ -32,16 +33,16 @@
 - ⚡ **Shock Roulette Stress-Testing** ✦ Stress-test your budget buffer against realistic emergencies (bike puncture, broken phone screen, sudden dental medicine, group dinner split) to measure shock resilience.
 - 👤 **1-Click Persona Presets** ✦ Instantly toggle between pre-configured real-world Gen Z profiles: *College Hosteler*, *First-Month Intern*, and *Freelance Creator*.
 - 📊 **30-Day Capital Allocation Corridor** ✦ Interactive stacked visual breakdown showing Spent to Date, Locked in Goals, Reserved for Bills, and Safe Discretionary Cushion.
-- 🩺 **"Audit Math" Health Diagnostics Modal** ✦ Clickable 4-pillar algorithmic audit detailing exact point scores, positive health highlights, and active diagnostic risk flags.
+- 🩺 **"Audit Math" Health Diagnostics & Radial Progress Gauge** ✦ Clickable 4-pillar algorithmic audit detailing exact point scores, animated SVG circular radial progress gauge, positive health highlights, and active diagnostic risk flags.
 - 🚨 **Dynamic Deficit & Solvency Alert Banner** ✦ Real-time alert banner warning of liquid cash shortfalls or runway exhaustion with instant sandbox fix actions.
 - 🗂️ **Category Budget Limits & Outflow Pacing** ✦ Per-category spending allocations vs actual burn with ARIA-accessible progress bars, 80% amber threshold alerts, and >100% overspend indicators.
-- 💡 **Actionable Optimization Recommendations** ✦ Context-aware levers providing calculated daily runway gains (e.g., *"Trimming 15% off Food & Dining lifts daily allowance by +₹7/day"*).
+- 💡 **Actionable Optimization Recommendations with Empirical Evidence** ✦ Context-aware levers providing calculated daily runway gains backed by verifiable audit evidence lines (`Evidence:`).
 - 🔄 **Bidirectional Savings Goal Actions** ✦ Micro-contributions with confetti milestones and safe fund unlocks back into the liquid wallet.
 - 🔊 **Web Audio Synthesizer Haptics** ✦ Zero-latency acoustic feedback using browser Web Audio oscillators for tactile timeline clicks, goal fanfare chimes, and warning alerts with one-click mute.
-- ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `R`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
+- ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `R`, `T`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
 - 💾 **Multi-Format Financial Exports** ✦ Instant export to Tabular CSV (30-day transactions), Full State JSON (audit logs & metrics), and formatted physical Print Statement.
 - 🛡️ **Defensive Security & Prototype Pollution Shield** ✦ DOMPurify XSS scrubbing on all user inputs, prototype pollution defense, bounded arithmetic clamping, and top-level ErrorBoundary resilience.
-- 🧪 **Vitest Unit & Integration Test Suite** ✦ 34 automated tests across 4 suites covering mathematical invariants, letter grade appraisal, recency-weighted burn velocity, multi-cone forecast curves, 3-way scenario comparisons, category budget caps, spending heatmaps, lockbox ripples, security sanitization, and fault recovery.
+- 🧪 **Vitest Unit & Integration Test Suite** ✦ 36 automated tests across 4 suites covering mathematical invariants, letter grade appraisal, recency-weighted burn velocity, multi-cone forecast curves, 3-way scenario comparisons, category budget caps, spending heatmaps, lockbox ripples, empirical evidence verification, security sanitization, and fault recovery.
 
 ---
 

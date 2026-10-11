@@ -13,7 +13,8 @@ import {
   FileCode, 
   Printer,
   ChevronDown,
-  Award
+  Award,
+  Compass
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -30,6 +31,7 @@ interface HeaderProps {
   onPrintStatement: () => void;
   onOpenReportCard?: () => void;
   letterGrade?: string;
+  onOpenTour?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -45,7 +47,8 @@ export const Header: React.FC<HeaderProps> = ({
   onExportJSON,
   onPrintStatement,
   onOpenReportCard,
-  letterGrade
+  letterGrade,
+  onOpenTour
 }) => {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
@@ -243,6 +246,19 @@ export const Header: React.FC<HeaderProps> = ({
                     {letterGrade}
                   </span>
                 )}
+              </button>
+            )}
+
+            {/* Guided Tour Button */}
+            {onOpenTour && (
+              <button
+                onClick={onOpenTour}
+                id="btn-open-tour"
+                className="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-xs font-medium text-slate-300 border border-slate-800 hover:border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="Guided Onboarding Tour (T)"
+              >
+                <Compass className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="hidden sm:inline">Tour</span>
               </button>
             )}
 

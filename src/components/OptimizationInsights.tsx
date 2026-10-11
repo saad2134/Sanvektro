@@ -1,6 +1,6 @@
 import React from 'react';
 import type { OptimizationTip } from '../types/finance';
-import { Sparkles, TrendingUp, Scissors, ShieldAlert } from 'lucide-react';
+import { Sparkles, TrendingUp, Scissors, ShieldAlert, Info } from 'lucide-react';
 
 interface OptimizationInsightsProps {
   tips: OptimizationTip[];
@@ -36,7 +36,7 @@ export const OptimizationInsights: React.FC<OptimizationInsightsProps> = ({ tips
               </span>
             </h3>
             <p className="text-[11px] text-slate-400">
-              Context-aware financial levers to extend 30-day runway and daily allowance
+              Context-aware financial levers with empirical audit evidence
             </p>
           </div>
         </div>
@@ -67,6 +67,14 @@ export const OptimizationInsights: React.FC<OptimizationInsightsProps> = ({ tips
             <p className="text-slate-400 leading-relaxed text-[11px] m-0 pl-8">
               {tip.actionableText}
             </p>
+            {tip.evidence && (
+              <div className="ml-8 mt-1.5 pt-1.5 border-t border-slate-800/60 flex items-start gap-1.5 text-[10px] text-slate-400 font-mono">
+                <Info className="w-3 h-3 text-cyan-400 shrink-0 mt-0.5" />
+                <span>
+                  <strong className="text-slate-300 font-sans">Evidence:</strong> {tip.evidence}
+                </span>
+              </div>
+            )}
           </div>
         ))}
       </div>
