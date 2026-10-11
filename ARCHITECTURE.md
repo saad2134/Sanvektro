@@ -153,6 +153,26 @@ The health score is a weighted composite of four fundamental financial pillars:
 | **Pillar C: Daily Allowance Cushion** | 20 pts | Gen Z purchasing power benchmark | $\ge ₹250$: 20 pts, $\ge ₹160$: 15 pts, $\ge ₹100$: 10 pts, $\ge ₹50$: 5 pts |
 | **Pillar D: Shock Resilience & Goals** | 20 pts | ₹1,000 emergency buffer + savings goal pacing | $(\text{BufferRatio} \times 10) + (\text{GoalRatio} \times 10)$ |
 
+### E. Academic Letter Grade ($G$) & Functional Descriptors
+The composite health score ($H$) maps to an academic grade standard with strategic solvency descriptors:
+- **A+ (90-100)**: *Elite Solvency ✦ Exceptional Reserve Discipline*
+- **A (80-89)**: *Strong Solvency ✦ Healthy Discretionary Buffer*
+- **B (70-79)**: *Stable Pacing ✦ Moderate Burn Velocity*
+- **C (60-69)**: *Constrained Cushion ✦ Spending Caution Advised*
+- **D (50-59)**: *Deficit Hazard ✦ Tight Living Runway*
+- **F (<50)**: *Critical Insolvency ✦ Imminent Cash Exhaustion*
+
+### F. Recency-Weighted Burn Velocity ($V_{\text{burn}}$)
+Rather than a naive arithmetic mean of all past days, Sanvektro computes a recency-weighted burn velocity that responds aggressively to recent behavioral changes:
+
+$$V_{\text{burn}} = 0.50 \times \overline{\text{Spend}}_{\text{last 3 days}} + 0.30 \times \overline{\text{Spend}}_{\text{days 4 to 7}} + 0.20 \times \overline{\text{Spend}}_{\text{days } > 7}$$
+
+### G. Multi-Cone 3-Scenario Forward Trajectory Forecast
+In addition to the expected baseline projection, Sanvektro computes a dynamic forecast cone fanning out from the current day to Day 30:
+1. **Best Case (Disciplined ✦ -25% burn)**: Simulates frugal pacing with daily burn capped at $0.75 \times A_t$.
+2. **Expected Case (Active Velocity ✦ 1.0x baseline)**: Projects linear continuation of dynamic allowance $A_t$.
+3. **Worst Case (Impulse Leakage ✦ +35% burn)**: Simulates uncontained impulse spending with daily burn expanding to $1.35 \times A_t$.
+
 ---
 
 ## 4. Security & Fault Tolerance Guarantees
@@ -187,12 +207,12 @@ Sanvektro includes a comprehensive test suite running under Vitest and `@testing
 
 | Test Suite | File Path | Focus & Assertions |
 |---|---|---|
-| **Financial Calculations & Analytics** | `src/__tests__/calculations.test.ts` | 21 tests: ₹10k budget baseline, safe burn allowance, consequence diffs, 30-day trajectory points, critical runway depletion risk, capital allocation distribution, category outflow aggregation, 4-pillar health audit diagnostics, 3 isolated comparison scenarios, category budget caps & 80%/100% alerts, extreme deficit resilience, non-mutating simulation immutability, savings goal allocation integrity, subscription cancellation without fake income, realized expense/inflow balance updates, transaction editing runway recalculation, transaction deletion liquidity restoration, 30-day spending intensity matrix heatmap, savings lockbox ripple trade-off, velocity risk tier benchmarks, and integer currency rounding drift invariants. |
+| **Financial Calculations & Analytics** | `src/__tests__/calculations.test.ts` | 25 tests: ₹10k budget baseline, safe burn allowance, consequence diffs, 30-day trajectory points, critical runway depletion risk, capital allocation distribution, category outflow aggregation, 4-pillar health audit diagnostics, 3 isolated comparison scenarios, category budget caps & 80%/100% alerts, extreme deficit resilience, non-mutating simulation immutability, savings goal allocation integrity, subscription cancellation without fake income, realized expense/inflow balance updates, transaction editing runway recalculation, transaction deletion liquidity restoration, 30-day spending intensity matrix heatmap, savings lockbox ripple trade-off, velocity risk tier benchmarks, integer currency rounding drift invariants, academic letter grade mapping (A+ to F), recency-weighted burn velocity (50/30/20 weights), multi-cone forecast curves (best/expected/worst), and ConsequenceMetrics grade integration. |
 | **Defensive Security** | `src/__tests__/security.test.ts` | 4 tests: Prototype pollution detection, object cleansing, DOMPurify XSS stripping, and boundary number clamping. |
 | **Fault Recovery** | `src/__tests__/ErrorBoundary.test.tsx` | 2 tests: ErrorBoundary rendering, error capture, fallback display, and child recovery. |
 | **End-to-End App Integration** | `src/__tests__/App.test.tsx` | 3 tests: 4-pillar metric cards mounting, persona switching, and reactive consequence rendering. |
 
-To execute the test suite (30/30 tests passing):
+To execute the test suite (34/34 tests passing):
 ```bash
 npm test
 ```

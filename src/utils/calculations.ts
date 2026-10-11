@@ -4,6 +4,7 @@ import type {
   ConsequenceDiff,
   SimulationDraft,
   RiskLevel,
+  HealthGrade,
   CapitalAllocation,
   CategoryOutflow,
   HealthScoreAudit,
@@ -13,6 +14,85 @@ import type {
   DailyHeatmapPoint,
   SavingsLockboxRipple
 } from '../types/finance';
+
+/**
+ * Maps composite health score (0-100) to an academic letter grade and functional descriptor.
+ */
+export function getHealthLetterGrade(score: number): { grade: HealthGrade; descriptor: string } {
+  if (score >= 90) {
+    return {
+      grade: 'A+',
+      descriptor: 'Elite Solvency ✦ Exceptional Reserve Discipline'
+    };
+  }
+  if (score >= 80) {
+    return {
+      grade: 'A',
+      descriptor: 'Strong Solvency ✦ Healthy Discretionary Buffer'
+    };
+  }
+  if (score >= 70) {
+    return {
+      grade: 'B',
+      descriptor: 'Stable Pacing ✦ Moderate Burn Velocity'
+    };
+  }
+  if (score >= 60) {
+    return {
+      grade: 'C',
+      descriptor: 'Constrained Cushion ✦ Spending Caution Advised'
+    };
+  }
+  if (score >= 50) {
+    return {
+      grade: 'D',
+      descriptor: 'Deficit Hazard ✦ Tight Living Runway'
+    };
+  }
+  return {
+    grade: 'F',
+    descriptor: 'Critical Insolvency ✦ Imminent Cash Exhaustion'
+  };
+}
+
+/**
+ * Computes recency-weighted burn velocity in ₹/day.
+ * Gives 50% weight to recent 3 days, 30% to days 4-7, and 20% to older days.
+ */
+export function calculateWeightedBurnVelocity(
+  transactions: { day: number; amount: number }[],
+  currentDay: number
+): number {
+  if (currentDay <= 0) return 0;
+
+  const dailySpends: number[] = [];
+  for (let d = 1; d <= currentDay; d++) {
+    const dayTotal = transactions
+      .filter(tx => tx.day === d)
+      .reduce((sum, tx) => sum + tx.amount, 0);
+    dailySpends.push(dayTotal);
+  }
+
+  const last3 = dailySpends.slice(Math.max(0, dailySpends.length - 3));
+  const avgLast3 = last3.length > 0 ? last3.reduce((a, b) => a + b, 0) / last3.length : 0;
+
+  const days4to7 = dailySpends.slice(
+    Math.max(0, dailySpends.length - 7),
+    Math.max(0, dailySpends.length - 3)
+  );
+  const avgDays4to7 = days4to7.length > 0 ? days4to7.reduce((a, b) => a + b, 0) / days4to7.length : avgLast3;
+
+  const older = dailySpends.slice(0, Math.max(0, dailySpends.length - 7));
+  const avgOlder = older.length > 0 ? older.reduce((a, b) => a + b, 0) / older.length : avgDays4to7;
+
+  if (dailySpends.length <= 3) {
+    return Math.round(avgLast3);
+  } else if (dailySpends.length <= 7) {
+    return Math.round(0.65 * avgLast3 + 0.35 * avgDays4to7);
+  } else {
+    return Math.round(0.5 * avgLast3 + 0.3 * avgDays4to7 + 0.2 * avgOlder);
+  }
+}
 
 /**
  * Calculates financial metrics for a given state, optionally applying a simulation draft.
@@ -209,10 +289,19 @@ export function calculateMetrics(
     riskLevel = 'OPTIMAL';
   }
 
+  const allTxsForVelocity = simulationDraft && simulationDraft.day <= currentDay
+    ? [...transactions, { day: simulationDraft.day, amount: simulationDraft.amount }]
+    : transactions;
+  const weightedBurnVelocity = calculateWeightedBurnVelocity(allTxsForVelocity, currentDay);
+  const { grade: letterGrade, descriptor: gradeDescriptor } = getHealthLetterGrade(healthScore);
+
   return {
     balance: Math.round(currentBalance),
     dailyAllowance,
     healthScore,
+    letterGrade,
+    gradeDescriptor,
+    weightedBurnVelocity,
     riskLevel,
     runwayDepletionDay: depletionDay,
     projectedDay30Balance,
@@ -281,6 +370,8 @@ export interface TrajectoryPoint {
   actualBalance?: number;
   projectedBalance: number;
   simulatedBalance?: number;
+  bestCaseBalance?: number;
+  worstCaseBalance?: number;
   safeCorridorMin: number;
   safeCorridorMax: number;
   eventNote?: string;
@@ -298,6 +389,12 @@ export function generateTrajectoryPoints(
 
   let curBal = startingBudget;
   let simBal = startingBudget;
+  let bestBal = startingBudget;
+  let worstBal = startingBudget;
+
+  // Multi-cone scenario burn allowances
+  const bestAllowance = Math.round(baseMetrics.dailyAllowance * 0.75);
+  const worstAllowance = Math.round(baseMetrics.dailyAllowance * 1.35);
 
   for (let day = 1; day <= 30; day++) {
     const dayInflow = inflows.filter(i => i.day === day).reduce((s, i) => s + i.amount, 0);
@@ -313,6 +410,14 @@ export function generateTrajectoryPoints(
     curBal += dayInflow - dayTx - dayCommitment - daySub;
     simBal += dayInflow - dayTx - dayCommitment - daySub;
 
+    if (day <= currentDay) {
+      bestBal = curBal;
+      worstBal = curBal;
+    } else {
+      bestBal += dayInflow - dayCommitment - daySub;
+      worstBal += dayInflow - dayCommitment - daySub;
+    }
+
     if (simulationDraft && simulationDraft.day === day) {
       simBal -= simulationDraft.amount;
       eventNote = (eventNote ? eventNote + ' | ' : '') + `Simulated: ₹${simulationDraft.amount}`;
@@ -321,6 +426,8 @@ export function generateTrajectoryPoints(
     // Future days burn rate
     if (day > currentDay) {
       curBal -= baseMetrics.dailyAllowance;
+      bestBal -= bestAllowance;
+      worstBal -= worstAllowance;
       if (simMetrics) {
         simBal -= simMetrics.dailyAllowance;
       }
@@ -336,6 +443,8 @@ export function generateTrajectoryPoints(
       actualBalance: day <= currentDay ? Math.round(curBal) : undefined,
       projectedBalance: Math.max(0, Math.round(curBal)),
       simulatedBalance: simMetrics ? Math.max(0, Math.round(simBal)) : undefined,
+      bestCaseBalance: day >= currentDay ? Math.max(0, Math.round(bestBal)) : undefined,
+      worstCaseBalance: day >= currentDay ? Math.max(0, Math.round(worstBal)) : undefined,
       safeCorridorMin,
       safeCorridorMax,
       eventNote

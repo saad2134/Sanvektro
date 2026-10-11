@@ -389,6 +389,79 @@ describe('Sanvektro Financial Calculations Engine', () => {
     expect(Number.isFinite(metrics.dailyAllowance)).toBe(true);
     expect(metrics.dailyAllowance % 1).toBe(0);
   });
+
+  it('evaluates academic letter grade from A+ down to F with functional descriptors', async () => {
+    const { getHealthLetterGrade } = await import('../utils/calculations');
+    
+    const gradeAplus = getHealthLetterGrade(95);
+    expect(gradeAplus.grade).toBe('A+');
+    expect(gradeAplus.descriptor).toContain('Elite Solvency');
+
+    const gradeA = getHealthLetterGrade(85);
+    expect(gradeA.grade).toBe('A');
+    expect(gradeA.descriptor).toContain('Strong Solvency');
+
+    const gradeB = getHealthLetterGrade(75);
+    expect(gradeB.grade).toBe('B');
+    expect(gradeB.descriptor).toContain('Stable Pacing');
+
+    const gradeC = getHealthLetterGrade(65);
+    expect(gradeC.grade).toBe('C');
+    expect(gradeC.descriptor).toContain('Constrained Cushion');
+
+    const gradeD = getHealthLetterGrade(55);
+    expect(gradeD.grade).toBe('D');
+    expect(gradeD.descriptor).toContain('Deficit Hazard');
+
+    const gradeF = getHealthLetterGrade(35);
+    expect(gradeF.grade).toBe('F');
+    expect(gradeF.descriptor).toContain('Critical Insolvency');
+  });
+
+  it('computes recency-weighted burn velocity giving 50% weight to recent 3 days', async () => {
+    const { calculateWeightedBurnVelocity } = await import('../utils/calculations');
+    
+    // Day 0 or negative
+    expect(calculateWeightedBurnVelocity([], 0)).toBe(0);
+
+    // Day 10 with high spend on recent 3 days (Day 8, 9, 10)
+    const txs = [
+      { day: 1, amount: 100 },
+      { day: 2, amount: 100 },
+      { day: 8, amount: 600 },
+      { day: 9, amount: 400 },
+      { day: 10, amount: 500 }
+    ];
+    const velocity = calculateWeightedBurnVelocity(txs, 10);
+    expect(velocity).toBeGreaterThan(0);
+    // Recent 3 days average is (600 + 400 + 500) / 3 = 500/d, so weighted burn reflects this elevated pace
+    expect(velocity).toBeGreaterThan(200);
+  });
+
+  it('projects multi-cone forecast curves with best-case (0.75x) and worst-case (1.35x) cones', () => {
+    const points = generateTrajectoryPoints(DEFAULT_HOSTEL_HUSTLER);
+    const futurePoint = points[points.length - 1]; // Day 30
+
+    expect(futurePoint.bestCaseBalance).toBeDefined();
+    expect(futurePoint.worstCaseBalance).toBeDefined();
+    expect(futurePoint.projectedBalance).toBeDefined();
+
+    // Best-case balance at Day 30 is higher or equal to projected balance
+    expect(futurePoint.bestCaseBalance!).toBeGreaterThanOrEqual(futurePoint.projectedBalance);
+    // Worst-case balance at Day 30 is lower or equal to projected balance
+    expect(futurePoint.worstCaseBalance!).toBeLessThanOrEqual(futurePoint.projectedBalance);
+
+    // Current day point should connect seamlessly
+    const currentDayPoint = points.find(p => p.day === DEFAULT_HOSTEL_HUSTLER.currentDay);
+    expect(currentDayPoint?.bestCaseBalance).toBe(currentDayPoint?.actualBalance ?? currentDayPoint?.projectedBalance);
+  });
+
+  it('integrates letter grade and weighted burn velocity directly in ConsequenceMetrics', () => {
+    const metrics = calculateMetrics(DEFAULT_HOSTEL_HUSTLER);
+    expect(['A+', 'A', 'B', 'C', 'D', 'F']).toContain(metrics.letterGrade);
+    expect(metrics.gradeDescriptor).toBeDefined();
+    expect(metrics.weightedBurnVelocity).toBeGreaterThanOrEqual(0);
+  });
 });
 
 

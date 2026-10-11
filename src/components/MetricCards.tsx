@@ -150,8 +150,8 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
         </div>
 
         <div className="mt-3 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/60 pt-2.5">
-          <span className="flex items-center gap-1">
-            <Clock className="w-3 h-3 text-slate-500" /> {remainingDays} days remaining
+          <span className="flex items-center gap-1" title="Recency-weighted actual daily burn velocity">
+            <Clock className="w-3 h-3 text-slate-500" /> {remainingDays}d left ✦ Burn: ₹{metrics.weightedBurnVelocity}/d
           </span>
           <span className={`font-medium ${metrics.dailyAllowance > 180 ? 'text-emerald-400' : metrics.dailyAllowance > 100 ? 'text-amber-400' : 'text-rose-400'}`}>
             {metrics.dailyAllowance > 180 ? 'Comfortable' : metrics.dailyAllowance > 100 ? 'Tight Pace' : 'Survival Mode'}
@@ -180,6 +180,14 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
           >
             {metrics.healthScore}
             <span className="text-sm font-normal text-slate-500">/100</span>
+          </span>
+          <span
+            id="metric-letter-grade"
+            data-testid="metric-letter-grade"
+            className="px-2 py-0.5 rounded-lg bg-purple-500/20 text-purple-300 font-extrabold text-sm border border-purple-500/30 font-mono shadow-sm cursor-help"
+            title={metrics.gradeDescriptor}
+          >
+            {metrics.letterGrade}
           </span>
           {diff && diff.healthScoreDelta !== 0 && (
             <span 

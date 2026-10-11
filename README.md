@@ -21,10 +21,11 @@
 
 - 🧪 **"What-If" Decision Simulator (Pre-Spend Sandbox)** ✦ Stage discretionary expenses (e.g., ₹480 Swiggy treat, ₹1,500 headphones, ₹2,200 sneaker drop) before committing to preview immediate ripple effects on your daily allowance, savings goals, monthly forecast, and financial health score. Includes **9 curated Gen Z impulse presets**.
 - 🔀 **3-Way Strategic Decision Comparison Matrix** ✦ Side-by-side consequence preview comparing **Scenario A (Buy Now)** vs **Scenario B (Delay 14 Days to protect liquidity)** vs **Scenario C (Smart Alternative ✦ -55% thrift discount)** with 1-click scenario adoption.
-- 🎛️ **4-Pillar Financial Health Cockpit** ✦ Real-time tracking of Liquid Balance, Dynamic Safe Daily Burn Allowance, Composite Financial Health Score (0-100), and 4-tier Financial Risk Classification (Optimal, Moderate, Elevated, Critical).
+- 🎛️ **4-Pillar Financial Health Cockpit & Academic Grade** ✦ Real-time tracking of Liquid Balance, Dynamic Safe Daily Burn Allowance, Academic Letter Grade (`A+` down to `F`), Recency-Weighted Burn Velocity, Composite Financial Health Score (0-100), and 4-tier Financial Risk Classification (Optimal, Moderate, Elevated, Critical).
+- 📜 **30-Day Executive Month-End Report Card Modal** ✦ Formal solvency appraisal and pacing recap with big letter grade stamp, 4 KPI pillars, behavioral insights, top outflows breakdown, 1-click Markdown clipboard copy, and hands-free hotkey access (`R`).
+- 📈 **Interactive 30-Day Multi-Cone Trajectory Forecast Curve** ✦ High-resolution SVG chart plotting actual realized cash vs safe corridor, baseline expected projection, and **3-scenario multi-cone forecast curves** (Best Case ✦ -25% burn, Expected Case ✦ active pace, Worst Case ✦ +35% burn) with legend toggle and rich tooltips.
 - 🗓️ **30-Day Calendar Time Scrubber** ✦ Move between Day 1 and Day 30 manually or activate Auto-Advance playback to watch compounding cashflow, scheduled commitment settlements, and subscription billings trigger in real time.
 - 🗓️ **30-Day Spending Intensity Matrix (Calendar Heatmap)** ✦ 30-cell visual density matrix mapping daily burn across the entire cycle with color-coded intensity tiers (Safe, Mid, Spike) and 1-click timeline scrubbing.
-- 📈 **Interactive 30-Day Trajectory Forecast Curve** ✦ High-resolution SVG burn chart comparing actual cash trajectory against a safe corridor band, projected month-end balance, and pulsing simulated delta paths.
 - ✂️ **Subscription Guillotine** ✦ Pause or reactivate micro-drains (Spotify, Netflix, Campus Gym, Cloud Storage) with live calculation of reclaimed daily runway (e.g., *"Pausing Campus Gym recovers +₹35/day safely"*).
 - 🛡️ **Fixed Commitments Ringfencing** ✦ Segregates non-negotiable living overhead (PG Rent share, Wi-Fi recharge, Metro smart card pass) from discretionary spending to eliminate end-of-month default risk.
 - 🎯 **Savings Goals Pacing Corridor & Lockbox Simulator** ✦ Monitor progress on Gen Z aspirations (Retro Dunks, Emergency Safety Cushion, Weekend Indie Fest) with target pacing alerts, micro-contributions, and an interactive **Savings Lockbox Ripple Simulator** testing daily runway trade-offs before locking funds.
@@ -37,10 +38,10 @@
 - 💡 **Actionable Optimization Recommendations** ✦ Context-aware levers providing calculated daily runway gains (e.g., *"Trimming 15% off Food & Dining lifts daily allowance by +₹7/day"*).
 - 🔄 **Bidirectional Savings Goal Actions** ✦ Micro-contributions with confetti milestones and safe fund unlocks back into the liquid wallet.
 - 🔊 **Web Audio Synthesizer Haptics** ✦ Zero-latency acoustic feedback using browser Web Audio oscillators for tactile timeline clicks, goal fanfare chimes, and warning alerts with one-click mute.
-- ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
+- ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `R`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
 - 💾 **Multi-Format Financial Exports** ✦ Instant export to Tabular CSV (30-day transactions), Full State JSON (audit logs & metrics), and formatted physical Print Statement.
 - 🛡️ **Defensive Security & Prototype Pollution Shield** ✦ DOMPurify XSS scrubbing on all user inputs, prototype pollution defense, bounded arithmetic clamping, and top-level ErrorBoundary resilience.
-- 🧪 **Vitest Unit & Integration Test Suite** ✦ 30 automated tests across 4 suites covering mathematical invariants, 3-way scenario comparisons, category budget caps, spending heatmaps, lockbox ripples, security sanitization, and fault recovery.
+- 🧪 **Vitest Unit & Integration Test Suite** ✦ 34 automated tests across 4 suites covering mathematical invariants, letter grade appraisal, recency-weighted burn velocity, multi-cone forecast curves, 3-way scenario comparisons, category budget caps, spending heatmaps, lockbox ripples, security sanitization, and fault recovery.
 
 ---
 

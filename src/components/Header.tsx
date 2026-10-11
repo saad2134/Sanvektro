@@ -12,7 +12,8 @@ import {
   FileSpreadsheet, 
   FileCode, 
   Printer,
-  ChevronDown
+  ChevronDown,
+  Award
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -27,6 +28,8 @@ interface HeaderProps {
   onExportCSV: () => void;
   onExportJSON: () => void;
   onPrintStatement: () => void;
+  onOpenReportCard?: () => void;
+  letterGrade?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -40,7 +43,9 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenShortcuts,
   onExportCSV,
   onExportJSON,
-  onPrintStatement
+  onPrintStatement,
+  onOpenReportCard,
+  letterGrade
 }) => {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
@@ -222,6 +227,24 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <RotateCcw className="w-4 h-4" />
             </button>
+
+            {/* Month-End Report Card Button */}
+            {onOpenReportCard && (
+              <button
+                onClick={onOpenReportCard}
+                id="btn-open-report-card"
+                className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/15 to-emerald-500/15 hover:from-amber-500/25 hover:to-emerald-500/25 text-xs font-semibold text-amber-300 border border-amber-500/30 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+                title="View 30-Day Executive Month-End Report Card (R)"
+              >
+                <Award className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden sm:inline">Report Card</span>
+                {letterGrade && (
+                  <span className="px-1.5 py-0.2 rounded-md bg-amber-500/20 text-amber-200 font-mono font-bold text-[10px] border border-amber-500/30">
+                    {letterGrade}
+                  </span>
+                )}
+              </button>
+            )}
 
             {/* System Architecture Guide Button */}
             <button

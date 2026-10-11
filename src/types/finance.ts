@@ -75,10 +75,15 @@ export interface FinancialState {
   emergencyBuffer: number;
 }
 
+export type HealthGrade = 'A+' | 'A' | 'B' | 'C' | 'D' | 'F';
+
 export interface ConsequenceMetrics {
   balance: number;
   dailyAllowance: number;
   healthScore: number;
+  letterGrade: HealthGrade;
+  gradeDescriptor: string;
+  weightedBurnVelocity: number;
   riskLevel: RiskLevel;
   runwayDepletionDay: number | null; // null if lasts through Day 30
   projectedDay30Balance: number;

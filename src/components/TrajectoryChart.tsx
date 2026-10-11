@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { TrajectoryPoint } from '../utils/calculations';
-import { TrendingDown, Calendar } from 'lucide-react';
+import { TrendingDown, Calendar, Layers } from 'lucide-react';
 
 interface TrajectoryChartProps {
   points: TrajectoryPoint[];
@@ -14,6 +14,7 @@ export const TrajectoryChart: React.FC<TrajectoryChartProps> = ({
   isSimulating
 }) => {
   const [hoveredPoint, setHoveredPoint] = useState<TrajectoryPoint | null>(null);
+  const [showMultiCone, setShowMultiCone] = useState<boolean>(true);
 
   // Chart dimensions in SVG coordinates
   const svgWidth = 800;
@@ -53,7 +54,28 @@ export const TrajectoryChart: React.FC<TrajectoryChartProps> = ({
     .map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(p.day)} ${getY(p.actualBalance ?? p.projectedBalance)}`)
     .join(' ');
 
-  // 4. Build Simulated Path (if active)
+  // 4. Build Multi-Cone Forecast Paths (Best case & Worst case from currentDay to Day 30)
+  const conePoints = points.filter(
+    p => p.day >= currentDay && p.bestCaseBalance !== undefined && p.worstCaseBalance !== undefined
+  );
+  const bestCasePath = conePoints
+    .map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(p.day)} ${getY(p.bestCaseBalance!)}`)
+    .join(' ');
+  const worstCasePath = conePoints
+    .map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(p.day)} ${getY(p.worstCaseBalance!)}`)
+    .join(' ');
+
+  const coneAreaPath =
+    conePoints.length > 0
+      ? `
+    M ${getX(conePoints[0].day)} ${getY(conePoints[0].bestCaseBalance!)}
+    ${conePoints.map(p => `L ${getX(p.day)} ${getY(p.bestCaseBalance!)}`).join(' ')}
+    ${conePoints.slice().reverse().map(p => `L ${getX(p.day)} ${getY(p.worstCaseBalance!)}`).join(' ')}
+    Z
+  `
+      : '';
+
+  // 5. Build Simulated Path (if active)
   const simulatedPath = isSimulating
     ? points
         .map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${getX(p.day)} ${getY(p.simulatedBalance ?? p.projectedBalance)}`)
@@ -70,29 +92,59 @@ export const TrajectoryChart: React.FC<TrajectoryChartProps> = ({
         <div>
           <h2 className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
             <TrendingDown className="w-4 h-4 text-emerald-400" />
-            30-Day Cash Trajectory & Burn Forecast
+            30-Day Cash Trajectory & Multi-Cone Forecast
           </h2>
           <p className="text-xs text-slate-400">
-            Realized cash trajectory vs safe corridor & simulated decision delta
+            Realized cash trajectory vs safe corridor & 3-scenario burn cones
           </p>
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap items-center gap-3 text-xs">
+        {/* Legend & Multi-Cone Toggle */}
+        <div className="flex flex-wrap items-center gap-2.5 text-xs">
+          <button
+            id="btn-toggle-multi-cone"
+            onClick={() => setShowMultiCone(!showMultiCone)}
+            className={`px-2.5 py-1 rounded-xl border text-[11px] font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+              showMultiCone
+                ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-300 shadow-sm shadow-cyan-500/10'
+                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+            }`}
+            title="Toggle 3-Scenario Forecast Cones (Best, Expected, Worst)"
+          >
+            <Layers className="w-3 h-3 text-cyan-400" />
+            <span>3-Scenario Cones</span>
+          </button>
+
           <div className="flex items-center gap-1.5 text-emerald-400">
             <span className="w-3 h-1 bg-emerald-400 rounded-full" />
             <span>Actual</span>
           </div>
+
           <div className="flex items-center gap-1.5 text-cyan-400">
             <span className="w-3 h-0.5 bg-cyan-400 border-b border-dashed border-cyan-400" />
-            <span>Projected</span>
+            <span>Expected</span>
           </div>
+
+          {showMultiCone && (
+            <>
+              <div className="flex items-center gap-1.5 text-emerald-300">
+                <span className="w-3 h-0.5 bg-emerald-400 border-b border-dotted border-emerald-400" />
+                <span>Best (-25%)</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-rose-300">
+                <span className="w-3 h-0.5 bg-rose-400 border-b border-dotted border-rose-400" />
+                <span>Worst (+35%)</span>
+              </div>
+            </>
+          )}
+
           {isSimulating && (
             <div className="flex items-center gap-1.5 text-amber-400 animate-pulse font-semibold">
               <span className="w-3 h-0.5 bg-amber-400 border-b-2 border-dotted border-amber-400" />
               <span>Simulated Shift</span>
             </div>
           )}
+
           <div className="flex items-center gap-1.5 text-slate-500">
             <span className="w-3 h-2 bg-emerald-500/10 rounded border border-emerald-500/20" />
             <span>Safe Corridor</span>
@@ -110,6 +162,10 @@ export const TrajectoryChart: React.FC<TrajectoryChartProps> = ({
             <linearGradient id="corridorGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#10b981" stopOpacity="0.12" />
               <stop offset="100%" stopColor="#10b981" stopOpacity="0.02" />
+            </linearGradient>
+            <linearGradient id="coneGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.01" />
             </linearGradient>
             <linearGradient id="actualGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#10b981" />
@@ -156,6 +212,11 @@ export const TrajectoryChart: React.FC<TrajectoryChartProps> = ({
           {/* Safe Corridor Area */}
           <path d={safeAreaPath} fill="url(#corridorGrad)" />
 
+          {/* Multi-Cone Scenario Area */}
+          {showMultiCone && coneAreaPath && (
+            <path d={coneAreaPath} fill="url(#coneGrad)" />
+          )}
+
           {/* Projected Path (Whole month) */}
           <path
             d={projectedPath}
@@ -165,6 +226,30 @@ export const TrajectoryChart: React.FC<TrajectoryChartProps> = ({
             strokeDasharray="4 4"
             opacity="0.7"
           />
+
+          {/* Best Case Cone Line */}
+          {showMultiCone && bestCasePath && (
+            <path
+              d={bestCasePath}
+              fill="none"
+              stroke="#34d399"
+              strokeWidth="1.5"
+              strokeDasharray="3 3"
+              opacity="0.8"
+            />
+          )}
+
+          {/* Worst Case Cone Line */}
+          {showMultiCone && worstCasePath && (
+            <path
+              d={worstCasePath}
+              fill="none"
+              stroke="#f43f5e"
+              strokeWidth="1.5"
+              strokeDasharray="3 3"
+              opacity="0.8"
+            />
+          )}
 
           {/* Simulated Path (If simulating) */}
           {isSimulating && (
@@ -234,23 +319,49 @@ export const TrajectoryChart: React.FC<TrajectoryChartProps> = ({
         {/* Hover Tooltip */}
         {hoveredPoint && (
           <div 
-            className="absolute z-20 pointer-events-none -translate-x-1/2 -translate-y-full bg-slate-900 border border-slate-700 p-2.5 rounded-xl shadow-xl text-xs font-mono"
+            className="absolute z-20 pointer-events-none -translate-x-1/2 -translate-y-full bg-slate-900 border border-slate-700 p-2.5 rounded-xl shadow-xl text-xs font-mono min-w-[170px]"
             style={{
               left: `${((hoveredPoint.day - 1) / 29) * 100}%`,
               top: '25%'
             }}
           >
-            <div className="font-bold text-white flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-cyan-400" /> Day {hoveredPoint.day}
+            <div className="font-bold text-white flex items-center justify-between gap-1">
+              <span className="flex items-center gap-1">
+                <Calendar className="w-3 h-3 text-cyan-400" /> Day {hoveredPoint.day}
+              </span>
+              {hoveredPoint.day === currentDay && (
+                <span className="text-[10px] px-1 py-0.2 bg-emerald-500/20 text-emerald-300 rounded">Today</span>
+              )}
             </div>
-            <div className="text-emerald-400 font-semibold mt-0.5">
+
+            <div className="text-emerald-400 font-semibold mt-1">
               Balance: ₹{hoveredPoint.day <= currentDay ? hoveredPoint.actualBalance : hoveredPoint.projectedBalance}
             </div>
+
+            {/* If future day, show multi-cone breakdown */}
+            {hoveredPoint.day > currentDay && (
+              <div className="mt-1.5 pt-1 border-t border-slate-800 space-y-0.5 text-[10px] font-sans">
+                <div className="text-emerald-300 flex justify-between font-mono">
+                  <span>Best (-25%):</span>
+                  <span>₹{hoveredPoint.bestCaseBalance}</span>
+                </div>
+                <div className="text-cyan-300 flex justify-between font-mono">
+                  <span>Expected:</span>
+                  <span>₹{hoveredPoint.projectedBalance}</span>
+                </div>
+                <div className="text-rose-300 flex justify-between font-mono">
+                  <span>Worst (+35%):</span>
+                  <span>₹{hoveredPoint.worstCaseBalance}</span>
+                </div>
+              </div>
+            )}
+
             {isSimulating && hoveredPoint.simulatedBalance !== undefined && (
-              <div className="text-amber-400 font-semibold">
+              <div className="text-amber-400 font-semibold mt-1">
                 Simulated: ₹{hoveredPoint.simulatedBalance}
               </div>
             )}
+
             {hoveredPoint.eventNote && (
               <div className="text-[11px] text-slate-300 mt-1 border-t border-slate-800 pt-1 font-sans">
                 {hoveredPoint.eventNote}
@@ -262,3 +373,4 @@ export const TrajectoryChart: React.FC<TrajectoryChartProps> = ({
     </section>
   );
 };
+

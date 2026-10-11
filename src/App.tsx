@@ -36,6 +36,7 @@ import { TransactionLedger } from './components/TransactionLedger';
 import { HowItEvaluatesModal } from './components/HowItEvaluatesModal';
 import { HealthAuditModal } from './components/HealthAuditModal';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
+import { MonthEndReportCardModal } from './components/MonthEndReportCardModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
@@ -73,7 +74,12 @@ export function AppContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHealthAuditOpen, setIsHealthAuditOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [isReportCardOpen, setIsReportCardOpen] = useState(false);
   const [isMutedState, setIsMutedState] = useState<boolean>(() => isAudioMuted());
+
+  const currentPreset = useMemo(() => {
+    return PERSONA_PRESETS.find(p => p.id === selectedPresetId) ?? PERSONA_PRESETS[0];
+  }, [selectedPresetId]);
 
   // Synchronous Reactive Calculations
   const baselineMetrics = useMemo(() => {
@@ -310,10 +316,14 @@ export function AppContent() {
     onToggleShortcutsModal: () => {
       setIsShortcutsOpen(prev => !prev);
     },
+    onToggleReportCard: () => {
+      setIsReportCardOpen(prev => !prev);
+    },
     onCloseModals: () => {
       setIsModalOpen(false);
       setIsHealthAuditOpen(false);
       setIsShortcutsOpen(false);
+      setIsReportCardOpen(false);
     }
   }), [financialState, simulatedMetrics, baselineMetrics, handleDayChange, handleSelectPreset, handleToggleMute, handleFocusSimulator]);
 
@@ -335,6 +345,8 @@ export function AppContent() {
         onExportCSV={() => exportLedgerAsCSV(financialState)}
         onExportJSON={() => exportStateAsJSON(financialState, simulatedMetrics ?? baselineMetrics)}
         onPrintStatement={printMonthlyStatement}
+        onOpenReportCard={() => setIsReportCardOpen(true)}
+        letterGrade={activeMetrics.letterGrade}
       />
 
       {/* Main Container */}
@@ -479,6 +491,16 @@ export function AppContent() {
       <KeyboardShortcutsModal
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      {/* 30-Day Executive Month-End Report Card Modal */}
+      <MonthEndReportCardModal
+        isOpen={isReportCardOpen}
+        onClose={() => setIsReportCardOpen(false)}
+        state={financialState}
+        metrics={activeMetrics}
+        presetName={currentPreset.name}
+        onPrintStatement={printMonthlyStatement}
       />
 
       {/* Footer */}

@@ -9,6 +9,7 @@ interface ShortcutActions {
   onPrint: () => void;
   onToggleMute: () => void;
   onToggleShortcutsModal: () => void;
+  onToggleReportCard?: () => void;
   onCloseModals: () => void;
 }
 
@@ -49,6 +50,11 @@ export function useKeyboardShortcuts(actions: ShortcutActions) {
         case 'S':
           e.preventDefault();
           actions.onFocusSimulator();
+          break;
+        case 'r':
+        case 'R':
+          e.preventDefault();
+          actions.onToggleReportCard?.();
           break;
         case 'e':
         case 'E':
