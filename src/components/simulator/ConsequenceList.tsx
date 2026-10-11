@@ -1,11 +1,6 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React from 'react';
-import type { SimulationResult, Subscription } from '../../types';
-import { Target, Tv, Compass } from 'lucide-react';
+import { SimulationResult, Subscription } from '../../types';
+import { Target, Calendar, AlertCircle, ShieldCheck } from 'lucide-react';
 
 interface ConsequenceListProps {
   simulationResult: SimulationResult;
@@ -18,62 +13,86 @@ export const ConsequenceList: React.FC<ConsequenceListProps> = ({
   subscriptions,
   daysRemaining,
 }) => {
-  const impact = simulationResult.impact || {};
+  const { impact } = simulationResult;
+  const activeSubs = subscriptions.filter((s) => s.isActive);
+  const totalUpcomingSubs = activeSubs.reduce((sum, s) => sum + s.amount, 0);
+  const remainingAfterSubs = impact.newBalance - totalUpcomingSubs;
 
   return (
-    <div className="rounded-xl bg-[#111320] border border-[#1E2238] p-5 space-y-5">
-      <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-        <Compass className="w-4 h-4 text-indigo-400" />
-        <span>Contextual Decision Guidance</span>
+    <div className="rounded-xl bg-[#111320] border border-[#1E2238] p-5 space-y-4">
+      <h3 className="text-sm font-bold text-white tracking-tight flex items-center justify-between">
+        <span>Detailed Ripple Chains</span>
+        <span className="text-xs text-slate-400 font-normal">Multi-system effects</span>
       </h3>
 
-      {impact.recommendation && (
-        <div className="p-3.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-200">
-          {impact.recommendation}
-        </div>
-      )}
-
-      {impact.goalImpact && impact.goalImpact.length > 0 && (
-        <div className="space-y-2">
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            <Target className="w-3.5 h-3.5 text-emerald-400" />
+      <div className="space-y-3">
+        {/* Goal Ripple */}
+        <div className="p-3.5 rounded-lg bg-[#0C0E17] border border-[#1C2036] text-xs space-y-1.5">
+          <div className="flex items-center gap-2 font-semibold text-slate-200">
+            <Target className="w-4 h-4 text-emerald-400" />
             <span>Savings Goals Ripple</span>
           </div>
-          <div className="space-y-1.5">
-            {impact.goalImpact.map((goal: any) => (
-              <div
-                key={goal.goalId}
-                className="flex items-center justify-between p-2.5 rounded-lg bg-[#0C0E17] border border-[#1F243B] text-xs"
-              >
-                <span className="text-slate-300 font-medium">{goal.goalName}</span>
-                <span className={goal.stillOnTrack ? 'text-emerald-400' : 'text-amber-400'}>
-                  {goal.stillOnTrack ? 'On Track' : `Delayed by ~${goal.delayDays} days`}
-                </span>
-              </div>
-            ))}
-          </div>
+          {impact.goalImpact.length === 0 ? (
+            <p className="text-slate-400">No active savings goals affected.</p>
+          ) : (
+            <div className="space-y-1">
+              {impact.goalImpact.map((g: any) => (
+                <div key={g.goalId} className="flex items-center justify-between text-slate-300">
+                  <span>{g.goalName}</span>
+                  <span
+                    className={`font-mono ${
+                      g.stillOnTrack ? 'text-emerald-400' : 'text-amber-400'
+                    }`}
+                  >
+                    {g.stillOnTrack
+                      ? '✓ On Track'
+                      : `Needs +₹${(g.newDailyRequired - g.previousDailyRequired).toFixed(0)}/d`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
 
-      {subscriptions.length > 0 && (
-        <div className="space-y-2">
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            <Tv className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Upcoming Recurring Commitments ({daysRemaining}d left)</span>
+        {/* Subscription Protection Ripple */}
+        <div className="p-3.5 rounded-lg bg-[#0C0E17] border border-[#1C2036] text-xs space-y-1.5">
+          <div className="flex items-center gap-2 font-semibold text-slate-200">
+            <Calendar className="w-4 h-4 text-cyan-400" />
+            <span>Upcoming Recurring Bills Buffer</span>
           </div>
-          <div className="space-y-1.5">
-            {subscriptions.slice(0, 3).map((sub) => (
-              <div
-                key={sub.id}
-                className="flex items-center justify-between p-2.5 rounded-lg bg-[#0C0E17] border border-[#1F243B] text-xs"
-              >
-                <span className="text-slate-300 font-medium">{sub.name}</span>
-                <span className="text-slate-400 font-mono">₹{sub.amount}/mo</span>
-              </div>
-            ))}
+          <div className="flex items-center justify-between text-slate-300">
+            <span>Committed Recurring Total</span>
+            <span className="font-mono text-white">₹{totalUpcomingSubs.toLocaleString('en-IN')}</span>
+          </div>
+          <div className="flex items-center justify-between text-slate-300">
+            <span>Buffer After All Subscriptions</span>
+            <span
+              className={`font-mono font-bold ${
+                remainingAfterSubs >= 0 ? 'text-emerald-400' : 'text-red-500'
+              }`}
+            >
+              ₹{Math.max(0, remainingAfterSubs).toLocaleString('en-IN')}
+            </span>
           </div>
         </div>
-      )}
+
+        {/* Daily Runway Chain */}
+        <div className="p-3.5 rounded-lg bg-[#0C0E17] border border-[#1C2036] text-xs space-y-1.5">
+          <div className="flex items-center gap-2 font-semibold text-slate-200">
+            {impact.newDailyAllowance >= 200 ? (
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-amber-400" />
+            )}
+            <span>Remaining Runway Trajectory</span>
+          </div>
+          <p className="text-slate-400 leading-relaxed">
+            With ₹{impact.newBalance.toLocaleString('en-IN')} left over {daysRemaining} days, you can
+            spend up to <strong className="text-white font-mono">₹{impact.newDailyAllowance}</strong>{' '}
+            every single day without incurring debt or overdraft.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

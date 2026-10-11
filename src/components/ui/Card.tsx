@@ -1,26 +1,25 @@
 import React from 'react';
 
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'surface' | 'glass' | 'subtle';
-  isPadded?: boolean;
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  variant?: 'default' | 'surface' | 'glass';
 }
 
 export const Card: React.FC<CardProps> = ({
-  variant = 'surface',
-  isPadded = true,
-  className = '',
   children,
+  className = '',
+  variant = 'default',
   ...props
 }) => {
   const variantStyles = {
-    surface: 'bg-[#090d16]/90 border border-slate-800/80 shadow-xl backdrop-blur-md',
-    glass: 'bg-[#0d121e]/80 border border-slate-800/90 shadow-2xl backdrop-blur-lg',
-    subtle: 'bg-slate-900/40 border border-slate-800/60'
-  }[variant];
+    default: 'bg-[#111320] border border-[#1E2238]',
+    surface: 'bg-[#0E101A] border border-[#1A1E30]',
+    glass: 'bg-[#111320]/80 backdrop-blur-md border border-[#1E2238]/60',
+  };
 
   return (
     <div
-      className={`rounded-2xl transition-all ${variantStyles} ${isPadded ? 'p-4 sm:p-5' : ''} ${className}`}
+      className={`rounded-xl p-5 md:p-6 transition-colors ${variantStyles[variant]} ${className}`}
       {...props}
     >
       {children}

@@ -78,6 +78,7 @@ export interface GoalImpact {
   previousDailyRequired: number;
   newDailyRequired: number;
   daysDelayed: number;
+  stillOnTrack?: boolean;
 }
 
 export interface SimulationResult {

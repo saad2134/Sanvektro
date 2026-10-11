@@ -1,18 +1,12 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
-export interface ModalProps {
+interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   description?: string;
   children: React.ReactNode;
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -21,63 +15,57 @@ export const Modal: React.FC<ModalProps> = ({
   title,
   description,
   children,
-  maxWidth = 'md',
 }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
     }
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
-
-  const maxWidthClass = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-xl',
-  }[maxWidth];
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn"
+      aria-describedby={description ? 'modal-description' : undefined}
+      className="fixed inset-0 z-50 flex items-center justify-center sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div
-        ref={modalRef}
-        className={`w-full ${maxWidthClass} bg-[#090d16] border border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-slideUp`}
-      >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800/80 bg-slate-900/40">
-          <div>
-            <h2 id="modal-title" className="text-base font-bold text-white font-['Plus_Jakarta_Sans']">
-              {title}
-            </h2>
-            {description && <p className="text-xs text-slate-400 mt-0.5">{description}</p>}
+      <div className="relative w-full h-full sm:h-auto max-h-full sm:max-w-lg bg-[#111322] border-0 sm:border sm:border-[#232842] rounded-none sm:rounded-2xl p-5 sm:p-6 shadow-2xl animate-scaleUp overflow-y-auto flex flex-col justify-between sm:justify-start">
+        <div>
+          <div className="flex items-start justify-between gap-4 mb-4 pb-2 border-b border-[#1E2338] sm:border-0 sm:pb-0">
+            <div>
+              <h2 id="modal-title" className="text-lg font-bold text-white tracking-tight">
+                {title}
+              </h2>
+              {description && (
+                <p id="modal-description" className="text-sm sm:text-xs text-slate-400 mt-1">
+                  {description}
+                </p>
+              )}
+            </div>
+            <button
+              onClick={onClose}
+              aria-label="Close dialog"
+              className="text-slate-400 hover:text-white p-2.5 rounded-lg hover:bg-[#1C2036] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center -mr-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            aria-label="Close modal"
-            className="p-1.5 aspect-square rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div>{children}</div>
         </div>
-        <div className="p-6">{children}</div>
       </div>
     </div>
   );

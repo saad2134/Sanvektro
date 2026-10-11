@@ -1,10 +1,5 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React from 'react';
-import type { BudgetState, RiskLevel } from '../../types';
+import { BudgetState, RiskLevel } from '../../types';
 import { ShieldCheck, AlertTriangle, Flame, Calendar, Sparkles } from 'lucide-react';
 
 interface BalanceCardProps {
@@ -63,21 +58,25 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
       aria-describedby="balance-desc"
       className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#121526] via-[#101220] to-[#0D0F1A] border border-[#20253E] p-6 shadow-xl"
     >
+      {/* Screen reader full context */}
       <p id="balance-desc" className="sr-only">
         You have spent ₹{spent} of your ₹{totalBudget} budget. ₹{availableBalance} remaining over {daysRemaining} days, giving you ₹{dailyAllowance} per day. Financial health score: {healthScore} out of 100. Risk level: {riskLevel}.
       </p>
 
+      {/* Decorative background glow */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
 
+      {/* Header row */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-2 text-xs text-slate-400">
           <Calendar className="w-3.5 h-3.5 text-indigo-400" />
           <span>Day {daysPassed} of 30</span>
-          <span aria-hidden="true">✦</span>
+          <span aria-hidden="true">·</span>
           <span>{daysRemaining} Days Remaining</span>
         </div>
 
+        {/* Risk meter status */}
         <div
           role="status"
           aria-live="polite"
@@ -86,11 +85,12 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
           className={`flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#181C30] border border-[#242A4A] text-xs font-semibold ${riskTextClasses[riskLevel]}`}
         >
           <span aria-hidden="true">{riskIcons[riskLevel]}</span>
-          <span className="sr-only">{riskLevel} risk ✦ </span>
+          <span className="sr-only">{riskLevel} risk — </span>
           <span>{riskLabels[riskLevel]}</span>
         </div>
       </div>
 
+      {/* Main Available Balance */}
       <div className="mb-6">
         <div className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">
           Available Runway Balance
@@ -103,6 +103,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
         </div>
       </div>
 
+      {/* Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4 border-y border-[#1E233B]">
         <div>
           <div className="text-[11px] text-slate-400 font-medium">Daily Allowance</div>
@@ -134,6 +135,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
         </div>
       </div>
 
+      {/* Action buttons */}
       <div className="mt-5 flex flex-wrap items-center gap-3">
         {onOpenAddExpense && (
           <button

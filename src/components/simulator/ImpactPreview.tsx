@@ -1,10 +1,5 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState } from 'react';
-import type { SimulationResult, RiskLevel } from '../../types';
+import { SimulationResult, RiskLevel } from '../../types';
 import { ArrowRight, AlertTriangle, CheckCircle2, Flame, Sparkles } from 'lucide-react';
 import { Button } from '../ui/Button';
 
@@ -21,22 +16,18 @@ export const ImpactPreview: React.FC<ImpactPreviewProps> = ({
   currentBalance,
   currentDailyAllowance,
   currentHealthScore,
-  currentRisk: _currentRisk,
+  currentRisk,
   simulationResult,
   onCommit,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [committedSuccess, setCommittedSuccess] = useState(false);
 
-  const decision = simulationResult.decision || { amount: 0, category: 'Food' as const, description: '' };
-  const impact = simulationResult.impact || {};
-  const safeToCommit = simulationResult.safeToCommit;
-
-  const newBalance = impact.newBalance ?? simulationResult.newBalance ?? 0;
-  const newDailyAllowance = impact.newDailyAllowance ?? simulationResult.newDailyAllowance ?? 0;
-  const newHealthScore = impact.newHealthScore ?? simulationResult.newHealthScore ?? 0;
-  const newRisk = impact.riskDelta ?? simulationResult.newRiskLevel ?? 'safe';
-  const warnings: string[] = impact.warnings || (simulationResult.riskMessage ? [simulationResult.riskMessage] : []);
+  const { decision, impact, safeToCommit } = simulationResult;
+  const newBalance = impact.newBalance;
+  const newDailyAllowance = impact.newDailyAllowance;
+  const newHealthScore = impact.newHealthScore;
+  const newRisk = impact.riskDelta;
 
   const handleCommit = async () => {
     if (isSubmitting || !safeToCommit) return;
@@ -65,10 +56,11 @@ export const ImpactPreview: React.FC<ImpactPreviewProps> = ({
 
   return (
     <div className="rounded-xl bg-[#111320] border border-[#1E2238] p-5 md:p-6 space-y-6">
+      {/* Live announcement for screen readers */}
       <div aria-live="polite" aria-atomic="true" className="sr-only" id="sim-result">
-        {`If you spend ₹${decision.amount}, your balance drops to ₹${newBalance}, daily allowance becomes ₹${newDailyAllowance}, health score ${
-          (impact.healthScoreDelta ?? 0) >= 0 ? 'improves' : 'drops'
-        } by ${Math.abs(impact.healthScoreDelta ?? 0)} points. ${warnings.join('. ')}`}
+        {`If you spend ₹${decision?.amount ?? 0}, your balance drops to ₹${newBalance}, daily allowance becomes ₹${newDailyAllowance}, health score ${
+          impact.healthScoreDelta >= 0 ? 'improves' : 'drops'
+        } by ${Math.abs(impact.healthScoreDelta)} points. ${impact.warnings.join('. ')}`}
       </div>
 
       <div className="flex items-center justify-between">
@@ -87,11 +79,12 @@ export const ImpactPreview: React.FC<ImpactPreviewProps> = ({
           )}
         </h3>
         <span className="text-xs text-slate-400 font-mono">
-          -₹{decision.amount.toLocaleString('en-IN')}
+          -₹{(decision?.amount ?? 0).toLocaleString('en-IN')}
         </span>
       </div>
 
-      {warnings.length > 0 && (
+      {/* Warnings / Alerts */}
+      {impact.warnings.length > 0 && (
         <div
           role="alert"
           aria-live="assertive"
@@ -102,14 +95,16 @@ export const ImpactPreview: React.FC<ImpactPreviewProps> = ({
             <span>Financial Ripple Warnings</span>
           </div>
           <ul className="list-disc pl-5 space-y-0.5 text-slate-300">
-            {warnings.map((warn: string, idx: number) => (
+            {impact.warnings.map((warn: string, idx: number) => (
               <li key={idx}>{warn}</li>
             ))}
           </ul>
         </div>
       )}
 
+      {/* Before / After Comparison Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Available Balance Card */}
         <div className="bg-[#0C0E17] border border-[#1F243B] rounded-lg p-3.5">
           <div className="text-[11px] font-medium text-slate-400">Available Balance</div>
           <div className="flex items-center justify-between mt-1.5">
@@ -127,11 +122,12 @@ export const ImpactPreview: React.FC<ImpactPreviewProps> = ({
             </div>
           </div>
           <div className="text-[10px] text-slate-500 font-mono mt-1 text-right">
-            {(impact.balanceDelta ?? 0) <= 0 ? '' : '+'}
-            ₹{(impact.balanceDelta ?? -decision.amount).toLocaleString('en-IN')} delta
+            {impact.balanceDelta <= 0 ? '' : '+'}
+            ₹{impact.balanceDelta.toLocaleString('en-IN')} delta
           </div>
         </div>
 
+        {/* Daily Allowance Card */}
         <div className="bg-[#0C0E17] border border-[#1F243B] rounded-lg p-3.5">
           <div className="text-[11px] font-medium text-slate-400">Daily Allowance</div>
           <div className="flex items-center justify-between mt-1.5">
@@ -152,11 +148,12 @@ export const ImpactPreview: React.FC<ImpactPreviewProps> = ({
             </div>
           </div>
           <div className="text-[10px] text-slate-500 font-mono mt-1 text-right">
-            {(impact.dailyAllowanceDelta ?? 0) <= 0 ? '' : '+'}
-            ₹{(impact.dailyAllowanceDelta ?? 0).toLocaleString('en-IN')}/d
+            {impact.dailyAllowanceDelta >= 0 ? '+' : ''}
+            ₹{impact.dailyAllowanceDelta.toLocaleString('en-IN')}/day delta
           </div>
         </div>
 
+        {/* Health Score Card */}
         <div className="bg-[#0C0E17] border border-[#1F243B] rounded-lg p-3.5">
           <div className="text-[11px] font-medium text-slate-400">Health Score</div>
           <div className="flex items-center justify-between mt-1.5">
@@ -164,36 +161,72 @@ export const ImpactPreview: React.FC<ImpactPreviewProps> = ({
               {currentHealthScore}/100
             </div>
             <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
-            <div className="text-lg font-mono font-bold text-white tabular-nums">
+            <div
+              className={`text-lg font-mono font-bold tabular-nums ${
+                newHealthScore >= 75
+                  ? 'text-emerald-400'
+                  : newHealthScore >= 50
+                  ? 'text-amber-400'
+                  : 'text-rose-400'
+              }`}
+            >
               {newHealthScore}/100
             </div>
           </div>
           <div className="text-[10px] text-slate-500 font-mono mt-1 text-right">
-            {(impact.healthScoreDelta ?? 0) >= 0 ? '+' : ''}
-            {impact.healthScoreDelta ?? 0} pts
+            {impact.healthScoreDelta >= 0 ? '+' : ''}
+            {impact.healthScoreDelta} pts
           </div>
         </div>
 
-        <div className="bg-[#0C0E17] border border-[#1F243B] rounded-lg p-3.5 flex flex-col justify-between">
-          <div className="text-[11px] font-medium text-slate-400">Simulated Velocity Risk</div>
-          <div className="mt-2">
-            <span className={`inline-block px-2.5 py-1 rounded text-xs font-bold border uppercase tracking-wider ${getRiskColor(newRisk)}`}>
+        {/* Risk Level Card */}
+        <div className="bg-[#0C0E17] border border-[#1F243B] rounded-lg p-3.5">
+          <div className="text-[11px] font-medium text-slate-400">Risk Assessment</div>
+          <div className="flex items-center justify-between mt-1.5">
+            <span className="text-xs font-semibold uppercase text-slate-400">
+              {currentRisk}
+            </span>
+            <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+            <span
+              className={`px-2 py-0.5 rounded text-xs font-bold uppercase border ${getRiskColor(
+                newRisk
+              )}`}
+            >
               {newRisk}
             </span>
           </div>
         </div>
       </div>
 
+      {/* AI Context Recommendation */}
+      <div className="rounded-lg bg-indigo-500/10 border border-indigo-500/20 p-3.5">
+        <div className="flex items-center gap-2 text-xs font-bold text-indigo-300 mb-1">
+          <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+          <span>FlowFi Smart Recommendation</span>
+        </div>
+        <p className="text-xs text-slate-300 leading-relaxed">
+          {impact.recommendation}
+        </p>
+      </div>
+
+      {/* Confirmation & Commit Action */}
       <div className="pt-2">
         <Button
-          variant="primary"
           onClick={handleCommit}
-          disabled={!safeToCommit || isSubmitting}
-          className="w-full flex items-center justify-center gap-2"
+          disabled={!safeToCommit || (decision?.amount ?? 0) <= 0 || isSubmitting}
+          isLoading={isSubmitting}
+          className="w-full text-sm font-semibold h-11"
+          variant={safeToCommit ? 'primary' : 'secondary'}
         >
-          <Sparkles className="w-4 h-4" />
-          <span>{committedSuccess ? 'Decision Committed!' : 'Commit Simulated Expense'}</span>
+          {committedSuccess
+            ? '✓ Expense Logged to Ledger!'
+            : safeToCommit
+            ? `Confirm & Deduct ₹${(decision?.amount ?? 0).toLocaleString('en-IN')}`
+            : 'Insufficient Funds ✦ Cannot Confirm'}
         </Button>
+        <p className="text-[11px] text-slate-500 text-center mt-2">
+          Clicking confirm deducts this amount from your live ₹10,000 monthly cycle.
+        </p>
       </div>
     </div>
   );

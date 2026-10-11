@@ -4,15 +4,8 @@
  */
 
 import { useState, useMemo, useCallback, Suspense, lazy } from 'react';
-import type { 
-  FinancialState, 
-  SimulationDraft
-} from './types/finance';
 import { PERSONA_PRESETS } from './data/presets';
-import { 
-  calculateMetrics, 
-  generateHealthScoreAudit
-} from './utils/calculations';
+import { generateHealthScoreAudit } from './utils/calculations';
 
 import { Layout } from './app/layout';
 import type { AppTab } from './store/budgetStore';
@@ -71,20 +64,18 @@ const ViewSkeleton = () => (
 
 export function AppContent() {
   const store = useBudgetStore();
+  const {
+    financialState,
+    baselineMetrics,
+    simulatedMetrics,
+    activePersona,
+    applyPersonaPreset,
+    setCurrentDay,
+    setSimulationDraft,
+  } = store;
+
   const [currentTab, setCurrentTab] = useState<AppTab>('dashboard');
-  const [selectedPresetId, setSelectedPresetId] = useState<string>('hostel-hustler');
-
-  const [financialState, setFinancialState] = useState<FinancialState>(() => {
-    const preset = PERSONA_PRESETS.find(p => p.id === 'hostel-hustler') ?? PERSONA_PRESETS[0];
-    return JSON.parse(JSON.stringify(preset.state));
-  });
-
-  const [simulationDraft, setSimulationDraft] = useState<SimulationDraft | null>({
-    title: 'Weekend Outing & Dinner Treat',
-    amount: 500,
-    category: 'Food & Dining',
-    day: financialState.currentDay
-  });
+  const [selectedPresetId, setSelectedPresetId] = useState<string>(activePersona);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHealthAuditOpen, setIsHealthAuditOpen] = useState(false);
@@ -99,16 +90,6 @@ export function AppContent() {
   const currentPreset = useMemo(() => {
     return PERSONA_PRESETS.find(p => p.id === selectedPresetId) ?? PERSONA_PRESETS[0];
   }, [selectedPresetId]);
-
-  // Synchronous Reactive Calculations
-  const baselineMetrics = useMemo(() => {
-    return calculateMetrics(financialState);
-  }, [financialState]);
-
-  const simulatedMetrics = useMemo(() => {
-    if (!simulationDraft || simulationDraft.amount <= 0) return null;
-    return calculateMetrics(financialState, simulationDraft);
-  }, [financialState, simulationDraft]);
 
   const activeMetrics = useMemo(() => {
     return simulatedMetrics ?? baselineMetrics;
@@ -125,31 +106,13 @@ export function AppContent() {
     
     playToggle();
     setSelectedPresetId(presetId);
-    const cloned = JSON.parse(JSON.stringify(preset.state));
-    setFinancialState(cloned);
-    store.applyPersonaPreset(presetId as any);
-    store.setCurrentDay(cloned.currentDay);
-    
-    setSimulationDraft({
-      title: 'Weekend Outing & Dinner Treat',
-      amount: 500,
-      category: 'Food & Dining',
-      day: cloned.currentDay
-    });
-  }, [store]);
+    applyPersonaPreset(presetId as 'hostel-hustler' | 'tech-intern' | 'freelance-creative');
+  }, [applyPersonaPreset]);
 
   const handleDayChange = useCallback((day: number) => {
     playTick();
-    setFinancialState(prev => ({
-      ...prev,
-      currentDay: day
-    }));
-    store.setCurrentDay(day);
-
-    if (simulationDraft) {
-      setSimulationDraft(prev => prev ? { ...prev, day } : null);
-    }
-  }, [simulationDraft, store]);
+    setCurrentDay(day);
+  }, [setCurrentDay]);
 
   const handleToggleMute = useCallback(() => {
     const muted = toggleAudioMute();

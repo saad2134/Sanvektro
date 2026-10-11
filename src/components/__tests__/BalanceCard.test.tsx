@@ -1,15 +1,11 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { BalanceCard } from '../budget/BalanceCard';
-import type { BudgetState } from '../../types';
+import { BudgetState } from '../../types';
 
-describe('BalanceCard Component Verification', () => {
+describe('BalanceCard', () => {
   const mockState: BudgetState = {
     totalBudget: 10000,
     startDate: new Date(),
