@@ -120,6 +120,7 @@ describe('Keyboard Accessibility Invariants', () => {
       { key: '2', action: 'Select Preset 2' },
       { key: '3', action: 'Select Preset 3' },
       { key: 'S', action: 'Focus Simulator' },
+      { key: 'C', action: 'Financial Decision Coach' },
       { key: 'K', action: 'Command Palette' },
       { key: 'L', action: 'The Lens Inspector' },
       { key: 'E', action: 'Export CSV' },

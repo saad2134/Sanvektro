@@ -40,6 +40,7 @@ import { MonthEndReportCardModal } from './components/MonthEndReportCardModal';
 import { OnboardingTourModal } from './components/OnboardingTourModal';
 import { TheLens } from './components/TheLens';
 import { CommandPalette } from './components/CommandPalette';
+import { SanvektroCoachModal } from './components/SanvektroCoachModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
@@ -81,6 +82,7 @@ export function AppContent() {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isLensActive, setIsLensActive] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isCoachOpen, setIsCoachOpen] = useState(false);
   const [isMutedState, setIsMutedState] = useState<boolean>(() => isAudioMuted());
 
   const currentPreset = useMemo(() => {
@@ -335,6 +337,9 @@ export function AppContent() {
       playToggle();
       setIsLensActive(prev => !prev);
     },
+    onToggleCoach: () => {
+      setIsCoachOpen(prev => !prev);
+    },
     onCloseModals: () => {
       setIsModalOpen(false);
       setIsHealthAuditOpen(false);
@@ -342,6 +347,7 @@ export function AppContent() {
       setIsReportCardOpen(false);
       setIsOnboardingOpen(false);
       setIsCommandPaletteOpen(false);
+      setIsCoachOpen(false);
     }
   }), [financialState, simulatedMetrics, baselineMetrics, handleDayChange, handleSelectPreset, handleToggleMute, handleFocusSimulator, playToggle]);
 
@@ -367,6 +373,7 @@ export function AppContent() {
         letterGrade={activeMetrics.letterGrade}
         onOpenTour={() => setIsOnboardingOpen(true)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenCoach={() => setIsCoachOpen(true)}
       />
 
       {/* Main Container */}
@@ -560,8 +567,22 @@ export function AppContent() {
           setIsLensActive(p => !p);
         }}
         onToggleMute={handleToggleMute}
+        onOpenCoach={() => setIsCoachOpen(true)}
         isMuted={isMutedState}
         isLensActive={isLensActive}
+      />
+
+      {/* Sanvektro Financial Decision Coach Modal */}
+      <SanvektroCoachModal
+        isOpen={isCoachOpen}
+        onClose={() => setIsCoachOpen(false)}
+        state={financialState}
+        metrics={activeMetrics}
+        presetName={currentPreset.name}
+        onStageSimulation={(draft) => {
+          setSimulationDraft(draft);
+          handleFocusSimulator();
+        }}
       />
 
       {/* Footer */}

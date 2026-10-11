@@ -19,10 +19,12 @@
 
 ## ✨ Key Features
 
+- 🤖 **Sanvektro Financial Decision Coach** ✦ Offline conversational AI companion (`C`) evaluating natural financial dilemmas against live ₹10k budget invariants, outputting deterministic verdicts (**SAFE**, **PROCEED WITH CAUTION**, **CRITICAL OVERDRAFT**), before/after metric deltas, and 1-click Pre-Spend Simulator staging.
 - 🔍 **"The Lens" Interactive Mathematical Inspector Loupe** ✦ Floating formula loupe mode (`L`) revealing exact mathematical invariants ($B_t$, $A_t$, Health Index, Financial Risk) with dynamic variable breakdowns and plain-language interpretations directly over cockpit cards.
-- ⌨️ **Global Command Palette Quick Launcher (`Ctrl+K` / `K`)** ✦ Instant keyboard-driven fuzzy search launcher for rapid persona switching, 1-click impulse simulations, data exports, and deep-section navigation.
+- ⌨️ **Global Command Palette Quick Launcher (`Ctrl+K` / `K`)** ✦ Instant keyboard-driven fuzzy search launcher for rapid persona switching, 1-click impulse simulations, data exports, Decision Coach access, and deep-section navigation.
 - 🚨 **Explicit Overdraft Deficit Modeling** ✦ Sub-zero liquidity tracking (`isOverdraft`, `overdraftAmount`) with prominent red overdraft warning badges and critical severity classification.
 - 🧭 **3-Stage Guided Onboarding Tour Modal** ✦ Interactive orientation introducing new evaluators to the ₹10,000 monthly living paradigm, the 3 capital buckets, and sandbox levers with hands-free hotkey access (`T`).
+- 📚 **Gen Z Financial Literacy Micro-Lessons** ✦ In-depth educational modules embedded in the Architecture guide exploring Safe Daily Burn Math vs Naive Division, Stealth Subscription Drain, the ₹2,000 Emergency Buffer Rule, and Simulation vs Rearview Tracking.
 - 🧪 **"What-If" Decision Simulator (Pre-Spend Sandbox)** ✦ Stage discretionary expenses (e.g., ₹480 Swiggy treat, ₹1,500 headphones, ₹2,200 sneaker drop) before committing to preview immediate ripple effects on your daily allowance, savings goals, monthly forecast, and financial health score. Includes **9 curated Gen Z impulse presets**.
 - 🔀 **3-Way Strategic Decision Comparison Matrix** ✦ Side-by-side consequence preview comparing **Scenario A (Buy Now)** vs **Scenario B (Delay 14 Days to protect liquidity)** vs **Scenario C (Smart Alternative ✦ -55% thrift discount)** with 1-click scenario adoption.
 - ⚡ **Multi-Tier Consequence Severity & Ripple Chains** ✦ Automatic severity grading (**NEGLIGIBLE**, **MODERATE**, **SEVERE**, **CRITICAL**) with dedicated **Committed Bills Shield** (verifies remaining buffer after mandatory obligations) and **Savings Goals Ripple** (tracking goal delay days).
@@ -31,7 +33,7 @@
 - 📈 **Interactive 30-Day Multi-Cone Trajectory Forecast Curve** ✦ High-resolution SVG chart plotting actual realized cash vs safe corridor, baseline expected projection, and **3-scenario multi-cone forecast curves** (Best Case ✦ -25% burn, Expected Case ✦ active pace, Worst Case ✦ +35% burn) with legend toggle and rich tooltips.
 - 🗓️ **30-Day Calendar Time Scrubber** ✦ Move between Day 1 and Day 30 manually or activate Auto-Advance playback to watch compounding cashflow, scheduled commitment settlements, and subscription billings trigger in real time.
 - 🗓️ **30-Day Spending Intensity Matrix (Calendar Heatmap)** ✦ 30-cell visual density matrix mapping daily burn across the entire cycle with color-coded intensity tiers (Safe, Mid, Spike) and 1-click timeline scrubbing.
-- ✂️ **Subscription Guillotine** ✦ Pause or reactivate micro-drains (Spotify, Netflix, Campus Gym, Cloud Storage) with live calculation of reclaimed daily runway (e.g., *"Pausing Campus Gym recovers +₹35/day safely"*).
+- ✂️ **Subscription Guillotine & Annual Run-Rate** ✦ Track monthly drain, annualized recurring burden ($\sum S \times 12$), and % of budget consumed, with instant calculation of daily allowance recovered by pausing optional services.
 - 🛡️ **Fixed Commitments Ringfencing** ✦ Segregates non-negotiable living overhead (PG Rent share, Wi-Fi recharge, Metro smart card pass) from discretionary spending to eliminate end-of-month default risk.
 - 🎯 **Savings Goals Feasibility Corridor & Lockbox Simulator** ✦ Track targets with **Required Daily Save rate**, **Projected Completion Horizon calendar day**, and an interactive **Savings Lockbox Ripple Simulator** testing daily runway trade-offs before locking funds.
 - ⚡ **Shock Roulette Stress-Testing** ✦ Stress-test your budget buffer against realistic emergencies (bike puncture, broken phone screen, sudden dental medicine, group dinner split) to measure shock resilience.
@@ -43,11 +45,11 @@
 - 💡 **Actionable Optimization Recommendations with Empirical Evidence** ✦ Context-aware levers providing calculated daily runway gains backed by verifiable audit evidence lines (`Evidence:`).
 - 🔄 **Bidirectional Savings Goal Actions** ✦ Micro-contributions with confetti milestones and safe fund unlocks back into the liquid wallet.
 - 🔊 **Web Audio Synthesizer Haptics** ✦ Zero-latency acoustic feedback using browser Web Audio oscillators for tactile timeline clicks, goal fanfare chimes, and warning alerts with one-click mute.
-- ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `K`, `L`, `R`, `T`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
+- ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `C`, `K`, `L`, `R`, `T`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
 - 💾 **Multi-Format Financial Exports & Schema-Guarded Imports** ✦ Instant export to Tabular CSV, Full State JSON, formatted physical Print Statement, and validated JSON restore capability.
 - 🛡️ **Defensive Security, Runtime Schema Validation & Prototype Shield** ✦ DOMPurify XSS scrubbing on all user inputs, runtime schema validation on all state payloads, prototype pollution defense, safe float arithmetic (`safeAdd`, `safeSub`), bounded number clamping, and top-level ErrorBoundary resilience.
 - ♿ **WCAG 2.1 AA Mathematical Contrast & Accessibility Verification** ✦ Programmatic validation of relative luminance and high-contrast tokens ($\ge 4.5:1$ body, $\ge 3:1$ UI accents) with accessible ARIA dialog contracts.
-- 🧪 **Vitest Unit & Integration Test Suite** ✦ 48 automated tests across 5 suites covering mathematical invariants, safe float arithmetic, letter grade appraisal, recency-weighted burn velocity, multi-cone forecast curves, 3-way scenario comparisons, category budget caps, spending heatmaps, lockbox ripples, goal feasibility horizons, consequence severity rankings, empirical evidence verification, schema validation, WCAG 2.1 AA contrast math, overdraft invariants, and fault recovery.
+- 🧪 **Vitest Unit & Integration Test Suite** ✦ 55 automated tests across 6 suites covering mathematical invariants, safe float arithmetic, letter grade appraisal, recency-weighted burn velocity, multi-cone forecast curves, 3-way scenario comparisons, category budget caps, spending heatmaps, lockbox ripples, goal feasibility horizons, consequence severity rankings, empirical evidence verification, schema validation, WCAG 2.1 AA contrast math, overdraft invariants, decision coach dilemma parsing, and fault recovery.
 
 ---
 

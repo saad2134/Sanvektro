@@ -74,10 +74,18 @@ export const SubscriptionsManager: React.FC<SubscriptionsManagerProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <div className="text-xs font-mono bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800">
-            <span className="text-slate-400">Active Drain: </span>
+            <span className="text-slate-400">Monthly Drain: </span>
             <span className="text-rose-400 font-bold">₹{activeTotal}/mo</span>
+          </div>
+          <div className="text-xs font-mono bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800 hidden md:block">
+            <span className="text-slate-400">Annual Run-Rate: </span>
+            <span className="text-amber-400 font-bold">₹{(activeTotal * 12).toLocaleString('en-IN')}/yr</span>
+          </div>
+          <div className="text-xs font-mono bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800 hidden lg:block">
+            <span className="text-slate-400">Budget Burden: </span>
+            <span className="text-purple-400 font-bold">{Math.round((activeTotal / 10000) * 100)}%</span>
           </div>
           <button
             onClick={() => setShowAddForm(!showAddForm)}

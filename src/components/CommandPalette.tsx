@@ -17,7 +17,8 @@ import {
   Target,
   Scissors,
   Zap,
-  Activity
+  Activity,
+  Bot
 } from 'lucide-react';
 import type { SimulationDraft, ExpenseCategory } from '../types/finance';
 
@@ -45,6 +46,7 @@ interface CommandPaletteProps {
   onOpenShortcuts: () => void;
   onToggleLens: () => void;
   onToggleMute: () => void;
+  onOpenCoach?: () => void;
   isMuted: boolean;
   isLensActive: boolean;
 }
@@ -63,6 +65,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onOpenShortcuts,
   onToggleLens,
   onToggleMute,
+  onOpenCoach,
   isMuted,
   isLensActive
 }) => {
@@ -167,6 +170,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     },
 
     // Actions & Tools
+    {
+      id: 'action-coach',
+      title: 'Decision Coach ✦ AI Dilemma Advisor (C)',
+      subtitle: 'Ask natural purchase dilemmas against live ₹10k invariants',
+      category: 'Actions',
+      icon: Bot,
+      keywords: ['coach', 'ai', 'dilemma', 'afford', 'advice', 'ask'],
+      action: () => onOpenCoach?.()
+    },
     {
       id: 'action-lens',
       title: `The Lens ✦ Formula Inspector (${isLensActive ? 'Active' : 'Off'})`,

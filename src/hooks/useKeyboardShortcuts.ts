@@ -13,6 +13,7 @@ interface ShortcutActions {
   onToggleTour?: () => void;
   onToggleCommandPalette?: () => void;
   onToggleLens?: () => void;
+  onToggleCoach?: () => void;
   onCloseModals: () => void;
 }
 
@@ -60,6 +61,11 @@ export function useKeyboardShortcuts(actions: ShortcutActions) {
         case 'S':
           e.preventDefault();
           actions.onFocusSimulator();
+          break;
+        case 'c':
+        case 'C':
+          e.preventDefault();
+          actions.onToggleCoach?.();
           break;
         case 'k':
         case 'K':

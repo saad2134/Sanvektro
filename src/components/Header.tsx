@@ -15,7 +15,8 @@ import {
   ChevronDown,
   Award,
   Compass,
-  Search
+  Search,
+  Bot
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -34,6 +35,7 @@ interface HeaderProps {
   letterGrade?: string;
   onOpenTour?: () => void;
   onOpenCommandPalette?: () => void;
+  onOpenCoach?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -51,7 +53,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenReportCard,
   letterGrade,
   onOpenTour,
-  onOpenCommandPalette
+  onOpenCommandPalette,
+  onOpenCoach
 }) => {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
@@ -277,6 +280,22 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="hidden sm:inline">Search</span>
                 <kbd className="hidden md:inline text-[9px] font-mono px-1 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
                   ⌘K
+                </kbd>
+              </button>
+            )}
+
+            {/* Decision Coach Button */}
+            {onOpenCoach && (
+              <button
+                onClick={onOpenCoach}
+                id="btn-open-coach"
+                className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500/15 to-emerald-500/15 hover:from-cyan-500/25 hover:to-emerald-500/25 text-xs font-semibold text-cyan-300 border border-cyan-500/30 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+                title="Sanvektro Financial Decision Coach (C)"
+              >
+                <Bot className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="hidden sm:inline">Coach</span>
+                <kbd className="hidden md:inline text-[9px] font-mono px-1 py-0.2 rounded bg-slate-800 text-cyan-300 border border-cyan-500/30">
+                  C
                 </kbd>
               </button>
             )}

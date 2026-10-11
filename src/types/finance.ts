@@ -213,3 +213,21 @@ export interface SavingsLockboxRipple {
   isSustainable: boolean;
 }
 
+export interface CoachEvaluationResult {
+  verdict: 'SAFE' | 'CAUTION' | 'CRITICAL';
+  verdictLabel: string;
+  response: string;
+  extractedAmount?: number;
+  extractedTitle?: string;
+  dataSnippet?: {
+    currentBalance: number;
+    simulatedBalance: number;
+    currentAllowance: number;
+    simulatedAllowance: number;
+    allowanceDelta: number;
+    projectedDay30Balance: number;
+    goalsCompromised: number;
+    isOverdraft: boolean;
+  };
+}
+
