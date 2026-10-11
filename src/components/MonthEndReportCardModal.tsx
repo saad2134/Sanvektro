@@ -75,6 +75,41 @@ export const MonthEndReportCardModal: React.FC<MonthEndReportCardModalProps> = (
 
   const style = getGradeStyle(metrics.letterGrade);
 
+  // Gen Z Survival Archetype
+  const getArchetype = (grade: string) => {
+    switch (grade) {
+      case 'A+':
+      case 'A':
+        return {
+          title: 'Prudent Mastermind',
+          subtitle: 'Flawless Solvency & Reserve Discipline',
+          badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+        };
+      case 'B':
+        return {
+          title: 'Budget Sensei',
+          subtitle: 'Balanced Pacing & Moderate Discretionary Burn',
+          badge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+        };
+      case 'C':
+        return {
+          title: 'Instant Noodle Survivor',
+          subtitle: 'Narrow Runway & Living on the Margin',
+          badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+        };
+      case 'D':
+      case 'F':
+      default:
+        return {
+          title: 'Broke Legend',
+          subtitle: 'Heroic Deficit & Cash Exhaustion Hazard',
+          badge: 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+        };
+    }
+  };
+
+  const archetype = getArchetype(metrics.letterGrade);
+
   // Top 3 highest expenses to date
   const topExpenses = [...state.transactions]
     .filter(t => t.day <= state.currentDay)
@@ -93,6 +128,7 @@ export const MonthEndReportCardModal: React.FC<MonthEndReportCardModalProps> = (
       `# ✦ SANVEKTRO ✦ 30-Day Executive Month-End Report Card`,
       `**Persona**: ${presetName} | **Current Day**: Day ${state.currentDay} / 30`,
       `**Academic Grade**: ${metrics.letterGrade} (${metrics.healthScore}/100)`,
+      `**Gen Z Archetype**: ${archetype.title} ✦ ${archetype.subtitle}`,
       `**Verdict**: ${metrics.gradeDescriptor}`,
       ``,
       `## ✦ Executive Summary Metrics`,
@@ -179,12 +215,15 @@ export const MonthEndReportCardModal: React.FC<MonthEndReportCardModalProps> = (
               </div>
 
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                     Solvency Appraisal
                   </span>
                   <span className={`text-xs font-bold font-mono px-2 py-0.5 rounded-full bg-slate-800/80 border border-slate-700 ${style.accent}`}>
                     {metrics.healthScore}/100 Health Index
+                  </span>
+                  <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${archetype.badge}`}>
+                    {archetype.title}
                   </span>
                 </div>
                 <h3 className="text-base sm:text-lg font-bold text-white mt-1 leading-snug">

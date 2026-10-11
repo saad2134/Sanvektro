@@ -556,6 +556,37 @@ describe('Sanvektro Financial Calculations Engine', () => {
     const majorDiff = calculateConsequenceDiff(baseline, majorSim, majorDraft.amount, DEFAULT_HOSTEL_HUSTLER);
     expect(['SEVERE', 'CRITICAL']).toContain(majorDiff.severity);
   });
+
+  it('guarantees integer paise conversion and zero IEEE 754 floating precision drift', async () => {
+    const { rupeesToPaise, paiseToRupees } = await import('../utils/calculations');
+
+    // Standard conversions
+    expect(rupeesToPaise(10000)).toBe(1000000); // ₹10,000 = 1,000,000 paise
+    expect(rupeesToPaise(299)).toBe(29900);     // ₹299 = 29,900 paise
+    expect(rupeesToPaise(15.5)).toBe(1550);     // ₹15.50 = 1,550 paise
+    expect(rupeesToPaise(0)).toBe(0);
+
+    // Inverse conversions
+    expect(paiseToRupees(1000000)).toBe(10000);
+    expect(paiseToRupees(29900)).toBe(299);
+    expect(paiseToRupees(1550)).toBe(15.5);
+
+    // IEEE 754 floating point arithmetic protection ✦ micro-transaction sum
+    // Standard JS: 0.1 + 0.2 = 0.30000000000000004
+    const paiseA = rupeesToPaise(0.1); // 10 paise
+    const paiseB = rupeesToPaise(0.2); // 20 paise
+    const sumPaise = paiseA + paiseB;  // 30 paise
+    expect(sumPaise).toBe(30);
+    expect(paiseToRupees(sumPaise)).toBe(0.3);
+
+    // Iterative accumulation of 1,000 micro-transactions of ₹0.10
+    let totalPaise = 0;
+    for (let i = 0; i < 1000; i++) {
+      totalPaise += rupeesToPaise(0.1);
+    }
+    expect(totalPaise).toBe(10000); // exactly 10,000 paise
+    expect(paiseToRupees(totalPaise)).toBe(100); // exactly ₹100.00
+  });
 });
 
 

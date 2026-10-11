@@ -46,7 +46,8 @@ const QUICK_SIMULATIONS = [
   { title: 'OTT & Music Annual Pass', amount: 1199, category: 'Entertainment & Social' as ExpenseCategory },
   { title: 'Screen Repair Emergency', amount: 1000, category: 'Health & Emergency' as ExpenseCategory },
   { title: 'Concert VIP Pass', amount: 1800, category: 'Entertainment & Social' as ExpenseCategory },
-  { title: 'Late-Night Cab Surge', amount: 380, category: 'Transit & Commute' as ExpenseCategory }
+  { title: 'Late-Night Cab Surge', amount: 380, category: 'Transit & Commute' as ExpenseCategory },
+  { title: 'Freelance Design Stipend', amount: 1500, category: 'Academic & Tech' as ExpenseCategory }
 ];
 
 export const DecisionSimulator: React.FC<DecisionSimulatorProps> = ({
@@ -165,6 +166,7 @@ export const DecisionSimulator: React.FC<DecisionSimulatorProps> = ({
             <button
               key={idx}
               id={`quick-sim-btn-${idx}`}
+              data-testid="stage-simulation-button"
               onClick={() => handleQuickSelect(item)}
               className="text-xs px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 hover:text-white hover:border-emerald-500/40 hover:bg-slate-800/90 transition-all font-medium flex items-center gap-1.5"
             >
@@ -204,6 +206,7 @@ export const DecisionSimulator: React.FC<DecisionSimulatorProps> = ({
             <input
               id="simulator-amount"
               data-testid="simulator-amount"
+              data-simulator-input="decision-simulator-input"
               type="number"
               min="0"
               step="50"
@@ -461,6 +464,7 @@ export const DecisionSimulator: React.FC<DecisionSimulatorProps> = ({
             <button
               onClick={handleDiscard}
               id="btn-discard-simulation"
+              data-testid="discard-simulation-button"
               className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors flex items-center gap-1.5"
             >
               <XCircle className="w-4 h-4" /> Discard Simulation
@@ -468,6 +472,7 @@ export const DecisionSimulator: React.FC<DecisionSimulatorProps> = ({
             <button
               onClick={handleCommit}
               id="btn-commit-simulation"
+              data-testid="commit-simulation-button"
               className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 text-xs font-bold shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-1.5"
             >
               <CheckCircle2 className="w-4 h-4" /> Commit to Active Ledger

@@ -332,6 +332,21 @@ export function safeSub(a: number, b: number): number {
 }
 
 /**
+ * Converts Indian Rupees to integer paise (1 INR = 100 paise).
+ * Eliminates IEEE 754 floating-point rounding errors.
+ */
+export function rupeesToPaise(rupees: number): number {
+  return Math.round(rupees * 100);
+}
+
+/**
+ * Converts integer paise back to Indian Rupees (100 paise = 1 INR).
+ */
+export function paiseToRupees(paise: number): number {
+  return Math.round(paise) / 100;
+}
+
+/**
  * Calculates feasibility metrics for a savings goal: daily required, completion horizon, and on-track status.
  */
 export function calculateGoalFeasibility(
