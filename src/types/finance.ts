@@ -107,3 +107,55 @@ export interface PersonaPreset {
   description: string;
   state: FinancialState;
 }
+
+export interface CapitalAllocation {
+  totalCapital: number;
+  spentToDate: number;
+  lockedInGoals: number;
+  reservedObligations: number;
+  freeDiscretionary: number;
+  spentPct: number;
+  lockedPct: number;
+  reservedPct: number;
+  freePct: number;
+}
+
+export interface CategoryOutflow {
+  category: ExpenseCategory;
+  amount: number;
+  percentage: number;
+  transactionCount: number;
+  color: string;
+}
+
+export interface PillarScore {
+  name: string;
+  score: number;
+  maxScore: number;
+  weightPct: number;
+  status: string;
+  description: string;
+}
+
+export interface HealthScoreAudit {
+  overallScore: number;
+  riskLevel: RiskLevel;
+  pillars: {
+    runway: PillarScore;
+    commitments: PillarScore;
+    allowance: PillarScore;
+    resilience: PillarScore;
+  };
+  positiveHighlights: string[];
+  riskWarnings: string[];
+}
+
+export interface OptimizationTip {
+  id: string;
+  title: string;
+  type: 'SAVINGS' | 'SUBSCRIPTION' | 'DISCRETIONARY';
+  impact: string;
+  actionableText: string;
+  badge: string;
+}
+

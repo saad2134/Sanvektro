@@ -16,13 +16,15 @@ interface MetricCardsProps {
   diff: ConsequenceDiff | null;
   currentDay: number;
   startingBudget: number;
+  onOpenHealthAudit?: () => void;
 }
 
 export const MetricCards: React.FC<MetricCardsProps> = ({
   metrics,
   diff,
   currentDay,
-  startingBudget
+  startingBudget,
+  onOpenHealthAudit
 }) => {
   const remainingDays = Math.max(1, 30 - currentDay + 1);
 
@@ -193,9 +195,21 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
 
         <div className="mt-3 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/60 pt-2.5">
           <span>Resilience: {metrics.shockResilienceScore}%</span>
-          <span className={`font-semibold ${getHealthColor(metrics.healthScore)}`}>
-            {metrics.healthScore >= 80 ? 'Elite Control' : metrics.healthScore >= 60 ? 'Stable Runway' : metrics.healthScore >= 40 ? 'Vulnerable' : 'High Friction'}
-          </span>
+          {onOpenHealthAudit ? (
+            <button
+              onClick={onOpenHealthAudit}
+              id="btn-audit-health-math"
+              className="text-purple-400 hover:text-purple-300 font-semibold underline text-[11px] transition-colors cursor-pointer flex items-center gap-1"
+              title="Audit transparent 4-pillar math"
+            >
+              <span>Audit Math</span>
+              <span>✦</span>
+            </button>
+          ) : (
+            <span className={`font-semibold ${getHealthColor(metrics.healthScore)}`}>
+              {metrics.healthScore >= 80 ? 'Elite Control' : metrics.healthScore >= 60 ? 'Stable Runway' : metrics.healthScore >= 40 ? 'Vulnerable' : 'High Friction'}
+            </span>
+          )}
         </div>
       </div>
 

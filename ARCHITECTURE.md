@@ -53,13 +53,14 @@ Sanvektro enforces strict separation of concerns across six decoupled architectu
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │ Layer 1: Presentation & Cockpit Shell (React 19 + Tailwind CSS v4)      │
-│ Header, MetricCards, TimelineScrubber, DecisionSimulator, Trajectory    │
+│ Header, MetricCards, CapitalAllocationBar, DeficitAlertBanner, Scrubber,│
+│ DecisionSimulator, TrajectoryChart, CategoryBreakdown, Insights, Modals │
 ├─────────────────────────────────────────────────────────────────────────┤
 │ Layer 2: Reactive State Orchestration (App.tsx + Hooks)                 │
 │ State immutability, optimistic draft sandboxing, hotkey dispatchers     │
 ├─────────────────────────────────────────────────────────────────────────┤
 │ Layer 3: Deterministic Financial Mathematics (calculations.ts)          │
-│ Pure functions, zero DOM dependencies, complete test coverage           │
+│ Pure functions, zero DOM dependencies, 17/17 automated test coverage    │
 ├─────────────────────────────────────────────────────────────────────────┤
 │ Layer 4: Defensive Security & Input Sanitization (security.ts)          │
 │ DOMPurify XSS scrubbing, prototype pollution defense, range clamping   │
@@ -184,12 +185,12 @@ Sanvektro includes a comprehensive test suite running under Vitest and `@testing
 
 | Test Suite | File Path | Focus & Assertions |
 |---|---|---|
-| **Financial Calculations** | `src/__tests__/calculations.test.ts` | ₹10k budget baseline, safe burn allowance, consequence diffs, 30-day trajectory points, and runway depletion risk tiers. |
-| **Defensive Security** | `src/__tests__/security.test.ts` | Prototype pollution detection, object cleansing, DOMPurify XSS stripping, and boundary number clamping. |
-| **Fault Recovery** | `src/__tests__/ErrorBoundary.test.tsx` | ErrorBoundary rendering, error capture, fallback display, and child recovery. |
-| **End-to-End App Integration** | `src/__tests__/App.test.tsx` | 4-pillar metric cards mounting, persona switching, and reactive consequence rendering. |
+| **Financial Calculations & Analytics** | `src/__tests__/calculations.test.ts` | 8 tests: ₹10k budget baseline, safe burn allowance, consequence diffs, 30-day trajectory points, critical runway depletion risk, capital allocation distribution, category outflow aggregation, and 4-pillar health audit diagnostics. |
+| **Defensive Security** | `src/__tests__/security.test.ts` | 4 tests: Prototype pollution detection, object cleansing, DOMPurify XSS stripping, and boundary number clamping. |
+| **Fault Recovery** | `src/__tests__/ErrorBoundary.test.tsx` | 2 tests: ErrorBoundary rendering, error capture, fallback display, and child recovery. |
+| **End-to-End App Integration** | `src/__tests__/App.test.tsx` | 3 tests: 4-pillar metric cards mounting, persona switching, and reactive consequence rendering. |
 
-To execute the test suite:
+To execute the test suite (17/17 tests passing):
 ```bash
 npx vitest run
 ```

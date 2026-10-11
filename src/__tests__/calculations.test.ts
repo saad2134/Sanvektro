@@ -70,4 +70,39 @@ describe('Sanvektro Financial Calculations Engine', () => {
     expect(metrics.riskLevel).toBe('CRITICAL');
     expect(metrics.runwayDepletionDay).not.toBeNull();
   });
+
+  it('calculates 30-day capital allocation distribution', async () => {
+    const { calculateCapitalAllocation } = await import('../utils/calculations');
+    const allocation = calculateCapitalAllocation(DEFAULT_HOSTEL_HUSTLER);
+
+    expect(allocation.totalCapital).toBe(11200);
+    expect(allocation.spentToDate).toBeGreaterThan(0);
+    expect(allocation.lockedInGoals).toBeGreaterThan(0);
+    expect(allocation.spentPct + allocation.lockedPct + allocation.reservedPct + allocation.freePct).toBeGreaterThanOrEqual(95);
+    expect(allocation.spentPct + allocation.lockedPct + allocation.reservedPct + allocation.freePct).toBeLessThanOrEqual(105);
+  });
+
+  it('aggregates category outflow distribution and sorts descending', async () => {
+    const { calculateCategoryOutflow } = await import('../utils/calculations');
+    const outflows = calculateCategoryOutflow(DEFAULT_HOSTEL_HUSTLER);
+
+    expect(outflows.length).toBeGreaterThan(0);
+    expect(outflows[0].amount).toBeGreaterThanOrEqual(outflows[outflows.length - 1].amount);
+    expect(outflows[0].percentage).toBeGreaterThan(0);
+  });
+
+  it('generates transparent 4-pillar health diagnostics and optimization tips', async () => {
+    const { generateHealthScoreAudit, generateOptimizationTips } = await import('../utils/calculations');
+    const metrics = calculateMetrics(DEFAULT_HOSTEL_HUSTLER);
+    const audit = generateHealthScoreAudit(DEFAULT_HOSTEL_HUSTLER, metrics);
+    const tips = generateOptimizationTips(DEFAULT_HOSTEL_HUSTLER, metrics);
+
+    expect(audit.pillars.runway.maxScore).toBe(35);
+    expect(audit.pillars.commitments.maxScore).toBe(25);
+    expect(audit.pillars.allowance.maxScore).toBe(20);
+    expect(audit.pillars.resilience.maxScore).toBe(20);
+    expect(audit.positiveHighlights.length).toBeGreaterThan(0);
+    expect(tips.length).toBeGreaterThan(0);
+  });
 });
+

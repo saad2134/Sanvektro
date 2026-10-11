@@ -7,12 +7,14 @@ interface SavingsGoalsProps {
   goals: SavingsGoal[];
   projectedSurplus: number;
   onContributeGoal: (id: string, amount: number) => void;
+  onWithdrawGoal?: (id: string, amount: number) => void;
 }
 
 export const SavingsGoals: React.FC<SavingsGoalsProps> = ({
   goals,
   projectedSurplus,
-  onContributeGoal
+  onContributeGoal,
+  onWithdrawGoal
 }) => {
   const handleContribute = (goal: SavingsGoal) => {
     const boost = 250;
@@ -24,6 +26,12 @@ export const SavingsGoals: React.FC<SavingsGoalsProps> = ({
         origin: { y: 0.7 }
       });
     }
+  };
+
+  const handleWithdraw = (goal: SavingsGoal) => {
+    if (!onWithdrawGoal || goal.currentAmount <= 0) return;
+    const withdrawAmount = Math.min(250, goal.currentAmount);
+    onWithdrawGoal(goal.id, withdrawAmount);
   };
 
   return (
@@ -101,15 +109,27 @@ export const SavingsGoals: React.FC<SavingsGoalsProps> = ({
                 <span className="text-slate-400 font-mono">
                   {progressPercent}%
                 </span>
-                <button
-                  onClick={() => handleContribute(goal)}
-                  disabled={isComplete}
-                  id={`btn-contribute-${goal.id}`}
-                  className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-emerald-400 font-semibold transition-colors flex items-center gap-1"
-                >
-                  {isComplete ? <CheckCircle2 className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-                  <span>{isComplete ? 'Done' : '+₹250'}</span>
-                </button>
+                <div className="flex items-center gap-1.5">
+                  {onWithdrawGoal && goal.currentAmount > 0 && (
+                    <button
+                      onClick={() => handleWithdraw(goal)}
+                      id={`btn-withdraw-${goal.id}`}
+                      className="px-2 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-rose-400 font-medium transition-colors"
+                      title="Unlock funds back to liquid wallet"
+                    >
+                      -₹{Math.min(250, goal.currentAmount)}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleContribute(goal)}
+                    disabled={isComplete}
+                    id={`btn-contribute-${goal.id}`}
+                    className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-emerald-400 font-semibold transition-colors flex items-center gap-1"
+                  >
+                    {isComplete ? <CheckCircle2 className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+                    <span>{isComplete ? 'Funded' : '+₹250'}</span>
+                  </button>
+                </div>
               </div>
             </div>
           );

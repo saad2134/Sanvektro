@@ -28,11 +28,17 @@
 - 🎯 **Savings Goals Pacing Corridor** ✦ Monitor progress on Gen Z aspirations (Retro Dunks, Emergency Safety Cushion, Weekend Indie Fest) with target pacing alerts and interactive micro-contributions.
 - ⚡ **Shock Roulette Stress-Testing** ✦ Stress-test your budget buffer against realistic emergencies (bike puncture, broken phone screen, sudden dental medicine, group dinner split) to measure shock resilience.
 - 👤 **1-Click Persona Presets** ✦ Instantly toggle between pre-configured real-world Gen Z profiles: *College Hosteler*, *First-Month Intern*, and *Freelance Creator*.
+- 📊 **30-Day Capital Allocation Corridor** ✦ Interactive stacked visual breakdown showing Spent to Date, Locked in Goals, Reserved for Bills, and Safe Discretionary Cushion.
+- 🩺 **"Audit Math" Health Diagnostics Modal** ✦ Clickable 4-pillar algorithmic audit detailing exact point scores, positive health highlights, and active diagnostic risk flags.
+- 🚨 **Dynamic Deficit & Solvency Alert Banner** ✦ Real-time alert banner warning of liquid cash shortfalls or runway exhaustion with instant sandbox fix actions.
+- 🗂️ **Outflow by Category Spend Breakdown** ✦ Aggregated distribution across Food & Dining, Transit, Shopping, and Tech with percentage meters and transaction counts.
+- 💡 **Actionable Optimization Recommendations** ✦ Context-aware levers providing calculated daily runway gains (e.g., *"Trimming 15% off Food & Dining lifts daily allowance by +₹7/day"*).
+- 🔄 **Bidirectional Savings Goal Actions** ✦ Micro-contributions with confetti milestones and safe fund unlocks back into the liquid wallet.
 - 🔊 **Web Audio Synthesizer Haptics** ✦ Zero-latency acoustic feedback using browser Web Audio oscillators for tactile timeline clicks, goal fanfare chimes, and warning alerts with one-click mute.
 - ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
 - 💾 **Multi-Format Financial Exports** ✦ Instant export to Tabular CSV (30-day transactions), Full State JSON (audit logs & metrics), and formatted physical Print Statement.
 - 🛡️ **Defensive Security & Prototype Pollution Shield** ✦ DOMPurify XSS scrubbing on all user inputs, prototype pollution defense, bounded arithmetic clamping, and top-level ErrorBoundary resilience.
-- 🧪 **Vitest Unit & Integration Test Suite** ✦ 14 automated test suites covering financial calculations, security sanitization, and fault recovery.
+- 🧪 **Vitest Unit & Integration Test Suite** ✦ 17 automated test suites covering financial calculations, capital allocation, security sanitization, and fault recovery.
 
 ---
 
@@ -121,20 +127,25 @@ flowchart TB
 PromptRunOct/
 ├── ARCHITECTURE.md               # Complete 6-layer architecture & mathematical specifications
 ├── src/
-│   ├── __tests__/                # Vitest test suites (14 tests)
+│   ├── __tests__/                # Vitest test suites (17 tests)
 │   │   ├── App.test.tsx              # Component integration & persona switching
-│   │   ├── calculations.test.ts      # Pure math & consequence diffing tests
+│   │   ├── calculations.test.ts      # Pure math, allocation & diagnostic tests
 │   │   ├── ErrorBoundary.test.tsx    # Crash containment & recovery verification
 │   │   └── security.test.ts          # DOMPurify XSS & prototype pollution tests
 │   ├── components/
+│   │   ├── CapitalAllocationBar.tsx  # 30-day 4-way stacked budget corridor bar
+│   │   ├── CategoryBreakdown.tsx     # Outflow by category spend distribution
 │   │   ├── CommitmentsList.tsx       # Mandatory bills with settlement toggles
 │   │   ├── DecisionSimulator.tsx     # The "What-If" pre-spend sandbox & consequence diff
+│   │   ├── DeficitAlertBanner.tsx    # Dynamic liquidity & runway crisis warning banner
 │   │   ├── ErrorBoundary.tsx         # Class-based crash interception boundary
 │   │   ├── Header.tsx                # Brand banner, audio toggle, export menu, shortcuts trigger
+│   │   ├── HealthAuditModal.tsx      # Transparent 4-pillar algorithmic math audit
 │   │   ├── HowItEvaluatesModal.tsx   # System architecture & author guide
 │   │   ├── KeyboardShortcutsModal.tsx# Rapid hotkey navigation overlay
 │   │   ├── MetricCards.tsx           # 4-pillar metrics (Balance, Daily Burn, Health, Risk)
-│   │   ├── SavingsGoals.tsx          # Goal pacing corridor with micro-contributions
+│   │   ├── OptimizationInsights.tsx  # Actionable AI-driven financial optimization tips
+│   │   ├── SavingsGoals.tsx          # Bidirectional goal corridor (contribute & withdraw)
 │   │   ├── ShockRoulette.tsx         # Emergency shock stress-testing roulette
 │   │   ├── SubscriptionsManager.tsx  # Subscription Guillotine with daily ROI feedback
 │   │   ├── TimelineScrubber.tsx      # Day 1-30 calendar time scrubber with autoplay

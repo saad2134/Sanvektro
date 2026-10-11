@@ -10,20 +10,29 @@ import { PERSONA_PRESETS } from './data/presets';
 import { 
   calculateMetrics, 
   calculateConsequenceDiff, 
-  generateTrajectoryPoints 
+  generateTrajectoryPoints,
+  calculateCapitalAllocation,
+  calculateCategoryOutflow,
+  generateHealthScoreAudit,
+  generateOptimizationTips
 } from './utils/calculations';
 
 import { Header } from './components/Header';
 import { MetricCards } from './components/MetricCards';
+import { CapitalAllocationBar } from './components/CapitalAllocationBar';
+import { DeficitAlertBanner } from './components/DeficitAlertBanner';
 import { TimelineScrubber } from './components/TimelineScrubber';
 import { DecisionSimulator } from './components/DecisionSimulator';
 import { TrajectoryChart } from './components/TrajectoryChart';
+import { CategoryBreakdown } from './components/CategoryBreakdown';
+import { OptimizationInsights } from './components/OptimizationInsights';
 import { SubscriptionsManager } from './components/SubscriptionsManager';
 import { CommitmentsList } from './components/CommitmentsList';
 import { SavingsGoals } from './components/SavingsGoals';
 import { ShockRoulette } from './components/ShockRoulette';
 import { TransactionLedger } from './components/TransactionLedger';
 import { HowItEvaluatesModal } from './components/HowItEvaluatesModal';
+import { HealthAuditModal } from './components/HealthAuditModal';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -60,6 +69,7 @@ export function AppContent() {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHealthAuditOpen, setIsHealthAuditOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isMutedState, setIsMutedState] = useState<boolean>(() => isAudioMuted());
 
@@ -81,6 +91,31 @@ export function AppContent() {
   const trajectoryPoints = useMemo(() => {
     return generateTrajectoryPoints(financialState, simulationDraft);
   }, [financialState, simulationDraft]);
+
+  // Capital Allocation & Advanced Analytics
+  const activeMetrics = simulatedMetrics ?? baselineMetrics;
+
+  const capitalAllocation = useMemo(() => {
+    return calculateCapitalAllocation(financialState, simulationDraft);
+  }, [financialState, simulationDraft]);
+
+  const categoryOutflows = useMemo(() => {
+    return calculateCategoryOutflow(financialState);
+  }, [financialState]);
+
+  const healthScoreAudit = useMemo(() => {
+    return generateHealthScoreAudit(financialState, activeMetrics);
+  }, [financialState, activeMetrics]);
+
+  const optimizationTips = useMemo(() => {
+    return generateOptimizationTips(financialState, activeMetrics);
+  }, [financialState, activeMetrics]);
+
+  const totalRealizedSpend = useMemo(() => {
+    return financialState.transactions
+      .filter(t => t.day <= financialState.currentDay)
+      .reduce((sum, t) => sum + t.amount, 0);
+  }, [financialState.transactions, financialState.currentDay]);
 
   // Audio Toggle
   const handleToggleMute = useCallback(() => {
@@ -170,6 +205,16 @@ export function AppContent() {
     }));
   }, []);
 
+  const handleWithdrawGoal = useCallback((goalId: string, amount: number) => {
+    playToggle();
+    setFinancialState(prev => ({
+      ...prev,
+      savingsGoals: prev.savingsGoals.map(g =>
+        g.id === goalId ? { ...g, currentAmount: Math.max(0, g.currentAmount - amount) } : g
+      )
+    }));
+  }, []);
+
   const handleApplyShock = useCallback((title: string, amount: number, category: ExpenseCategory) => {
     playWarning();
     const newTx: Transaction = {
@@ -230,6 +275,12 @@ export function AppContent() {
     });
   }, []);
 
+  const handleFocusSimulator = useCallback(() => {
+    const simInput = document.getElementById('sim-amount-input') || document.getElementById('decision-simulator-section');
+    simInput?.scrollIntoView({ behavior: 'smooth' });
+    simInput?.focus();
+  }, []);
+
   // Keyboard Shortcuts Hook
   const shortcutActions = useMemo(() => ({
     onTogglePlay: () => {
@@ -239,10 +290,7 @@ export function AppContent() {
       const preset = PERSONA_PRESETS[index];
       if (preset) handleSelectPreset(preset.id);
     },
-    onFocusSimulator: () => {
-      const simInput = document.getElementById('sim-amount-input') || document.getElementById('sim-title-input');
-      simInput?.focus();
-    },
+    onFocusSimulator: handleFocusSimulator,
     onExportCSV: () => {
       exportLedgerAsCSV(financialState);
     },
@@ -258,9 +306,10 @@ export function AppContent() {
     },
     onCloseModals: () => {
       setIsModalOpen(false);
+      setIsHealthAuditOpen(false);
       setIsShortcutsOpen(false);
     }
-  }), [financialState, simulatedMetrics, baselineMetrics, handleDayChange, handleSelectPreset, handleToggleMute]);
+  }), [financialState, simulatedMetrics, baselineMetrics, handleDayChange, handleSelectPreset, handleToggleMute, handleFocusSimulator]);
 
   useKeyboardShortcuts(shortcutActions);
 
@@ -285,15 +334,28 @@ export function AppContent() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
+        {/* Dynamic Deficit & Solvency Alert Banner */}
+        <DeficitAlertBanner
+          metrics={activeMetrics}
+          state={financialState}
+          onSolveInSimulator={handleFocusSimulator}
+        />
+
         {/* 1. Hero 4-Pillar Metric Cockpit */}
         <MetricCards
-          metrics={simulatedMetrics ?? baselineMetrics}
+          metrics={activeMetrics}
           diff={diff}
           currentDay={financialState.currentDay}
           startingBudget={financialState.startingBudget}
+          onOpenHealthAudit={() => setIsHealthAuditOpen(true)}
         />
 
-        {/* 2. 30-Day Timeline Calendar Scrubber */}
+        {/* 2. 30-Day Stacked Capital Allocation Bar */}
+        <CapitalAllocationBar
+          allocation={capitalAllocation}
+        />
+
+        {/* 3. 30-Day Timeline Calendar Scrubber */}
         <TimelineScrubber
           currentDay={financialState.currentDay}
           onDayChange={handleDayChange}
@@ -302,7 +364,7 @@ export function AppContent() {
           inflows={financialState.inflows}
         />
 
-        {/* 3. Central Grid: Decision Simulator & Interactive Visualizations */}
+        {/* 4. Central Grid: Decision Simulator & Interactive Visualizations */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* Left Column (7 cols): The Decision Engine & Forecast */}
@@ -326,6 +388,12 @@ export function AppContent() {
               isSimulating={simulationDraft !== null && simulationDraft.amount > 0}
             />
 
+            {/* Outflow by Category Breakdown */}
+            <CategoryBreakdown
+              outflows={categoryOutflows}
+              totalSpent={totalRealizedSpend}
+            />
+
             {/* Transaction Ledger */}
             <TransactionLedger
               transactions={financialState.transactions}
@@ -339,6 +407,11 @@ export function AppContent() {
           {/* Right Column (5 cols): Guardrails, Subscriptions & Shocks */}
           <div className="lg:col-span-5 space-y-6">
             
+            {/* Actionable AI Optimization Insights */}
+            <OptimizationInsights
+              tips={optimizationTips}
+            />
+
             {/* Subscription Guillotine */}
             <SubscriptionsManager
               subscriptions={financialState.subscriptions}
@@ -352,6 +425,7 @@ export function AppContent() {
               goals={financialState.savingsGoals}
               projectedSurplus={baselineMetrics.projectedDay30Balance}
               onContributeGoal={handleContributeGoal}
+              onWithdrawGoal={handleWithdrawGoal}
             />
 
             {/* Fixed Commitments */}
@@ -377,6 +451,13 @@ export function AppContent() {
       <HowItEvaluatesModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+
+      {/* Health Audit Diagnostics Modal */}
+      <HealthAuditModal
+        isOpen={isHealthAuditOpen}
+        onClose={() => setIsHealthAuditOpen(false)}
+        audit={healthScoreAudit}
       />
 
       {/* Keyboard Shortcuts Modal */}
@@ -414,4 +495,5 @@ export function App() {
 }
 
 export default App;
+
 

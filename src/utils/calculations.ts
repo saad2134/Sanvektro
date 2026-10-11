@@ -3,7 +3,12 @@ import type {
   ConsequenceMetrics,
   ConsequenceDiff,
   SimulationDraft,
-  RiskLevel
+  RiskLevel,
+  CapitalAllocation,
+  CategoryOutflow,
+  HealthScoreAudit,
+  OptimizationTip,
+  ExpenseCategory
 } from '../types/finance';
 
 /**
@@ -336,3 +341,323 @@ export function generateTrajectoryPoints(
 
   return points;
 }
+
+/**
+ * Calculates 4-way capital allocation across 30 days:
+ * Spent to date, Locked in savings goals, Reserved for bills, and Free discretionary cushion.
+ */
+export function calculateCapitalAllocation(
+  state: FinancialState,
+  draft: SimulationDraft | null = null
+): CapitalAllocation {
+  const { startingBudget, inflows, transactions, commitments, subscriptions, savingsGoals, currentDay } = state;
+
+  const totalInflows = inflows.reduce((sum, inf) => sum + inf.amount, 0);
+  const totalCapital = startingBudget + totalInflows;
+
+  // Realized expenses up to current day
+  const realizedTxs = transactions
+    .filter(t => t.day <= currentDay)
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const realizedCommitments = commitments
+    .filter(c => c.dueDay <= currentDay && c.isPaid)
+    .reduce((sum, c) => sum + c.amount, 0);
+
+  const realizedSubs = subscriptions
+    .filter(s => s.isActive && s.billingDay <= currentDay)
+    .reduce((sum, s) => sum + s.amount, 0);
+
+  const draftImmediate = draft && draft.day <= currentDay ? draft.amount : 0;
+  const spentToDate = realizedTxs + realizedCommitments + realizedSubs + draftImmediate;
+
+  // Capital committed into savings goals
+  const lockedInGoals = savingsGoals.reduce((sum, g) => sum + Math.max(0, g.currentAmount), 0);
+
+  // Reserved obligations due after current day
+  const pendingCommitments = commitments
+    .filter(c => c.dueDay > currentDay && !c.isPaid)
+    .reduce((sum, c) => sum + c.amount, 0);
+
+  const pendingSubs = subscriptions
+    .filter(s => s.isActive && s.billingDay > currentDay)
+    .reduce((sum, s) => sum + s.amount, 0);
+
+  const draftFuture = draft && draft.day > currentDay ? draft.amount : 0;
+  const reservedObligations = pendingCommitments + pendingSubs + draftFuture;
+
+  // Free discretionary cushion
+  const freeDiscretionary = Math.max(0, totalCapital - spentToDate - lockedInGoals - reservedObligations);
+
+  const safeTotal = Math.max(1, totalCapital);
+  const spentPct = Math.round((spentToDate / safeTotal) * 100);
+  const lockedPct = Math.round((lockedInGoals / safeTotal) * 100);
+  const reservedPct = Math.round((reservedObligations / safeTotal) * 100);
+  const freePct = Math.max(0, 100 - spentPct - lockedPct - reservedPct);
+
+  return {
+    totalCapital,
+    spentToDate,
+    lockedInGoals,
+    reservedObligations,
+    freeDiscretionary,
+    spentPct,
+    lockedPct,
+    reservedPct,
+    freePct
+  };
+}
+
+const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
+  'Food & Dining': '#f59e0b',
+  'Transit & Commute': '#06b6d4',
+  'Shopping & Quick-Commerce': '#ec4899',
+  'Entertainment & Social': '#8b5cf6',
+  'Academic & Tech': '#3b82f6',
+  'Health & Emergency': '#ef4444',
+  'Commitments': '#10b981',
+  'Other': '#64748b'
+};
+
+/**
+ * Aggregates realized spending across categories with percentage distribution.
+ */
+export function calculateCategoryOutflow(state: FinancialState): CategoryOutflow[] {
+  const { transactions } = state;
+  const totals: Partial<Record<ExpenseCategory, { amount: number; count: number }>> = {};
+
+  transactions.forEach(tx => {
+    const cat = tx.category || 'Other';
+    if (!totals[cat]) {
+      totals[cat] = { amount: 0, count: 0 };
+    }
+    totals[cat]!.amount += tx.amount;
+    totals[cat]!.count += 1;
+  });
+
+  const totalSpent = Object.values(totals).reduce((sum, item) => sum + (item?.amount ?? 0), 0);
+
+  const outflows: CategoryOutflow[] = Object.entries(totals).map(([cat, data]) => {
+    const category = cat as ExpenseCategory;
+    const amount = data?.amount ?? 0;
+    const percentage = totalSpent > 0 ? Math.round((amount / totalSpent) * 100) : 0;
+    return {
+      category,
+      amount,
+      percentage,
+      transactionCount: data?.count ?? 0,
+      color: CATEGORY_COLORS[category] || '#64748b'
+    };
+  });
+
+  return outflows.sort((a, b) => b.amount - a.amount);
+}
+
+/**
+ * Generates transparent mathematical audit for the 4 pillars of the Health Index.
+ */
+export function generateHealthScoreAudit(
+  state: FinancialState,
+  metrics: ConsequenceMetrics
+): HealthScoreAudit {
+  const { commitments, subscriptions, currentDay } = state;
+
+  const pendingBills = commitments
+    .filter(c => c.dueDay > currentDay && !c.isPaid)
+    .reduce((sum, c) => sum + c.amount, 0);
+
+  const pendingSubs = subscriptions
+    .filter(s => s.isActive && s.billingDay > currentDay)
+    .reduce((sum, s) => sum + s.amount, 0);
+
+  const obligationsTotal = pendingBills + pendingSubs;
+
+  // Pillar 1: Runway (35 pts)
+  let runwayScore = 0;
+  let runwayStatus = 'Deficit Hazard';
+  if (metrics.runwayDepletionDay === null) {
+    runwayScore = Math.min(35, Math.max(10, Math.round((metrics.projectedDay30Balance / 2500) * 35)));
+    runwayStatus = 'Full 30-Day Runway';
+  } else {
+    runwayScore = Math.max(0, Math.round((metrics.runwayDepletionDay / 30) * 20));
+    runwayStatus = `Depletes on Day ${metrics.runwayDepletionDay}`;
+  }
+
+  // Pillar 2: Commitments (25 pts)
+  let commitmentScore = 25;
+  let commitmentStatus = '100% Fully Covered';
+  if (obligationsTotal > 0 && metrics.balance < obligationsTotal) {
+    commitmentScore = Math.max(0, Math.round((metrics.balance / obligationsTotal) * 25));
+    commitmentStatus = `Shortfall of ₹${obligationsTotal - metrics.balance}`;
+  } else if (obligationsTotal === 0) {
+    commitmentStatus = 'Zero Pending Bills';
+  }
+
+  // Pillar 3: Daily Allowance (20 pts)
+  let allowanceScore = 0;
+  let allowanceStatus = 'Survival Floor';
+  if (metrics.dailyAllowance >= 250) {
+    allowanceScore = 20;
+    allowanceStatus = 'Abundant Cushion (₹250+/day)';
+  } else if (metrics.dailyAllowance >= 160) {
+    allowanceScore = 15;
+    allowanceStatus = 'Comfortable (₹160+/day)';
+  } else if (metrics.dailyAllowance >= 100) {
+    allowanceScore = 10;
+    allowanceStatus = 'Moderate Buffer (₹100+/day)';
+  } else if (metrics.dailyAllowance >= 50) {
+    allowanceScore = 5;
+    allowanceStatus = 'Constrained (₹50+/day)';
+  } else {
+    allowanceScore = 0;
+    allowanceStatus = 'Depleted Allowance';
+  }
+
+  // Pillar 4: Resilience & Goals (20 pts)
+  const bufferPts = Math.round((metrics.shockResilienceScore / 100) * 10);
+  const goalsRatio = metrics.totalGoalsCount > 0 ? metrics.goalsAchievableCount / metrics.totalGoalsCount : 1;
+  const goalsPts = Math.round(goalsRatio * 10);
+  const resilienceScore = bufferPts + goalsPts;
+  const resilienceStatus = `${metrics.shockResilienceScore}% Shock Buffer`;
+
+  // Highlights & Warnings
+  const positiveHighlights: string[] = [];
+  const riskWarnings: string[] = [];
+
+  if (metrics.dailyAllowance >= 160) {
+    positiveHighlights.push(`Robust daily safe burn of ₹${metrics.dailyAllowance}/day exceeds living baseline.`);
+  }
+  if (metrics.balance >= obligationsTotal && obligationsTotal > 0) {
+    positiveHighlights.push(`All ₹${obligationsTotal} in upcoming commitments are 100% reserved and safe.`);
+  } else if (obligationsTotal === 0) {
+    positiveHighlights.push('All scheduled commitments for the month have been settled.');
+  }
+  if (metrics.runwayDepletionDay === null) {
+    positiveHighlights.push(`Projected month-end cash surplus of ₹${metrics.projectedDay30Balance}.`);
+  }
+  if (metrics.shockResilienceScore >= 70) {
+    positiveHighlights.push('Emergency cushion can absorb unexpected ₹1,000 crisis events.');
+  }
+
+  if (metrics.runwayDepletionDay !== null && metrics.runwayDepletionDay <= 28) {
+    riskWarnings.push(`Critical cash exhaustion projected on Day ${metrics.runwayDepletionDay}.`);
+  }
+  if (metrics.balance < obligationsTotal) {
+    riskWarnings.push(`Liquidity shortfall of ₹${obligationsTotal - metrics.balance} to cover scheduled obligations.`);
+  }
+  if (metrics.dailyAllowance < 90) {
+    riskWarnings.push(`Daily discretionary allowance squeezed to ₹${metrics.dailyAllowance}/day.`);
+  }
+
+  return {
+    overallScore: metrics.healthScore,
+    riskLevel: metrics.riskLevel,
+    pillars: {
+      runway: {
+        name: 'Runway & Month-End Surplus',
+        score: runwayScore,
+        maxScore: 35,
+        weightPct: 35,
+        status: runwayStatus,
+        description: 'Projects solvency across Day 1 to Day 30 and rewards positive end-of-month cash reserves.'
+      },
+      commitments: {
+        name: 'Mandatory Bill Coverage',
+        score: commitmentScore,
+        maxScore: 25,
+        weightPct: 25,
+        status: commitmentStatus,
+        description: 'Verifies liquid cash covers upcoming unpaid commitments and active subscriptions.'
+      },
+      allowance: {
+        name: 'Daily Allowance Cushion',
+        score: allowanceScore,
+        maxScore: 20,
+        weightPct: 20,
+        status: allowanceStatus,
+        description: 'Evaluates daily purchasing power against living benchmarks for students and interns.'
+      },
+      resilience: {
+        name: 'Emergency Buffer & Goals',
+        score: resilienceScore,
+        maxScore: 20,
+        weightPct: 20,
+        status: resilienceStatus,
+        description: 'Measures capacity to absorb unexpected ₹1,000 expense shocks and sustain savings goals.'
+      }
+    },
+    positiveHighlights,
+    riskWarnings
+  };
+}
+
+/**
+ * Computes actionable context-aware optimization tips based on active financial state.
+ */
+export function generateOptimizationTips(
+  state: FinancialState,
+  metrics: ConsequenceMetrics
+): OptimizationTip[] {
+  const tips: OptimizationTip[] = [];
+  const outflows = calculateCategoryOutflow(state);
+  const remainingDays = Math.max(1, 30 - state.currentDay + 1);
+
+  // Priority Tip: Runway Depletion Crisis
+  if (metrics.runwayDepletionDay !== null && metrics.runwayDepletionDay <= 28) {
+    tips.push({
+      id: 'tip-runway-crisis',
+      title: `Critical Solvency Warning ✦ Day ${metrics.runwayDepletionDay}`,
+      type: 'DISCRETIONARY',
+      impact: 'Avoid Insolvency',
+      actionableText: `Your funds are projected to deplete on Day ${metrics.runwayDepletionDay}. Cut discretionary burn or pause subscriptions to ensure solvency through Day 30.`,
+      badge: `Exhausts Day ${metrics.runwayDepletionDay}`
+    });
+  }
+
+  // Tip 1: Top Category trim
+  if (outflows.length > 0 && outflows[0].amount > 500) {
+    const top = outflows[0];
+    const savings15 = Math.round(top.amount * 0.15);
+    const dailyBoost = Math.round(savings15 / remainingDays);
+    tips.push({
+      id: 'tip-trim-top',
+      title: `Optimize Top Spend: ${top.category}`,
+      type: 'DISCRETIONARY',
+      impact: `+₹${dailyBoost}/day`,
+      actionableText: `Trimming 15% (₹${savings15}) from ${top.category} lifts your daily allowance by +₹${dailyBoost}/day across remaining ${remainingDays} days.`,
+      badge: `${top.percentage}% of Spend`
+    });
+  }
+
+  // Tip 2: Subscription Guillotine review
+  const activeSubs = state.subscriptions.filter(s => s.isActive);
+  const totalSubDrain = activeSubs.reduce((sum, s) => sum + s.amount, 0);
+  if (activeSubs.length > 0) {
+    const firstSub = activeSubs[0];
+    const dailyReclaimed = Math.round(firstSub.amount / remainingDays);
+    tips.push({
+      id: 'tip-pause-sub',
+      title: `Subscription Guillotine Review`,
+      type: 'SUBSCRIPTION',
+      impact: `+₹${dailyReclaimed}/day`,
+      actionableText: `You have ${activeSubs.length} active recurring subscriptions (₹${totalSubDrain}/mo). Pausing ${firstSub.name} frees ₹${firstSub.amount} instantly.`,
+      badge: `${activeSubs.length} Active`
+    });
+  }
+
+  // Tip 3: Emergency Buffer Pacing
+  if (state.emergencyBuffer < 1000) {
+    const needed = 1000 - state.emergencyBuffer;
+    tips.push({
+      id: 'tip-emergency-buffer',
+      title: `Emergency Cushion Milestone`,
+      type: 'SAVINGS',
+      impact: '100% Shock Shield',
+      actionableText: `Reserving an extra ₹${needed} into your emergency buffer maximizes shock resilience against unexpected hospital, transit, or hardware crises.`,
+      badge: `₹${state.emergencyBuffer}/₹1,000`
+    });
+  }
+
+  return tips;
+}
+
