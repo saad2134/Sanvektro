@@ -62,7 +62,7 @@ export const CommitmentsList: React.FC<CommitmentsListProps> = ({
                 <button
                   onClick={() => onToggleCommitmentPaid(item.id)}
                   id={`btn-toggle-paid-${item.id}`}
-                  className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors ${
+                  className={`w-6 h-6 aspect-square rounded-lg flex items-center justify-center transition-colors shrink-0 ${
                     item.isPaid
                       ? 'bg-emerald-500 text-slate-950'
                       : isOverdue

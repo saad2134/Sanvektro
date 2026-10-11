@@ -62,7 +62,7 @@ export const TimelineScrubber: React.FC<TimelineScrubberProps> = ({
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+          <div className="w-9 h-9 aspect-square rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 shrink-0">
             <Calendar className="w-4 h-4" />
           </div>
           <div>
@@ -81,7 +81,7 @@ export const TimelineScrubber: React.FC<TimelineScrubberProps> = ({
             onClick={handlePrev}
             disabled={currentDay <= 1}
             id="btn-day-prev"
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:hover:bg-slate-800 text-slate-300 transition-colors"
+            className="w-8 h-8 aspect-square rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-center shrink-0"
             title="Previous Day"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -111,7 +111,7 @@ export const TimelineScrubber: React.FC<TimelineScrubberProps> = ({
             onClick={handleNext}
             disabled={currentDay >= 30}
             id="btn-day-next"
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:hover:bg-slate-800 text-slate-300 transition-colors"
+            className="w-8 h-8 aspect-square rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-center shrink-0"
             title="Next Day"
           >
             <ChevronRight className="w-4 h-4" />

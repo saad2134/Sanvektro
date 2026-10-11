@@ -82,7 +82,7 @@ export const SubscriptionsManager: React.FC<SubscriptionsManagerProps> = ({
           <button
             onClick={() => setShowAddForm(!showAddForm)}
             id="btn-add-subscription"
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+            className="w-8 h-8 aspect-square rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors flex items-center justify-center shrink-0"
             title="Add subscription"
           >
             <Plus className="w-4 h-4" />
@@ -157,7 +157,7 @@ export const SubscriptionsManager: React.FC<SubscriptionsManagerProps> = ({
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-slate-800/80 flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 aspect-square rounded-xl bg-slate-800/80 flex items-center justify-center shrink-0">
                   {getSubIcon(sub.name)}
                 </div>
                 <div>

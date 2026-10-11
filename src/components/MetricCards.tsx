@@ -78,7 +78,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       >
         <div className="flex items-center justify-between text-slate-400 mb-2">
           <span className="text-xs font-semibold uppercase tracking-wider">Liquid Balance</span>
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+          <div className="w-9 h-9 aspect-square rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 shrink-0">
             <Wallet className="w-4 h-4" />
           </div>
         </div>
@@ -120,7 +120,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       >
         <div className="flex items-center justify-between text-slate-400 mb-2">
           <span className="text-xs font-semibold uppercase tracking-wider">Safe Daily Burn</span>
-          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+          <div className="w-9 h-9 aspect-square rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 shrink-0">
             <Flame className="w-4 h-4" />
           </div>
         </div>
@@ -165,7 +165,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       >
         <div className="flex items-center justify-between text-slate-400 mb-2">
           <span className="text-xs font-semibold uppercase tracking-wider">Health Index</span>
-          <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
+          <div className="w-9 h-9 aspect-square rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 shrink-0">
             <Activity className="w-4 h-4" />
           </div>
         </div>
@@ -207,7 +207,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       >
         <div className="flex items-center justify-between text-slate-400 mb-2">
           <span className="text-xs font-semibold uppercase tracking-wider">Financial Risk</span>
-          <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+          <div className="w-9 h-9 aspect-square rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 shrink-0">
             {metrics.riskLevel === 'OPTIMAL' ? (
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
             ) : (

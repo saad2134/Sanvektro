@@ -1,7 +1,9 @@
-# Artifacts
+# Artifacts & Local Agent Config
 /artifacts
 /artifacts/
 artifacts/
+AGENTS.md
+.agents/
 
 # Dependencies
 node_modules/

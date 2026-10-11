@@ -194,7 +194,7 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({
                 <button
                   onClick={() => onDeleteTransaction(tx.id)}
                   id={`btn-delete-tx-${tx.id}`}
-                  className="p-1 rounded text-slate-500 hover:text-rose-400 transition-colors"
+                  className="w-7 h-7 aspect-square rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition-colors flex items-center justify-center shrink-0"
                   title="Remove expense"
                 >
                   <Trash2 className="w-3.5 h-3.5" />

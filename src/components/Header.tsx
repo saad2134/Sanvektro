@@ -26,8 +26,8 @@ export const Header: React.FC<HeaderProps> = ({
           
           {/* Brand Identity */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-500 p-0.5 shadow-lg shadow-emerald-500/20">
-              <div className="w-full h-full bg-[#07090e] rounded-[10px] flex items-center justify-center">
+            <div className="w-10 h-10 aspect-square rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-500 p-0.5 shadow-lg shadow-emerald-500/20 shrink-0">
+              <div className="w-full h-full aspect-square bg-[#07090e] rounded-[14px] flex items-center justify-center">
                 <Zap className="w-5 h-5 text-emerald-400 fill-emerald-400/20" />
               </div>
             </div>
@@ -88,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onResetToBaseline}
               id="btn-reset-state"
-              className="p-2 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-colors"
+              className="w-9 h-9 aspect-square rounded-xl bg-slate-900/90 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-colors flex items-center justify-center shrink-0"
               title="Reset current persona state"
             >
               <RotateCcw className="w-4 h-4" />
