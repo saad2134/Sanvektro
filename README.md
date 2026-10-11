@@ -1,1 +1,208 @@
+<h1 align="center">
+  <br>
+  ⚡ Sanvektro
+  <br>
+</h1>
 
+> <p align="center"><strong>A predictive personal finance simulation engine and decision cockpit for Gen Z managing a ₹10,000 budget across 30 days. Sanvektro connects liquid balance, daily safe burn allowances, fixed commitments, subscription guillotine controls, savings goals pacing, unexpected expense shocks, financial risk, and financial health into a real-time reactive model. Simulate financial decisions before you spend.</strong></p>
+
+<div align="center">
+
+[![React](https://img.shields.io/badge/React-v19.2.8-1e293b?style=flat&logo=react&logoColor=61dafb&labelColor=0f172a)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-v6.0-1e293b?style=flat&logo=typescript&logoColor=3178c6&labelColor=0f172a)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-v8.3-1e293b?style=flat&logo=vite&logoColor=646cff&labelColor=0f172a)](https://vite.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.3-1e293b?style=flat&logo=tailwindcss&logoColor=38bdf8&labelColor=0f172a)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-1e293b?style=flat&logo=opensourceinitiative&logoColor=white&labelColor=10b981)](LICENSE)
+[![Author](https://img.shields.io/badge/Author-Saaduddin_Mohammed-1e293b?style=flat&logo=github&logoColor=white&labelColor=6366f1)](https://github.com/saad2134)
+
+</div>
+
+---
+
+## ✨ Key Features
+
+- 🧪 **"What-If" Decision Simulator (Pre-Spend Sandbox)** ✦ Stage discretionary expenses (e.g., ₹480 Swiggy treat, ₹1,500 concert ticket, ₹999 thrift drop) before committing to preview immediate ripple effects on your daily allowance, savings goals, monthly forecast, and financial health score.
+- 🎛️ **4-Pillar Financial Health Cockpit** ✦ Real-time tracking of Liquid Balance, Dynamic Safe Daily Burn Allowance, Composite Financial Health Score (0–100), and 4-tier Financial Risk Classification (Optimal, Moderate, Elevated, Critical).
+- 🗓️ **30-Day Calendar Time Scrubber** ✦ Move between Day 1 and Day 30 manually or activate Auto-Advance playback to watch compounding cashflow, scheduled commitment settlements, and subscription billings trigger in real time.
+- 📈 **Interactive 30-Day Trajectory Forecast Curve** ✦ High-resolution SVG burn chart comparing actual cash trajectory against a safe corridor corridor band, projected month-end balance, and pulsing simulated delta paths.
+- ✂️ **Subscription Guillotine** ✦ Pause or reactivate micro-drains (Spotify, Netflix, Campus Gym, Cloud Storage) with live calculation of reclaimed daily runway (e.g., *"Pausing Campus Gym recovers +₹35/day safely"*).
+- 🛡️ **Fixed Commitments Ringfencing** ✦ Segregates non-negotiable living overhead (PG Rent share, Wi-Fi recharge, Metro smart card pass) from discretionary spending to eliminate end-of-month default risk.
+- 🎯 **Savings Goals Pacing Corridor** ✦ Monitor progress on Gen Z aspirations (Retro Dunks, Emergency Safety Cushion, Weekend Indie Fest) with target pacing alerts and interactive micro-contributions.
+- ⚡ **Shock Roulette Stress-Testing** ✦ Stress-test your budget buffer against realistic emergencies (bike puncture, broken phone screen, sudden dental medicine, group dinner split) to measure shock resilience.
+- 👤 **1-Click Persona Presets** ✦ Instantly toggle between pre-configured real-world Gen Z profiles: *College Hosteler*, *First-Month Intern*, and *Freelance Creator*.
+
+---
+
+## 🏛️ Core Philosophy & Interconnected Engine
+
+Most budgeting utilities act as passive rearview mirrors, recording transactions after money has already left the account. Sanvektro flips this paradigm into a **predictive flight simulator**:
+
+> **"Simulate before you swipe. Financial decisions have visible and interconnected consequences."**
+
+```mermaid
+flowchart TB
+  subgraph Inputs["📥 Inflows & Ringfenced Obligations"]
+    Income["₹10,000 Baseline Stipend<br>+ Freelance Inflows"]
+    Commitments["Fixed Commitments<br>(Rent, Wi-Fi, Transit)"]
+    Subs["Subscriptions<br>(Streaming, Gym, Cloud)"]
+  end
+
+  subgraph Engine["⚡ Sanvektro Reactive Simulation Engine"]
+    Liquid["Liquid Cash Balance"]
+    Discretionary["Dynamic Discretionary Pool"]
+    Burn["Daily Safe Burn Allowance<br>Formula: (Liquid - Commitments - Subs) / Days Left"]
+    HealthScore["Composite Health Index (0-100)<br>Runway + Coverage + Cushion + Goals"]
+    Risk["4-Tier Financial Risk Gauge<br>(Optimal ✦ Moderate ✦ Elevated ✦ Critical)"]
+  end
+
+  subgraph Sandbox["🧪 'What-If' Decision Sandbox"]
+    Draft["Staged Expense Draft"]
+    Diff["Consequence Diff Preview<br>Δ Balance ✦ Δ Allowance ✦ Δ Health ✦ Goal Pacing"]
+  end
+
+  subgraph Targets["🎯 Outcomes & Forecast"]
+    Goals["Savings Goals Pacing"]
+    Forecast["30-Day Solvency Trajectory"]
+  end
+
+  Income --> Liquid
+  Commitments -.-> Discretionary
+  Subs -.-> Discretionary
+  Liquid --> Discretionary
+  Discretionary --> Burn
+  Burn --> HealthScore
+  HealthScore --> Risk
+  Draft --> Diff
+  Diff -.-> Liquid
+  Diff -.-> Burn
+  Diff -.-> HealthScore
+  Diff -.-> Goals
+  Burn --> Forecast
+```
+
+---
+
+## 📊 The 9 Interconnected Dimensions
+
+| Dimension | Role in Sanvektro | Interconnected Ripple Effect |
+| :--- | :--- | :--- |
+| **1. Income** | Baseline capital (₹10,000 allowance + gig payouts) | Dictates starting runway ceiling and total available capital pool. |
+| **2. Liquid Balance** | Real-time liquid cash available at the active day | Decreases with realized expenses, settlements, and active subscriptions. |
+| **3. Spending** | Granular realized discretionary expenditures | Consumes safe daily allowance and reduces month-end surplus. |
+| **4. Commitments** | Ringfenced mandatory overhead (PG rent, transit) | Deducted from the discretionary pool so essentials are never starved. |
+| **5. Savings Goals** | Pacing targets for lifestyle and safety reserves | Simulated purchases flag if a goal is cannibalized or delayed. |
+| **6. Subscriptions** | Recurring micro-charges with toggle controls | Pausing a subscription immediately boosts daily safe allowance. |
+| **7. Unexpected Expenses** | Emergency shocks (screen repair, dental care) | Evaluates whether your emergency buffer absorbs the shock without insolvency. |
+| **8. Financial Risk** | 4-tier health classification | Dynamically shifts (Optimal ➔ Elevated) when burn rates threaten solvency. |
+| **9. Financial Health** | 0–100 weighted financial vitality index | Synthesizes runway survival, commitment coverage, and buffer capacity. |
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework:** [React 19](https://react.dev/) + [Vite 8](https://vite.dev/)
+- **Language:** [TypeScript 6](https://www.typescriptlang.org/) (Strict type safety, verbatim module syntax)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) (CSS-first `@theme` design tokens, glassmorphic dark theme)
+- **Icons:** [Lucide React](https://lucide.dev/)
+- **Visuals & Delight:** Native SVG responsive coordinate charts + [canvas-confetti](https://www.npmjs.com/package/canvas-confetti)
+- **Deployment & Performance:** Zero external runtime network APIs ✦ 100% deterministic client-side calculation (sub-0.5s First Contentful Paint)
+
+---
+
+## 📁 Project Architecture
+
+```
+PromptRunOct/
+├── public/
+│   ├── favicon.svg               # Sanvektro vector branding icon
+│   └── icons.svg                 # SVG sprite symbols
+├── src/
+│   ├── components/
+│   │   ├── CommitmentsList.tsx       # Mandatory bills with settlement toggles
+│   │   ├── DecisionSimulator.tsx     # The "What-If" pre-spend sandbox & consequence diff
+│   │   ├── Header.tsx                # Brand banner, persona switcher, timeline pill
+│   │   ├── HowItEvaluatesModal.tsx   # System architecture & author guide
+│   │   ├── MetricCards.tsx           # 4-pillar metrics (Balance, Daily Burn, Health, Risk)
+│   │   ├── SavingsGoals.tsx          # Goal pacing corridor with micro-contributions
+│   │   ├── ShockRoulette.tsx         # Emergency shock stress-testing roulette
+│   │   ├── SubscriptionsManager.tsx  # Subscription Guillotine with daily ROI feedback
+│   │   ├── TimelineScrubber.tsx      # Day 1-30 calendar time scrubber with autoplay
+│   │   ├── TrajectoryChart.tsx       # Interactive SVG 30-day forecast & corridor chart
+│   │   └── TransactionLedger.tsx     # Chronological realized spend history & search
+│   ├── data/
+│   │   └── presets.ts                # Real-world Gen Z presets (Hosteler, Intern, Creator)
+│   ├── types/
+│   │   └── finance.ts                # Master TypeScript contracts and interfaces
+│   ├── utils/
+│   │   └── calculations.ts           # Pure mathematical simulation & diffing engine
+│   ├── App.tsx                       # Root application coordinator & layout
+│   ├── index.css                     # Tailwind v4 theme tokens & custom scrollbars
+│   └── main.tsx                      # React root entry point
+├── index.html                        # Optimized HTML5 entry with metadata
+├── package.json                      # Project dependencies & scripts
+├── tsconfig.json                     # TypeScript compiler configuration
+└── vite.config.ts                    # Vite build configuration with Tailwind v4
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js `v18+` (Tested on Node `v24.21.0`)
+- npm `v9+`
+
+### Installation & Run
+
+```bash
+# 1. Clone repository
+git clone https://github.com/saad2134/sanvektro.git
+
+# 2. Navigate to project root
+cd sanvektro
+
+# 3. Install dependencies
+npm install
+
+# 4. Start local development server
+npm run dev
+```
+
+Visit `http://localhost:5173/` in your browser.
+
+### Production Build
+
+```bash
+# Compile and package for production
+npm run build
+
+# Preview production bundle
+npm run preview
+```
+
+---
+
+## 👤 Author & Publisher
+
+Developed and engineered by **Saaduddin Mohammed (@saad2134)**.
+- GitHub: [github.com/saad2134](https://github.com/saad2134)
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** ✦ see the [LICENSE](LICENSE) file for details.
+
+- ✅ Commercial use
+- ✅ Modification
+- ✅ Distribution
+- ✅ Private use
+- ❌ Liability
+- ❌ Warranty
+
+---
+
+## 🏷️ Tags
+
+`react` `typescript` `vite` `tailwindcss` `fintech` `personal-finance` `gen-z` `budgeting` `simulation-engine` `financial-health` `cashflow-forecasting` `interactive-dashboard` `open-source`

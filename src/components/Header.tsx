@@ -41,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-medium">
-                Guide your 30-day cash vector • Gen Z ₹10,000 Budget Simulation Engine
+                Guide your 30-day cash vector ✦ Gen Z ₹10,000 Budget Simulation Engine
               </p>
             </div>
           </div>
@@ -101,7 +101,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700/60 transition-colors flex items-center gap-1.5"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-              <span>How It Evaluates</span>
+              <span>System Architecture</span>
             </button>
           </div>
 

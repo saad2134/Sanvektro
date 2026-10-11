@@ -298,15 +298,15 @@ export function App() {
       {/* Footer */}
       <footer className="border-t border-slate-800/80 bg-[#090d16] py-5 mt-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <div className="flex items-center gap-2 font-mono">
+          <div className="flex flex-wrap items-center gap-2 font-mono">
             <span className="text-emerald-400 font-bold">Sanvektro</span>
-            <span>•</span>
-            <span>FAIE Evaluator Ready</span>
-            <span>•</span>
-            <span>Gen Z ₹10k 30-Day Cockpit</span>
+            <span>✦</span>
+            <span>Created by <a href="https://github.com/saad2134" target="_blank" rel="noreferrer" className="text-slate-300 hover:text-emerald-400 underline transition-colors">Saaduddin Mohammed</a> (github.com/saad2134)</span>
+            <span>✦</span>
+            <span>Gen Z ₹10k 30-Day Decision Cockpit</span>
           </div>
           <div>
-            Built with React 19 + TypeScript + Tailwind CSS v4
+            React 19 + TypeScript + Tailwind CSS v4
           </div>
         </div>
       </footer>
