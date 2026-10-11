@@ -14,7 +14,8 @@ import {
   calculateCapitalAllocation,
   calculateCategoryOutflow,
   generateHealthScoreAudit,
-  generateOptimizationTips
+  generateOptimizationTips,
+  calculateDailySpendHeatmap
 } from './utils/calculations';
 
 import { Header } from './components/Header';
@@ -24,6 +25,7 @@ import { DeficitAlertBanner } from './components/DeficitAlertBanner';
 import { TimelineScrubber } from './components/TimelineScrubber';
 import { DecisionSimulator } from './components/DecisionSimulator';
 import { TrajectoryChart } from './components/TrajectoryChart';
+import { SpendingHeatmap } from './components/SpendingHeatmap';
 import { CategoryBreakdown } from './components/CategoryBreakdown';
 import { OptimizationInsights } from './components/OptimizationInsights';
 import { SubscriptionsManager } from './components/SubscriptionsManager';
@@ -116,6 +118,10 @@ export function AppContent() {
       .filter(t => t.day <= financialState.currentDay)
       .reduce((sum, t) => sum + t.amount, 0);
   }, [financialState.transactions, financialState.currentDay]);
+
+  const heatmapPoints = useMemo(() => {
+    return calculateDailySpendHeatmap(financialState);
+  }, [financialState]);
 
   // Audio Toggle
   const handleToggleMute = useCallback(() => {
@@ -389,6 +395,13 @@ export function AppContent() {
               isSimulating={simulationDraft !== null && simulationDraft.amount > 0}
             />
 
+            {/* 30-Day Spending Intensity Matrix */}
+            <SpendingHeatmap
+              points={heatmapPoints}
+              currentDay={financialState.currentDay}
+              onSelectDay={handleDayChange}
+            />
+
             {/* Outflow by Category Breakdown */}
             <CategoryBreakdown
               outflows={categoryOutflows}
@@ -425,6 +438,7 @@ export function AppContent() {
             <SavingsGoals
               goals={financialState.savingsGoals}
               projectedSurplus={baselineMetrics.projectedDay30Balance}
+              financialState={financialState}
               onContributeGoal={handleContributeGoal}
               onWithdrawGoal={handleWithdrawGoal}
             />

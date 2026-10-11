@@ -175,3 +175,22 @@ export interface OptimizationTip {
   badge: string;
 }
 
+export interface DailyHeatmapPoint {
+  day: number;
+  amount: number;
+  isPast: boolean;
+  isToday: boolean;
+  isFuture: boolean;
+  intensity: 'none' | 'low' | 'moderate' | 'high';
+  transactionCount: number;
+}
+
+export interface SavingsLockboxRipple {
+  currentDailyAllowance: number;
+  simulatedDailyAllowance: number;
+  allowanceDelta: number;
+  remainingDays: number;
+  lockedAmount: number;
+  isSustainable: boolean;
+}
+

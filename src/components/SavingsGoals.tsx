@@ -1,11 +1,13 @@
-import React from 'react';
-import type { SavingsGoal } from '../types/finance';
-import { Target, Plus, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import type { SavingsGoal, FinancialState } from '../types/finance';
+import { calculateSavingsLockboxRipple } from '../utils/calculations';
+import { Target, Plus, CheckCircle2, Lock, ShieldCheck, AlertTriangle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface SavingsGoalsProps {
   goals: SavingsGoal[];
   projectedSurplus: number;
+  financialState?: FinancialState;
   onContributeGoal: (id: string, amount: number) => void;
   onWithdrawGoal?: (id: string, amount: number) => void;
 }
@@ -13,9 +15,17 @@ interface SavingsGoalsProps {
 export const SavingsGoals: React.FC<SavingsGoalsProps> = ({
   goals,
   projectedSurplus,
+  financialState,
   onContributeGoal,
   onWithdrawGoal
 }) => {
+  const [lockboxAmount, setLockboxAmount] = useState<number>(500);
+  const [isLockboxOpen, setIsLockboxOpen] = useState<boolean>(false);
+
+  const lockboxRipple = financialState
+    ? calculateSavingsLockboxRipple(financialState, lockboxAmount)
+    : null;
+
   const handleContribute = (goal: SavingsGoal) => {
     const boost = 250;
     onContributeGoal(goal.id, boost);
@@ -135,6 +145,99 @@ export const SavingsGoals: React.FC<SavingsGoalsProps> = ({
           );
         })}
       </div>
+
+      {/* Savings Lockbox Ripple Simulator */}
+      {financialState && (
+        <div className="mt-4 pt-4 border-t border-slate-800/80">
+          <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => setIsLockboxOpen(!isLockboxOpen)}
+              id="btn-toggle-lockbox-simulator"
+              className="flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-white transition-colors"
+            >
+              <div className="w-5 h-5 aspect-square rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <Lock className="w-3 h-3" />
+              </div>
+              <span>Savings Lockbox Ripple Simulator</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-cyan-300 border border-slate-700">
+                {isLockboxOpen ? 'Hide Simulator' : 'Test Lock Impact'}
+              </span>
+            </button>
+            <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">
+              Safe Daily Burn Trade-Off
+            </span>
+          </div>
+
+          {isLockboxOpen && lockboxRipple && (
+            <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 mt-2 space-y-3 animate-fadeIn">
+              <p className="text-[11px] text-slate-400">
+                See how locking extra emergency capital or trip funds impacts your remaining {lockboxRipple.remainingDays}-day safe daily burn allowance:
+              </p>
+
+              {/* Quick Chip Presets */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px] text-slate-400 font-medium">Test Lock Amount:</span>
+                {[250, 500, 1000, 1500, 2000].map(amt => (
+                  <button
+                    key={amt}
+                    onClick={() => setLockboxAmount(amt)}
+                    className={`text-xs px-2.5 py-1 rounded-lg font-mono font-bold transition-all ${
+                      lockboxAmount === amt
+                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                        : 'bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700'
+                    }`}
+                  >
+                    ₹{amt}
+                  </button>
+                ))}
+              </div>
+
+              {/* Impact Comparison Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-xs font-mono">
+                <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                  <span className="text-[10px] text-slate-400 block font-sans">Current Safe Burn</span>
+                  <span className="text-sm font-bold text-slate-200">
+                    ₹{lockboxRipple.currentDailyAllowance}/day
+                  </span>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                  <span className="text-[10px] text-slate-400 block font-sans">Simulated Safe Burn</span>
+                  <span className={`text-sm font-bold ${
+                    lockboxRipple.simulatedDailyAllowance >= 160
+                      ? 'text-emerald-400'
+                      : lockboxRipple.simulatedDailyAllowance >= 100
+                      ? 'text-amber-400'
+                      : 'text-rose-400'
+                  }`}>
+                    ₹{lockboxRipple.simulatedDailyAllowance}/day
+                  </span>
+                  <span className="text-[10px] text-rose-400 block">
+                    {lockboxRipple.allowanceDelta}/day
+                  </span>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800 flex flex-col justify-center">
+                  <span className="text-[10px] text-slate-400 block font-sans">Pacing Assessment</span>
+                  <div className="flex items-center gap-1.5 font-sans font-bold text-xs mt-0.5">
+                    {lockboxRipple.isSustainable ? (
+                      <>
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-300">Sustainable Cushion</span>
+                      </>
+                    ) : (
+                      <>
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                        <span className="text-amber-300">Liquidity Squeeze</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 };

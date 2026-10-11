@@ -9,7 +9,9 @@ import type {
   HealthScoreAudit,
   OptimizationTip,
   ExpenseCategory,
-  ScenarioComparison
+  ScenarioComparison,
+  DailyHeatmapPoint,
+  SavingsLockboxRipple
 } from '../types/finance';
 
 /**
@@ -763,5 +765,95 @@ export function generateComparisonScenarios(
       isRecommended: true
     }
   ];
+}
+
+/**
+ * Computes chronological 30-day spending intensity points for the matrix heatmap.
+ */
+export function calculateDailySpendHeatmap(state: FinancialState): DailyHeatmapPoint[] {
+  const currentDay = state.currentDay || 1;
+  const { transactions } = state;
+
+  // Aggregate realized expenses per day
+  const dayTotals: Record<number, { amount: number; count: number }> = {};
+  for (let d = 1; d <= 30; d++) {
+    dayTotals[d] = { amount: 0, count: 0 };
+  }
+
+  transactions.forEach(tx => {
+    if (tx.day >= 1 && tx.day <= 30) {
+      dayTotals[tx.day].amount += tx.amount;
+      dayTotals[tx.day].count += 1;
+    }
+  });
+
+  const points: DailyHeatmapPoint[] = [];
+
+  for (let day = 1; day <= 30; day++) {
+    const isToday = day === currentDay;
+    const isPast = day < currentDay;
+    const isFuture = day > currentDay;
+    const amount = dayTotals[day].amount;
+    const transactionCount = dayTotals[day].count;
+
+    let intensity: 'none' | 'low' | 'moderate' | 'high' = 'none';
+    if (!isFuture && amount > 0) {
+      if (amount <= 300) {
+        intensity = 'low';
+      } else if (amount <= 600) {
+        intensity = 'moderate';
+      } else {
+        intensity = 'high';
+      }
+    }
+
+    points.push({
+      day,
+      amount,
+      isPast,
+      isToday,
+      isFuture,
+      intensity,
+      transactionCount
+    });
+  }
+
+  return points;
+}
+
+/**
+ * Calculates ripple impact on daily allowance when locking funds into savings.
+ */
+export function calculateSavingsLockboxRipple(
+  state: FinancialState,
+  lockAmount: number
+): SavingsLockboxRipple {
+  const currentDay = state.currentDay || 1;
+  const remainingDays = Math.max(1, 30 - currentDay + 1);
+  const baselineMetrics = calculateMetrics(state);
+  const currentDailyAllowance = baselineMetrics.dailyAllowance;
+
+  // Hypothetical state with increased savings buffer or locked goal
+  const safeLock = Math.max(0, lockAmount);
+  
+  // Calculate simulated daily allowance with additional locked funds
+  // Discretionary pool reduces directly by safeLock
+  const simulatedState: FinancialState = {
+    ...state,
+    emergencyBuffer: state.emergencyBuffer + safeLock
+  };
+  const simulatedMetrics = calculateMetrics(simulatedState);
+  const simulatedDailyAllowance = simulatedMetrics.dailyAllowance;
+  const allowanceDelta = simulatedDailyAllowance - currentDailyAllowance;
+  const isSustainable = simulatedDailyAllowance >= 100;
+
+  return {
+    currentDailyAllowance,
+    simulatedDailyAllowance,
+    allowanceDelta,
+    remainingDays,
+    lockedAmount: safeLock,
+    isSustainable
+  };
 }
 

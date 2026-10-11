@@ -309,5 +309,86 @@ describe('Sanvektro Financial Calculations Engine', () => {
     const afterDelete = calculateMetrics(afterDeleteState);
     expect(afterDelete.balance).toBe(beforeDelete.balance + 800);
   });
+
+  it('calculates 30-day spending matrix heatmap accurately across all cycle days', async () => {
+    const { calculateDailySpendHeatmap } = await import('../utils/calculations');
+    const points = calculateDailySpendHeatmap(DEFAULT_HOSTEL_HUSTLER);
+
+    expect(points).toHaveLength(30);
+    expect(points[0].day).toBe(1);
+    expect(points[29].day).toBe(30);
+
+    // Current day flag
+    const todayPoint = points.find(p => p.day === DEFAULT_HOSTEL_HUSTLER.currentDay);
+    expect(todayPoint).toBeDefined();
+    expect(todayPoint!.isToday).toBe(true);
+    expect(todayPoint!.isFuture).toBe(false);
+
+    // Past vs future flags
+    const pastPoint = points[0];
+    expect(pastPoint.isPast).toBe(true);
+    expect(pastPoint.isFuture).toBe(false);
+
+    const futurePoint = points[29];
+    expect(futurePoint.isFuture).toBe(true);
+    expect(futurePoint.isPast).toBe(false);
+
+    // Sum of past and today amounts matches realized spend
+    const realizedHeatmapSum = points
+      .filter(p => !p.isFuture)
+      .reduce((sum, p) => sum + p.amount, 0);
+    const expectedSum = DEFAULT_HOSTEL_HUSTLER.transactions
+      .filter(t => t.day <= DEFAULT_HOSTEL_HUSTLER.currentDay)
+      .reduce((sum, t) => sum + t.amount, 0);
+    expect(realizedHeatmapSum).toBe(expectedSum);
+  });
+
+  it('evaluates savings lockbox ripple trade-off on daily burn allowance', async () => {
+    const { calculateSavingsLockboxRipple } = await import('../utils/calculations');
+    const ripple = calculateSavingsLockboxRipple(DEFAULT_HOSTEL_HUSTLER, 1000);
+
+    expect(ripple.lockedAmount).toBe(1000);
+    expect(ripple.currentDailyAllowance).toBeGreaterThan(0);
+    expect(ripple.simulatedDailyAllowance).toBeLessThan(ripple.currentDailyAllowance);
+    expect(ripple.allowanceDelta).toBeLessThan(0);
+    expect(ripple.remainingDays).toBe(30 - DEFAULT_HOSTEL_HUSTLER.currentDay + 1);
+    expect(typeof ripple.isSustainable).toBe('boolean');
+  });
+
+  it('classifies velocity risk levels aligned with Gen Z living benchmarks', () => {
+    // Robust living baseline state
+    const healthyMetrics = calculateMetrics(DEFAULT_HOSTEL_HUSTLER);
+    expect(['OPTIMAL', 'MODERATE']).toContain(healthyMetrics.riskLevel);
+
+    // Strained state with depleted allowance
+    const strainedState: FinancialState = {
+      ...DEFAULT_HOSTEL_HUSTLER,
+      startingBudget: 10000,
+      currentDay: 20,
+      emergencyBuffer: 1000,
+      transactions: [
+        { id: 'tx-heavy', title: 'Severe Drain', amount: 7500, day: 2, category: 'Shopping & Quick-Commerce' }
+      ]
+    };
+    const strainedMetrics = calculateMetrics(strainedState);
+    expect(['ELEVATED', 'CRITICAL']).toContain(strainedMetrics.riskLevel);
+  });
+
+  it('preserves integer currency invariants and prevents floating point rounding drift', () => {
+    const fractionalState: FinancialState = {
+      ...DEFAULT_HOSTEL_HUSTLER,
+      startingBudget: 10000,
+      currentDay: 15,
+      transactions: [
+        { id: 'tx-frac-1', title: 'Coffee', amount: 150.33, day: 2, category: 'Food & Dining' },
+        { id: 'tx-frac-2', title: 'Cookie', amount: 49.67, day: 3, category: 'Food & Dining' }
+      ]
+    };
+    const metrics = calculateMetrics(fractionalState);
+    expect(Number.isFinite(metrics.balance)).toBe(true);
+    expect(Number.isFinite(metrics.dailyAllowance)).toBe(true);
+    expect(metrics.dailyAllowance % 1).toBe(0);
+  });
 });
+
 

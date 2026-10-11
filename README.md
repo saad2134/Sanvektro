@@ -23,10 +23,11 @@
 - 🔀 **3-Way Strategic Decision Comparison Matrix** ✦ Side-by-side consequence preview comparing **Scenario A (Buy Now)** vs **Scenario B (Delay 14 Days to protect liquidity)** vs **Scenario C (Smart Alternative ✦ -55% thrift discount)** with 1-click scenario adoption.
 - 🎛️ **4-Pillar Financial Health Cockpit** ✦ Real-time tracking of Liquid Balance, Dynamic Safe Daily Burn Allowance, Composite Financial Health Score (0-100), and 4-tier Financial Risk Classification (Optimal, Moderate, Elevated, Critical).
 - 🗓️ **30-Day Calendar Time Scrubber** ✦ Move between Day 1 and Day 30 manually or activate Auto-Advance playback to watch compounding cashflow, scheduled commitment settlements, and subscription billings trigger in real time.
+- 🗓️ **30-Day Spending Intensity Matrix (Calendar Heatmap)** ✦ 30-cell visual density matrix mapping daily burn across the entire cycle with color-coded intensity tiers (Safe, Mid, Spike) and 1-click timeline scrubbing.
 - 📈 **Interactive 30-Day Trajectory Forecast Curve** ✦ High-resolution SVG burn chart comparing actual cash trajectory against a safe corridor band, projected month-end balance, and pulsing simulated delta paths.
 - ✂️ **Subscription Guillotine** ✦ Pause or reactivate micro-drains (Spotify, Netflix, Campus Gym, Cloud Storage) with live calculation of reclaimed daily runway (e.g., *"Pausing Campus Gym recovers +₹35/day safely"*).
 - 🛡️ **Fixed Commitments Ringfencing** ✦ Segregates non-negotiable living overhead (PG Rent share, Wi-Fi recharge, Metro smart card pass) from discretionary spending to eliminate end-of-month default risk.
-- 🎯 **Savings Goals Pacing Corridor** ✦ Monitor progress on Gen Z aspirations (Retro Dunks, Emergency Safety Cushion, Weekend Indie Fest) with target pacing alerts and interactive micro-contributions.
+- 🎯 **Savings Goals Pacing Corridor & Lockbox Simulator** ✦ Monitor progress on Gen Z aspirations (Retro Dunks, Emergency Safety Cushion, Weekend Indie Fest) with target pacing alerts, micro-contributions, and an interactive **Savings Lockbox Ripple Simulator** testing daily runway trade-offs before locking funds.
 - ⚡ **Shock Roulette Stress-Testing** ✦ Stress-test your budget buffer against realistic emergencies (bike puncture, broken phone screen, sudden dental medicine, group dinner split) to measure shock resilience.
 - 👤 **1-Click Persona Presets** ✦ Instantly toggle between pre-configured real-world Gen Z profiles: *College Hosteler*, *First-Month Intern*, and *Freelance Creator*.
 - 📊 **30-Day Capital Allocation Corridor** ✦ Interactive stacked visual breakdown showing Spent to Date, Locked in Goals, Reserved for Bills, and Safe Discretionary Cushion.
@@ -39,7 +40,7 @@
 - ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
 - 💾 **Multi-Format Financial Exports** ✦ Instant export to Tabular CSV (30-day transactions), Full State JSON (audit logs & metrics), and formatted physical Print Statement.
 - 🛡️ **Defensive Security & Prototype Pollution Shield** ✦ DOMPurify XSS scrubbing on all user inputs, prototype pollution defense, bounded arithmetic clamping, and top-level ErrorBoundary resilience.
-- 🧪 **Vitest Unit & Integration Test Suite** ✦ 26 automated tests across 4 suites covering mathematical invariants, 3-way scenario comparisons, category budget caps, security sanitization, and fault recovery.
+- 🧪 **Vitest Unit & Integration Test Suite** ✦ 30 automated tests across 4 suites covering mathematical invariants, 3-way scenario comparisons, category budget caps, spending heatmaps, lockbox ripples, security sanitization, and fault recovery.
 
 ---
 
