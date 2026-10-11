@@ -1,7 +1,5 @@
 <h1 align="center">
-  <br>
   ⚡ Sanvektro
-  <br>
 </h1>
 
 > <p align="center"><strong>A predictive personal finance simulation engine and decision cockpit for Gen Z managing a ₹10,000 budget across 30 days. Sanvektro connects liquid balance, daily safe burn allowances, fixed commitments, subscription guillotine controls, savings goals pacing, unexpected expense shocks, financial risk, and financial health into a real-time reactive model. Simulate financial decisions before you spend.</strong></p>
@@ -22,14 +20,19 @@
 ## ✨ Key Features
 
 - 🧪 **"What-If" Decision Simulator (Pre-Spend Sandbox)** ✦ Stage discretionary expenses (e.g., ₹480 Swiggy treat, ₹1,500 concert ticket, ₹999 thrift drop) before committing to preview immediate ripple effects on your daily allowance, savings goals, monthly forecast, and financial health score.
-- 🎛️ **4-Pillar Financial Health Cockpit** ✦ Real-time tracking of Liquid Balance, Dynamic Safe Daily Burn Allowance, Composite Financial Health Score (0–100), and 4-tier Financial Risk Classification (Optimal, Moderate, Elevated, Critical).
+- 🎛️ **4-Pillar Financial Health Cockpit** ✦ Real-time tracking of Liquid Balance, Dynamic Safe Daily Burn Allowance, Composite Financial Health Score (0-100), and 4-tier Financial Risk Classification (Optimal, Moderate, Elevated, Critical).
 - 🗓️ **30-Day Calendar Time Scrubber** ✦ Move between Day 1 and Day 30 manually or activate Auto-Advance playback to watch compounding cashflow, scheduled commitment settlements, and subscription billings trigger in real time.
-- 📈 **Interactive 30-Day Trajectory Forecast Curve** ✦ High-resolution SVG burn chart comparing actual cash trajectory against a safe corridor corridor band, projected month-end balance, and pulsing simulated delta paths.
+- 📈 **Interactive 30-Day Trajectory Forecast Curve** ✦ High-resolution SVG burn chart comparing actual cash trajectory against a safe corridor band, projected month-end balance, and pulsing simulated delta paths.
 - ✂️ **Subscription Guillotine** ✦ Pause or reactivate micro-drains (Spotify, Netflix, Campus Gym, Cloud Storage) with live calculation of reclaimed daily runway (e.g., *"Pausing Campus Gym recovers +₹35/day safely"*).
 - 🛡️ **Fixed Commitments Ringfencing** ✦ Segregates non-negotiable living overhead (PG Rent share, Wi-Fi recharge, Metro smart card pass) from discretionary spending to eliminate end-of-month default risk.
 - 🎯 **Savings Goals Pacing Corridor** ✦ Monitor progress on Gen Z aspirations (Retro Dunks, Emergency Safety Cushion, Weekend Indie Fest) with target pacing alerts and interactive micro-contributions.
 - ⚡ **Shock Roulette Stress-Testing** ✦ Stress-test your budget buffer against realistic emergencies (bike puncture, broken phone screen, sudden dental medicine, group dinner split) to measure shock resilience.
 - 👤 **1-Click Persona Presets** ✦ Instantly toggle between pre-configured real-world Gen Z profiles: *College Hosteler*, *First-Month Intern*, and *Freelance Creator*.
+- 🔊 **Web Audio Synthesizer Haptics** ✦ Zero-latency acoustic feedback using browser Web Audio oscillators for tactile timeline clicks, goal fanfare chimes, and warning alerts with one-click mute.
+- ⌨️ **Hands-Free Keyboard Navigation** ✦ Full hotkey shortcuts (`Space`, `1-3`, `S`, `E`, `J`, `P`, `M`, `?`, `Esc`) for rapid interaction.
+- 💾 **Multi-Format Financial Exports** ✦ Instant export to Tabular CSV (30-day transactions), Full State JSON (audit logs & metrics), and formatted physical Print Statement.
+- 🛡️ **Defensive Security & Prototype Pollution Shield** ✦ DOMPurify XSS scrubbing on all user inputs, prototype pollution defense, bounded arithmetic clamping, and top-level ErrorBoundary resilience.
+- 🧪 **Vitest Unit & Integration Test Suite** ✦ 14 automated test suites covering financial calculations, security sanitization, and fault recovery.
 
 ---
 
@@ -94,7 +97,7 @@ flowchart TB
 | **6. Subscriptions** | Recurring micro-charges with toggle controls | Pausing a subscription immediately boosts daily safe allowance. |
 | **7. Unexpected Expenses** | Emergency shocks (screen repair, dental care) | Evaluates whether your emergency buffer absorbs the shock without insolvency. |
 | **8. Financial Risk** | 4-tier health classification | Dynamically shifts (Optimal ➔ Elevated) when burn rates threaten solvency. |
-| **9. Financial Health** | 0–100 weighted financial vitality index | Synthesizes runway survival, commitment coverage, and buffer capacity. |
+| **9. Financial Health** | 0-100 weighted financial vitality index | Synthesizes runway survival, commitment coverage, and buffer capacity. |
 
 ---
 
@@ -103,6 +106,9 @@ flowchart TB
 - **Framework:** [React 19](https://react.dev/) + [Vite 8](https://vite.dev/)
 - **Language:** [TypeScript 6](https://www.typescriptlang.org/) (Strict type safety, verbatim module syntax)
 - **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) (CSS-first `@theme` design tokens, glassmorphic dark theme)
+- **Testing:** [Vitest 5](https://vitest.dev/) + [@testing-library/react](https://testing-library.com/) + [jsdom](https://github.com/jsdom/jsdom) (14/14 automated tests)
+- **Security:** [DOMPurify](https://github.com/cure53/DOMPurify) (Zero XSS injection, prototype pollution defense)
+- **Audio:** Web Audio API (Client-side native acoustic synthesizers)
 - **Icons:** [Lucide React](https://lucide.dev/)
 - **Visuals & Delight:** Native SVG responsive coordinate charts + [canvas-confetti](https://www.npmjs.com/package/canvas-confetti)
 - **Deployment & Performance:** Zero external runtime network APIs ✦ 100% deterministic client-side calculation (sub-0.5s First Contentful Paint)
@@ -113,15 +119,20 @@ flowchart TB
 
 ```
 PromptRunOct/
-├── public/
-│   ├── favicon.svg               # Sanvektro vector branding icon
-│   └── icons.svg                 # SVG sprite symbols
+├── ARCHITECTURE.md               # Complete 6-layer architecture & mathematical specifications
 ├── src/
+│   ├── __tests__/                # Vitest test suites (14 tests)
+│   │   ├── App.test.tsx              # Component integration & persona switching
+│   │   ├── calculations.test.ts      # Pure math & consequence diffing tests
+│   │   ├── ErrorBoundary.test.tsx    # Crash containment & recovery verification
+│   │   └── security.test.ts          # DOMPurify XSS & prototype pollution tests
 │   ├── components/
 │   │   ├── CommitmentsList.tsx       # Mandatory bills with settlement toggles
 │   │   ├── DecisionSimulator.tsx     # The "What-If" pre-spend sandbox & consequence diff
-│   │   ├── Header.tsx                # Brand banner, persona switcher, timeline pill
+│   │   ├── ErrorBoundary.tsx         # Class-based crash interception boundary
+│   │   ├── Header.tsx                # Brand banner, audio toggle, export menu, shortcuts trigger
 │   │   ├── HowItEvaluatesModal.tsx   # System architecture & author guide
+│   │   ├── KeyboardShortcutsModal.tsx# Rapid hotkey navigation overlay
 │   │   ├── MetricCards.tsx           # 4-pillar metrics (Balance, Daily Burn, Health, Risk)
 │   │   ├── SavingsGoals.tsx          # Goal pacing corridor with micro-contributions
 │   │   ├── ShockRoulette.tsx         # Emergency shock stress-testing roulette
@@ -129,15 +140,22 @@ PromptRunOct/
 │   │   ├── TimelineScrubber.tsx      # Day 1-30 calendar time scrubber with autoplay
 │   │   ├── TrajectoryChart.tsx       # Interactive SVG 30-day forecast & corridor chart
 │   │   └── TransactionLedger.tsx     # Chronological realized spend history & search
+│   ├── hooks/
+│   │   └── useKeyboardShortcuts.ts   # Keyboard navigation event listener
+│   ├── services/
+│   │   ├── audioService.ts           # Web Audio API synthesizers (ticks, chimes, alerts)
+│   │   ├── exportService.ts          # Tabular CSV, JSON state archive, and print statement
+│   │   └── security.ts               # DOMPurify sanitization & prototype pollution defense
 │   ├── data/
 │   │   └── presets.ts                # Real-world Gen Z presets (Hosteler, Intern, Creator)
 │   ├── types/
 │   │   └── finance.ts                # Master TypeScript contracts and interfaces
 │   ├── utils/
 │   │   └── calculations.ts           # Pure mathematical simulation & diffing engine
-│   ├── App.tsx                       # Root application coordinator & layout
+│   ├── App.tsx                       # Root application coordinator wrapped in ErrorBoundary
 │   ├── index.css                     # Tailwind v4 theme tokens & custom scrollbars
 │   └── main.tsx                      # React root entry point
+├── vitest.config.ts                  # Vitest runner configuration with jsdom
 ├── index.html                        # Optimized HTML5 entry with metadata
 ├── package.json                      # Project dependencies & scripts
 ├── tsconfig.json                     # TypeScript compiler configuration

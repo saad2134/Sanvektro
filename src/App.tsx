@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import type { 
   FinancialState, 
   SimulationDraft, 
@@ -24,10 +24,28 @@ import { SavingsGoals } from './components/SavingsGoals';
 import { ShockRoulette } from './components/ShockRoulette';
 import { TransactionLedger } from './components/TransactionLedger';
 import { HowItEvaluatesModal } from './components/HowItEvaluatesModal';
+import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+
+import { 
+  isAudioMuted, 
+  toggleAudioMute, 
+  playTick, 
+  playChime, 
+  playWarning, 
+  playToggle 
+} from './services/audioService';
+import { 
+  exportStateAsJSON, 
+  exportLedgerAsCSV, 
+  printMonthlyStatement 
+} from './services/exportService';
+import { sanitizeText, sanitizeAmount } from './services/security';
 
 import confetti from 'canvas-confetti';
 
-export function App() {
+export function AppContent() {
   const [selectedPresetId, setSelectedPresetId] = useState<string>('hostel-hustler');
   const [financialState, setFinancialState] = useState<FinancialState>(() => {
     const preset = PERSONA_PRESETS.find(p => p.id === 'hostel-hustler') ?? PERSONA_PRESETS[0];
@@ -42,6 +60,8 @@ export function App() {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [isMutedState, setIsMutedState] = useState<boolean>(() => isAudioMuted());
 
   // Synchronous Reactive Calculations
   const baselineMetrics = useMemo(() => {
@@ -62,10 +82,20 @@ export function App() {
     return generateTrajectoryPoints(financialState, simulationDraft);
   }, [financialState, simulationDraft]);
 
+  // Audio Toggle
+  const handleToggleMute = useCallback(() => {
+    const nextMuted = toggleAudioMute();
+    setIsMutedState(nextMuted);
+    if (!nextMuted) {
+      playTick();
+    }
+  }, []);
+
   // Handlers
-  const handleSelectPreset = (presetId: string) => {
+  const handleSelectPreset = useCallback((presetId: string) => {
     const preset = PERSONA_PRESETS.find(p => p.id === presetId);
     if (preset) {
+      playToggle();
       setSelectedPresetId(presetId);
       const cloned = JSON.parse(JSON.stringify(preset.state));
       setFinancialState(cloned);
@@ -76,15 +106,17 @@ export function App() {
         day: cloned.currentDay
       });
     }
-  };
+  }, []);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
+    playToggle();
     const preset = PERSONA_PRESETS.find(p => p.id === selectedPresetId) ?? PERSONA_PRESETS[0];
     setFinancialState(JSON.parse(JSON.stringify(preset.state)));
     setSimulationDraft(null);
-  };
+  }, [selectedPresetId]);
 
-  const handleDayChange = (day: number | ((prev: number) => number)) => {
+  const handleDayChange = useCallback((day: number | ((prev: number) => number)) => {
+    playTick();
     setFinancialState(prev => {
       const nextDay = typeof day === 'function' ? day(prev.currentDay) : day;
       return {
@@ -92,51 +124,58 @@ export function App() {
         currentDay: Math.min(30, Math.max(1, nextDay))
       };
     });
-  };
+  }, []);
 
-  const handleToggleSubscription = (subId: string) => {
+  const handleToggleSubscription = useCallback((subId: string) => {
+    playToggle();
     setFinancialState(prev => ({
       ...prev,
       subscriptions: prev.subscriptions.map(s =>
         s.id === subId ? { ...s, isActive: !s.isActive } : s
       )
     }));
-  };
+  }, []);
 
-  const handleAddSubscription = (newSub: Omit<Subscription, 'id'>) => {
+  const handleAddSubscription = useCallback((newSub: Omit<Subscription, 'id'>) => {
+    playToggle();
     const sub: Subscription = {
       ...newSub,
+      name: sanitizeText(newSub.name, 40),
+      amount: sanitizeAmount(newSub.amount, 10, 5000),
       id: `sub-custom-${Date.now()}`
     };
     setFinancialState(prev => ({
       ...prev,
       subscriptions: [...prev.subscriptions, sub]
     }));
-  };
+  }, []);
 
-  const handleToggleCommitmentPaid = (comId: string) => {
+  const handleToggleCommitmentPaid = useCallback((comId: string) => {
+    playToggle();
     setFinancialState(prev => ({
       ...prev,
       commitments: prev.commitments.map(c =>
         c.id === comId ? { ...c, isPaid: !c.isPaid } : c
       )
     }));
-  };
+  }, []);
 
-  const handleContributeGoal = (goalId: string, amount: number) => {
+  const handleContributeGoal = useCallback((goalId: string, amount: number) => {
+    playChime();
     setFinancialState(prev => ({
       ...prev,
       savingsGoals: prev.savingsGoals.map(g =>
         g.id === goalId ? { ...g, currentAmount: g.currentAmount + amount } : g
       )
     }));
-  };
+  }, []);
 
-  const handleApplyShock = (title: string, amount: number, category: ExpenseCategory) => {
+  const handleApplyShock = useCallback((title: string, amount: number, category: ExpenseCategory) => {
+    playWarning();
     const newTx: Transaction = {
       id: `tx-shock-${Date.now()}`,
-      title,
-      amount,
+      title: sanitizeText(title, 50),
+      amount: sanitizeAmount(amount, 10, 10000),
       category,
       day: financialState.currentDay,
       isUnexpected: true
@@ -145,31 +184,36 @@ export function App() {
       ...prev,
       transactions: [...prev.transactions, newTx]
     }));
-  };
+  }, [financialState.currentDay]);
 
-  const handleDeleteTransaction = (txId: string) => {
+  const handleDeleteTransaction = useCallback((txId: string) => {
+    playToggle();
     setFinancialState(prev => ({
       ...prev,
       transactions: prev.transactions.filter(t => t.id !== txId)
     }));
-  };
+  }, []);
 
-  const handleAddManualTransaction = (txData: Omit<Transaction, 'id'>) => {
+  const handleAddManualTransaction = useCallback((txData: Omit<Transaction, 'id'>) => {
+    playChime();
     const newTx: Transaction = {
       ...txData,
+      title: sanitizeText(txData.title, 50),
+      amount: sanitizeAmount(txData.amount, 1, 20000),
       id: `tx-man-${Date.now()}`
     };
     setFinancialState(prev => ({
       ...prev,
       transactions: [...prev.transactions, newTx]
     }));
-  };
+  }, []);
 
-  const handleCommitDraft = (draft: SimulationDraft) => {
+  const handleCommitDraft = useCallback((draft: SimulationDraft) => {
+    playChime();
     const newTx: Transaction = {
       id: `tx-sim-commit-${Date.now()}`,
-      title: draft.title,
-      amount: draft.amount,
+      title: sanitizeText(draft.title, 50),
+      amount: sanitizeAmount(draft.amount, 1, 20000),
       category: draft.category,
       day: draft.day
     };
@@ -184,7 +228,41 @@ export function App() {
       spread: 70,
       origin: { y: 0.6 }
     });
-  };
+  }, []);
+
+  // Keyboard Shortcuts Hook
+  const shortcutActions = useMemo(() => ({
+    onTogglePlay: () => {
+      handleDayChange(prev => (prev >= 30 ? 1 : prev + 1));
+    },
+    onSelectPreset: (index: number) => {
+      const preset = PERSONA_PRESETS[index];
+      if (preset) handleSelectPreset(preset.id);
+    },
+    onFocusSimulator: () => {
+      const simInput = document.getElementById('sim-amount-input') || document.getElementById('sim-title-input');
+      simInput?.focus();
+    },
+    onExportCSV: () => {
+      exportLedgerAsCSV(financialState);
+    },
+    onExportJSON: () => {
+      exportStateAsJSON(financialState, simulatedMetrics ?? baselineMetrics);
+    },
+    onPrint: () => {
+      printMonthlyStatement();
+    },
+    onToggleMute: handleToggleMute,
+    onToggleShortcutsModal: () => {
+      setIsShortcutsOpen(prev => !prev);
+    },
+    onCloseModals: () => {
+      setIsModalOpen(false);
+      setIsShortcutsOpen(false);
+    }
+  }), [financialState, simulatedMetrics, baselineMetrics, handleDayChange, handleSelectPreset, handleToggleMute]);
+
+  useKeyboardShortcuts(shortcutActions);
 
   return (
     <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/20 selection:text-emerald-300">
@@ -196,6 +274,12 @@ export function App() {
         onSelectPreset={handleSelectPreset}
         onResetToBaseline={handleReset}
         onOpenHowItWorks={() => setIsModalOpen(true)}
+        isMuted={isMutedState}
+        onToggleMute={handleToggleMute}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
+        onExportCSV={() => exportLedgerAsCSV(financialState)}
+        onExportJSON={() => exportStateAsJSON(financialState, simulatedMetrics ?? baselineMetrics)}
+        onPrintStatement={printMonthlyStatement}
       />
 
       {/* Main Container */}
@@ -289,10 +373,16 @@ export function App() {
 
       </main>
 
-      {/* Evaluation Criteria Modal */}
+      {/* System Architecture Modal */}
       <HowItEvaluatesModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+
+      {/* Keyboard Shortcuts Modal */}
+      <KeyboardShortcutsModal
+        isOpen={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
       />
 
       {/* Footer */}
@@ -315,4 +405,13 @@ export function App() {
   );
 }
 
+export function App() {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
+  );
+}
+
 export default App;
+

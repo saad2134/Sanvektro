@@ -1,6 +1,19 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { PERSONA_PRESETS } from '../data/presets';
-import { Sparkles, RotateCcw, ShieldCheck, Zap } from 'lucide-react';
+import { 
+  Sparkles, 
+  RotateCcw, 
+  ShieldCheck, 
+  Zap, 
+  Volume2, 
+  VolumeX, 
+  Keyboard, 
+  Download, 
+  FileSpreadsheet, 
+  FileCode, 
+  Printer,
+  ChevronDown
+} from 'lucide-react';
 
 interface HeaderProps {
   currentDay: number;
@@ -8,6 +21,12 @@ interface HeaderProps {
   onSelectPreset: (presetId: string) => void;
   onResetToBaseline: () => void;
   onOpenHowItWorks: () => void;
+  isMuted: boolean;
+  onToggleMute: () => void;
+  onOpenShortcuts: () => void;
+  onExportCSV: () => void;
+  onExportJSON: () => void;
+  onPrintStatement: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -15,14 +34,32 @@ export const Header: React.FC<HeaderProps> = ({
   selectedPresetId,
   onSelectPreset,
   onResetToBaseline,
-  onOpenHowItWorks
+  onOpenHowItWorks,
+  isMuted,
+  onToggleMute,
+  onOpenShortcuts,
+  onExportCSV,
+  onExportJSON,
+  onPrintStatement
 }) => {
+  const [isExportOpen, setIsExportOpen] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
   const monthProgress = Math.round((currentDay / 30) * 100);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setIsExportOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <header className="border-b border-slate-800/80 bg-[#090d16]/90 backdrop-blur-md sticky top-0 z-40 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           
           {/* Brand Identity */}
           <div className="flex items-center gap-3">
@@ -46,8 +83,9 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Center / Right: Persona Presets & Evaluation Helpers */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          {/* Center / Right: Presets & Controls */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+            {/* Persona Presets */}
             <div className="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs">
               <span className="text-slate-400 px-2 font-medium flex items-center gap-1.5 hidden sm:inline-flex">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Presets:
@@ -84,6 +122,97 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
 
+            {/* Audio Toggle Button */}
+            <button
+              onClick={onToggleMute}
+              id="btn-toggle-audio"
+              className={`w-9 h-9 aspect-square rounded-xl border transition-colors flex items-center justify-center shrink-0 ${
+                isMuted
+                  ? 'bg-slate-900/60 border-slate-800 text-slate-500 hover:text-slate-300'
+                  : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+              }`}
+              title={isMuted ? 'Unmute Audio Haptics (M)' : 'Mute Audio Haptics (M)'}
+              aria-label="Toggle Audio"
+            >
+              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </button>
+
+            {/* Keyboard Shortcuts Button */}
+            <button
+              onClick={onOpenShortcuts}
+              id="btn-shortcuts"
+              className="w-9 h-9 aspect-square rounded-xl bg-slate-900/90 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-colors flex items-center justify-center shrink-0"
+              title="Keyboard Shortcuts (?)"
+              aria-label="Keyboard Shortcuts"
+            >
+              <Keyboard className="w-4 h-4" />
+            </button>
+
+            {/* Export Menu Dropdown */}
+            <div className="relative" ref={exportRef}>
+              <button
+                onClick={() => setIsExportOpen(!isExportOpen)}
+                id="btn-export-dropdown"
+                className="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-xs font-medium text-slate-300 border border-slate-800 hover:border-slate-700 transition-colors flex items-center gap-1.5"
+                title="Export Ledger or Budget Statement"
+              >
+                <Download className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="hidden sm:inline">Export</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
+
+              {isExportOpen && (
+                <div className="absolute right-0 mt-2 w-56 rounded-xl bg-[#0f1422] border border-slate-700/80 shadow-2xl p-1.5 z-50 text-xs animate-in fade-in slide-in-from-top-1 duration-150">
+                  <button
+                    onClick={() => {
+                      onExportCSV();
+                      setIsExportOpen(false);
+                    }}
+                    id="btn-export-csv"
+                    className="w-full text-left px-3 py-2 rounded-lg text-slate-200 hover:bg-emerald-500/10 hover:text-emerald-300 flex items-center gap-2.5 transition-colors"
+                  >
+                    <FileSpreadsheet className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div>
+                      <div className="font-semibold">Export Ledger (CSV)</div>
+                      <div className="text-[10px] text-slate-400">All 30-day transactions</div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      onExportJSON();
+                      setIsExportOpen(false);
+                    }}
+                    id="btn-export-json"
+                    className="w-full text-left px-3 py-2 rounded-lg text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-300 flex items-center gap-2.5 transition-colors"
+                  >
+                    <FileCode className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <div>
+                      <div className="font-semibold">Export State (JSON)</div>
+                      <div className="text-[10px] text-slate-400">Full audit log & metrics</div>
+                    </div>
+                  </button>
+
+                  <div className="h-px bg-slate-800 my-1" />
+
+                  <button
+                    onClick={() => {
+                      onPrintStatement();
+                      setIsExportOpen(false);
+                    }}
+                    id="btn-print-statement"
+                    className="w-full text-left px-3 py-2 rounded-lg text-slate-200 hover:bg-purple-500/10 hover:text-purple-300 flex items-center gap-2.5 transition-colors"
+                  >
+                    <Printer className="w-4 h-4 text-purple-400 shrink-0" />
+                    <div>
+                      <div className="font-semibold">Print Statement</div>
+                      <div className="text-[10px] text-slate-400">Clean physical copy</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Reset Button */}
             <button
               onClick={onResetToBaseline}
@@ -94,14 +223,14 @@ export const Header: React.FC<HeaderProps> = ({
               <RotateCcw className="w-4 h-4" />
             </button>
 
-            {/* Guide Button */}
+            {/* System Architecture Guide Button */}
             <button
               onClick={onOpenHowItWorks}
               id="btn-how-it-works"
               className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700/60 transition-colors flex items-center gap-1.5"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-              <span>System Architecture</span>
+              <span className="hidden sm:inline">Architecture</span>
             </button>
           </div>
 
@@ -110,3 +239,4 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+

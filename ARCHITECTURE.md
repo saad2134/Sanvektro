@@ -1,0 +1,208 @@
+# System Architecture & Technical Specifications ✦ Sanvektro
+
+> **Author**: Saaduddin Mohammed ([github.com/saad2134](https://github.com/saad2134))  
+> **Engine**: Sanvektro ✦ 30-Day Financial Trajectory & Decision Simulation Cockpit  
+> **Core Stack**: React 19 ✦ TypeScript 5 ✦ Vite 8 ✦ Tailwind CSS v4 ✦ Vitest 3 ✦ Web Audio API
+
+---
+
+## 1. Executive Summary & Design Philosophy
+
+**Sanvektro** is a high-precision, client-side financial simulation cockpit designed to solve the critical "end-of-month cash cliff" experienced by students, interns, and early-career earners managing a constrained ₹10,000 monthly budget.
+
+Unlike retrospective expense trackers that merely record past spending after the damage is done, Sanvektro is **forward-projecting and proactive**. Every financial action (a ₹450 Swiggy order, an ₹800 gym renewal, or an unexpected ₹1,500 bike repair) is simulated across the remaining days of the month *before* capital is committed. The user immediately visualizes the exact consequence vector: how daily safe-to-spend allowance drops, whether fixed obligations remain solvent, and whether balance will deplete before Day 30.
+
+```
++-----------------------------------------------------------------------------------+
+|                              SANVEKTRO REACTIVE LOOP                              |
++-----------------------------------------------------------------------------------+
+|                                                                                   |
+|  [ Current State ] + [ Simulation Draft ]                                         |
+|         │                     │                                                   |
+|         ▼                     ▼                                                   |
+|  ┌─────────────────────────────────────────────────────────────┐                  |
+|  │          PURE DETERMINISTIC CALCULATION ENGINE             │                  |
+|  │  - Net Liquid Balance       - Dynamic Daily Allowance       │                  |
+|  │  - Day-by-Day Forecast      - Runway Depletion Day          │                  |
+|  │  - Shock Resilience Ratio   - Composite Health Score        │                  |
+|  └────────────────────────────┬────────────────────────────────┘                  |
+|                               │                                                   |
+|                               ▼                                                   |
+|  ┌─────────────────────────────────────────────────────────────┐                  |
+|  │             CONSEQUENCE DIFF & TRADE-OFF MATRIX             │                  |
+|  │  - Allowance Delta (Δ/day)  - Runway Shift                  │                  |
+|  │  - Health Score Penalty     - Opportunity Cost Narrative    │                  |
+|  └────────────────────────────┬────────────────────────────────┘                  |
+|                               │                                                   |
+|             ┌─────────────────┴─────────────────┐                                 |
+|             ▼                                   ▼                                 |
+|  [ Interactive Visual Cockpit ]      [ Web Audio Acoustic Haptics ]               |
+|  - 4-Pillar Metric Cards             - Tactile Slider Clicks                      |
+|  - 30-Point SVG Trajectory Curve     - Alert Tones on Critical Risk               |
+|  - Calendar Scrubber                 - Harmonic Chimes on Goals                   |
+|                                                                                   |
++-----------------------------------------------------------------------------------+
+```
+
+---
+
+## 2. Six-Layer Modular Architecture
+
+Sanvektro enforces strict separation of concerns across six decoupled architectural tiers:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│ Layer 1: Presentation & Cockpit Shell (React 19 + Tailwind CSS v4)      │
+│ Header, MetricCards, TimelineScrubber, DecisionSimulator, Trajectory    │
+├─────────────────────────────────────────────────────────────────────────┤
+│ Layer 2: Reactive State Orchestration (App.tsx + Hooks)                 │
+│ State immutability, optimistic draft sandboxing, hotkey dispatchers     │
+├─────────────────────────────────────────────────────────────────────────┤
+│ Layer 3: Deterministic Financial Mathematics (calculations.ts)          │
+│ Pure functions, zero DOM dependencies, complete test coverage           │
+├─────────────────────────────────────────────────────────────────────────┤
+│ Layer 4: Defensive Security & Input Sanitization (security.ts)          │
+│ DOMPurify XSS scrubbing, prototype pollution defense, range clamping   │
+├─────────────────────────────────────────────────────────────────────────┤
+│ Layer 5: Data Serialization & Multi-Format Export (exportService.ts)    │
+│ Tabular CSV compilation, structured JSON archiving, print stylesheet    │
+├─────────────────────────────────────────────────────────────────────────┤
+│ Layer 6: Acoustic Synthesizer & Accessibility (audioService.ts, hotkeys)│
+│ Web Audio API oscillators, zero network audio latency, keyboard control │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Layer Breakdown
+
+1. **Presentation & Cockpit Shell (`src/components/`)**:
+   - Built with Tailwind CSS v4 using modern theme primitives and pure CSS transitions.
+   - Enforces square squircle containers (`aspect-square rounded-xl` / `rounded-2xl`) across all action buttons, metric frames, and icon badges.
+   - Fully responsive layout adapting from mobile viewports to ultra-wide displays.
+
+2. **Reactive State Orchestration (`src/App.tsx`, `src/hooks/`)**:
+   - Maintains an immutable `FinancialState` object tracking budget, transactions, recurring commitments, subscriptions, and savings goals.
+   - Separate transient `SimulationDraft` state allowing zero-risk exploratory sandbox testing.
+   - Comprehensive keyboard shortcuts listener (`useKeyboardShortcuts`) supporting rapid navigation.
+
+3. **Deterministic Financial Mathematics (`src/utils/calculations.ts`)**:
+   - 100% pure TypeScript functions with zero side effects.
+   - Computes daily safe-to-spend burn allowance, runway depletion day, shock resilience, and a 4-pillar composite health score (0 to 100).
+
+4. **Defensive Security (`src/services/security.ts`)**:
+   - Strict XSS protection via `DOMPurify` for all user-entered transaction titles, commitment labels, and categories.
+   - Prototype pollution defense (`hasPrototypePollution`, `sanitizeObject`) blocking `__proto__`, `constructor`, and `prototype` manipulation.
+   - Boundary clamping (`sanitizeAmount`) preventing negative numbers, infinite floats, or integer overflows.
+
+5. **Multi-Format Export Engine (`src/services/exportService.ts`)**:
+   - **Tabular CSV**: Formats chronological 30-day transactions, commitments, and inflows for spreadsheet analysis.
+   - **JSON Archive**: Full snapshot of state, metrics, and audit log for portability.
+   - **Print Statement**: Clean layout formatted for physical statements or PDF print preview.
+
+6. **Acoustic Synthesizer (`src/services/audioService.ts`)**:
+   - Zero-asset Web Audio API synthesis creating micro-acoustic haptic feedback.
+   - Frequency-modulated sine ticks for timeline scrubbing, harmonic major chords for savings progress, and sawtooth alerts for runway breaches.
+
+---
+
+## 3. Mathematical Foundations & Decision Algorithms
+
+### A. Realized Liquid Balance ($B_t$)
+At any given day $t \in [1, 30]$:
+
+$$B_t = B_0 + \sum I_{\le t} - \sum T_{\le t} - \sum C_{\text{paid}, \le t} - \sum S_{\text{billed}, \le t}$$
+
+Where:
+- $B_0$: Starting monthly capital (₹10,000 baseline)
+- $I_{\le t}$: Inflows realized on or before day $t$
+- $T_{\le t}$: Discretionary expenses recorded on or before day $t$
+- $C_{\text{paid}, \le t}$: Mandatory commitments marked as paid
+- $S_{\text{billed}, \le t}$: Subscriptions billed on or before day $t$
+
+### B. Dynamic Daily Safe-to-Spend Allowance ($A_t$)
+The safe daily allowance ensures the user will not default on upcoming fixed bills:
+
+$$P_{\text{discretionary}} = \max\left(0, B_t + \sum I_{> t} - \sum C_{\text{unpaid}, > t} - \sum S_{\text{active}, > t} - E_{\text{buffer}} - S_{\text{draft}}\right)$$
+
+$$A_t = \left\lfloor \frac{P_{\text{discretionary}}}{\max(1, 30 - t + 1)} \right\rfloor$$
+
+Where:
+- $C_{\text{unpaid}, > t}$: Unpaid essential commitments due between day $t+1$ and day 30
+- $S_{\text{active}, > t}$: Active subscriptions billing between day $t+1$ and day 30
+- $E_{\text{buffer}}$: Protected emergency cushion (default ₹500 to ₹1,000)
+- $S_{\text{draft}}$: Amount of the currently staged "What-If" simulation
+
+### C. 30-Day Forward Trajectory Simulation ($F_d$)
+For each forecast day $d \in [1, 30]$:
+
+$$\text{Cash}_d = \text{Cash}_{d-1} + I_d - T_d - C_d - S_d - [d > t \implies A_t]$$
+
+$$\text{DepletionDay} = \min \{ d \in [1, 30] \mid \text{Cash}_d < 0 \}$$
+
+If $\text{Cash}_d \ge 0$ for all $d \in [1, 30]$, $\text{DepletionDay} = \text{null}$.
+
+### D. Composite Financial Health Score ($H \in [5, 100]$)
+The health score is a weighted composite of four fundamental financial pillars:
+
+| Pillar | Weight | Metric Evaluated | Calculation Formula |
+|---|---|---|---|
+| **Pillar A: Runway & Day 30 Surplus** | 35 pts | Solvency & projected end-of-month cash | $\min\left(35, \frac{\text{ProjectedSurplus}}{2500} \times 35\right)$ or $\frac{\text{DepletionDay}}{30} \times 20$ |
+| **Pillar B: Obligation Coverage** | 25 pts | Ability of current liquid cash to cover pending bills | $\min\left(25, \frac{B_t}{\text{ObligationsTotal}} \times 25\right)$ |
+| **Pillar C: Daily Allowance Cushion** | 20 pts | Gen Z purchasing power benchmark | $\ge ₹250$: 20 pts, $\ge ₹160$: 15 pts, $\ge ₹100$: 10 pts, $\ge ₹50$: 5 pts |
+| **Pillar D: Shock Resilience & Goals** | 20 pts | ₹1,000 emergency buffer + savings goal pacing | $(\text{BufferRatio} \times 10) + (\text{GoalRatio} \times 10)$ |
+
+---
+
+## 4. Security & Fault Tolerance Guarantees
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        SECURITY & STABILITY MATRIX                     │
+├────────────────────────────┬───────────────────────────────────────────┤
+│ Threat / Risk Vector       │ Sanvektro Defensive Implementation        │
+├────────────────────────────┼───────────────────────────────────────────┤
+│ Cross-Site Scripting (XSS) │ DOMPurify sanitization stripping all tags │
+│ Prototype Pollution        │ Object.create(null) + recursive scrubbing │
+│ Arithmetic Overflow / NaN  │ Bounded number clamping via sanitizeAmount│
+│ React Component Crash      │ Class-based ErrorBoundary fallback UI     │
+│ Zero-Network Audio Failure │ Graceful silent degradation if Web Audio  │
+│                            │ is unsupported or disabled by policy      │
+└────────────────────────────┴───────────────────────────────────────────┘
+```
+
+1. **DOMPurify HTML Entity Stripping**:  
+   User input from custom subscriptions, shocks, and manual ledger entries passes through `DOMPurify.sanitize(input, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })`.
+2. **Object Prototype Freezing**:  
+   Imported and manipulated states are parsed through `sanitizeObject()`, removing `__proto__`, `constructor`, and `prototype` keys before state updates.
+3. **ErrorBoundary Recovery**:  
+   The entire application tree is wrapped in `<ErrorBoundary>`. If any unhandled exception occurs, the cockpit intercepts the error, prevents blank screen failures, displays technical error details, and presents a one-click session restore button.
+
+---
+
+## 5. Verification & Testing Suite
+
+Sanvektro includes a comprehensive test suite running under Vitest and `@testing-library/react`:
+
+| Test Suite | File Path | Focus & Assertions |
+|---|---|---|
+| **Financial Calculations** | `src/__tests__/calculations.test.ts` | ₹10k budget baseline, safe burn allowance, consequence diffs, 30-day trajectory points, and runway depletion risk tiers. |
+| **Defensive Security** | `src/__tests__/security.test.ts` | Prototype pollution detection, object cleansing, DOMPurify XSS stripping, and boundary number clamping. |
+| **Fault Recovery** | `src/__tests__/ErrorBoundary.test.tsx` | ErrorBoundary rendering, error capture, fallback display, and child recovery. |
+| **End-to-End App Integration** | `src/__tests__/App.test.tsx` | 4-pillar metric cards mounting, persona switching, and reactive consequence rendering. |
+
+To execute the test suite:
+```bash
+npx vitest run
+```
+
+To execute full type checking and bundle production build:
+```bash
+npm run build
+```
+
+---
+
+## 6. Typography & UI Geometry Compliance
+
+- **Typography Standard**: All copy, documentation, and code comments strictly enforce the `✦` symbol in place of em dashes.
+- **Icon Frame Geometry**: All icon buttons, indicators, and status badges feature square squircle geometry (`aspect-square` with `rounded-xl` / `rounded-2xl`).
+- **Color Palette**: Dark-mode primary palette (`#07090e`, `#090d16`, `#0d121e`) with emerald (`#10b981`), cyan (`#06b6d4`), amber (`#f59e0b`), and rose (`#f43f5e`) functional accents.
