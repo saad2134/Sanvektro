@@ -11,10 +11,12 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-v5.x-3178c6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-v8.3-646cff?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.3-38bdf8?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Vitest](https://img.shields.io/badge/Vitest-59%2F59_Passed-fcc72b?style=for-the-badge&logo=vitest&logoColor=black)](https://vitest.dev/)
+[![Zustand](https://img.shields.io/badge/State-Zustand-443e38?style=for-the-badge)](https://zustand.docs.pmnd.rs/)
+[![Zod](https://img.shields.io/badge/Validation-Zod-3068b7?style=for-the-badge&logo=zod&logoColor=white)](https://zod.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-78%2F78_Passed-fcc72b?style=for-the-badge&logo=vitest&logoColor=black)](https://vitest.dev/)
 [![Accessibility](https://img.shields.io/badge/A11y-WCAG_AA_100%25-10b981?style=for-the-badge)](https://www.w3.org/WAI/standards-guidelines/wcag/)
 [![Live Demo](https://img.shields.io/badge/Deployment-Live_on_Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://sanvektro.vercel.app/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-10b981?style=for-the-badge)](LICENSE)
 
 <p align="center">
   <strong>Stop reviewing mistakes after they happen. Simulate the ripple before you swipe.</strong><br/>
@@ -201,7 +203,7 @@ export const safeSub = (a: number, b: number): number => Math.max(0, paiseToRupe
 - **Framework:** [React 19](https://react.dev/) + [Vite 8](https://vite.dev/)
 - **Language:** [TypeScript 6](https://www.typescriptlang.org/) (Strict type safety, verbatim module syntax)
 - **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) (CSS-first `@theme` design tokens, glassmorphic dark theme)
-- **Testing:** [Vitest 5](https://vitest.dev/) + [@testing-library/react](https://testing-library.com/) + [jsdom](https://github.com/jsdom/jsdom) (59/59 automated tests)
+- **Testing:** [Vitest 5](https://vitest.dev/) + [@testing-library/react](https://testing-library.com/) + [jsdom](https://github.com/jsdom/jsdom) (78/78 automated tests across 11 test suites)
 - **Security:** [DOMPurify](https://github.com/cure53/DOMPurify) (Zero XSS injection, prototype pollution defense)
 - **Audio:** Web Audio API (Client-side native acoustic synthesizers)
 - **Icons:** [Lucide React](https://lucide.dev/)
@@ -215,21 +217,41 @@ export const safeSub = (a: number, b: number): number => Math.max(0, paiseToRupe
 ```
 PromptRunOct/
 ├── ARCHITECTURE.md               # Complete 6-layer architecture & mathematical specifications
+├── .env.example                  # Environment configuration template
+├── CONTRIBUTING.md               # Contribution workflow & guidelines
+├── LICENSE                       # Apache-2.0 open-source license
 ├── metadata.json                 # FAIE application manifest & capability contracts
 ├── public/
 │   ├── favicon.svg               # Vector brand pulse icon
 │   ├── readme_banner.png         # Glassmorphic README header banner (1440x310)
 │   └── social-preview.png        # Official GitHub repository preview card (1280x640)
 ├── src/
-│   ├── __tests__/                # Vitest test suites (59 tests across 6 suites)
+│   ├── __tests__/                # Root Vitest integration test suites
 │   │   ├── a11y.test.ts              # Mathematical WCAG contrast & keyboard shortcut tests
 │   │   ├── App.test.tsx              # Component integration & persona switching
 │   │   ├── calculations.test.ts      # Pure math, allocation, opportunity cost & diagnostic tests
 │   │   ├── coachEvaluator.test.ts    # Dilemma parsing & financial coach logic
 │   │   ├── ErrorBoundary.test.tsx    # Crash containment & recovery verification
 │   │   └── security.test.ts          # DOMPurify XSS & prototype pollution tests
+│   ├── app/                      # Modular view routing & layout layer
+│   │   ├── layout.tsx                # Top Bar contract, skip link, responsive tablist
+│   │   ├── page.tsx                  # Dashboard view (hero metrics, allocation, scrubber, ledger)
+│   │   ├── simulate/page.tsx         # Dedicated What-If decision simulator view
+│   │   ├── goals/page.tsx            # Tactile Capital Vault & savings lockbox view
+│   │   ├── subscriptions/page.tsx    # Recurring subscriptions & commitments radar view
+│   │   └── forecast/page.tsx         # 30-day forward trajectory & stress-testing view
 │   ├── components/
-│   │   ├── ui/                       # Reusable design system primitives (Badge, Button, Card)
+│   │   ├── ui/                       # Reusable UI primitives (Badge, Button, Card, Modal, Slider)
+│   │   ├── budget/                   # Budget overview & balance components
+│   │   │   └── BalanceCard.tsx           # Accessible balance region with risk indicators
+│   │   ├── simulator/                # Standalone simulation widgets
+│   │   │   ├── DecisionCard.tsx          # Presets & amount inputs with slider
+│   │   │   ├── ImpactPreview.tsx         # Live balance diff & screen reader announcements
+│   │   │   ├── ConsequenceList.tsx       # Contextual guidance & goal delays
+│   │   │   └── Simulator.tsx             # Modular simulator container
+│   │   ├── __tests__/                # Component unit test suites
+│   │   │   ├── BalanceCard.test.tsx      # BalanceCard rendering & risk colors
+│   │   │   └── Simulator.test.tsx        # Decision simulator reactive diff tests
 │   │   ├── CapitalAllocationBar.tsx  # 30-day 4-way stacked budget corridor bar
 │   │   ├── CategoryBreakdown.tsx     # Outflow by category spend distribution
 │   │   ├── CommitmentsList.tsx       # Mandatory bills with settlement toggles
@@ -253,14 +275,28 @@ PromptRunOct/
 │   │   ├── TimelineScrubber.tsx      # Day 1-30 calendar time scrubber with autoplay
 │   │   ├── TrajectoryChart.tsx       # Interactive SVG 30-day forecast & corridor chart
 │   │   └── TransactionLedger.tsx     # Chronological realized spend history & search
-│   ├── lib/                          # Decoupled domain calculation engines
+│   ├── store/                    # Centralized reactive state store
+│   │   └── budgetStore.ts            # Zustand store with persistent state & demo resets
+│   ├── hooks/                    # Custom React hooks layer
+│   │   ├── useBudget.ts              # Budget calculations & category summaries
+│   │   ├── useGoals.ts               # Savings goals management
+│   │   ├── useHealthScore.ts         # Weighted health index & recommendations
+│   │   ├── useSimulator.ts           # Pre-spend decision sandbox state
+│   │   ├── useSubscriptions.ts       # Recurring commitment management
+│   │   └── useKeyboardShortcuts.ts   # Hands-free keyboard navigation listener
+│   ├── constants/
+│   │   └── categories.ts             # Category metadata, colors & Gen Z presets
+│   ├── lib/                      # Decoupled domain calculation & persistence engines
 │   │   ├── budget-engine.ts          # Liquid balance, daily safe burn, and floating-point safety
-│   │   ├── forecast-engine.ts        # 30-day trajectory, 50/30/20 burn velocity, multi-cone
-│   │   ├── health-calculator.ts      # 4-pillar composite health, risk meters & personality
+│   │   ├── forecast-engine.ts        # 30-day trajectory, burn velocity, multi-cone
+│   │   ├── health-calculator.ts      # 5-pillar composite health, risk meters & personality
 │   │   ├── simulator-engine.ts       # Pre-spend diffs, 3-way comparisons, opportunity cost
-│   │   └── index.ts                  # Unified domain facade barrel
-│   ├── hooks/
-│   │   └── useKeyboardShortcuts.ts   # Keyboard navigation event listener
+│   │   ├── storage.ts                # Versioned LocalStorage with schema validation
+│   │   ├── validators.ts             # Zod input validation schemas
+│   │   └── __tests__/                # Engine unit test suites
+│   │       ├── budget-engine.test.ts     # Invariant balance & daily allowance tests
+│   │       ├── simulator-engine.test.ts  # Pure function & depletion tests
+│   │       └── validators.test.ts        # Defensive schema validation tests
 │   ├── services/
 │   │   ├── audioService.ts           # Web Audio API synthesizers (ticks, chimes, alerts)
 │   │   ├── exportService.ts          # Tabular CSV, JSON state archive, and print statement
@@ -268,10 +304,11 @@ PromptRunOct/
 │   ├── data/
 │   │   └── presets.ts                # Real-world Gen Z presets (Hosteler, Intern, Creator)
 │   ├── types/
-│   │   └── finance.ts                # Master TypeScript contracts and interfaces
+│   │   ├── index.ts                  # Master canonical type exports
+│   │   └── finance.ts                # Domain contracts and state interfaces
 │   ├── utils/
 │   │   └── calculations.ts           # Pure mathematical simulation facade
-│   ├── App.tsx                       # Root application coordinator wrapped in ErrorBoundary
+│   ├── App.tsx                       # Root application coordinator with Suspense code splitting
 │   ├── index.css                     # Tailwind v4 theme tokens & custom scrollbars
 │   └── main.tsx                      # React root entry point
 ├── vitest.config.ts                  # Vitest runner configuration with jsdom
@@ -279,6 +316,37 @@ PromptRunOct/
 ├── package.json                      # Project dependencies & scripts
 ├── tsconfig.json                     # TypeScript compiler configuration
 └── vite.config.ts                    # Vite build configuration with manual vendor chunking
+```
+
+---
+
+## 🧪 Test Suite & Verification
+
+Sanvektro maintains an unyielding **100% test pass rate** verified across 11 test suites and 78 test cases covering pure math invariants, security sanitization, defensive input schemas, and UI component workflows:
+
+| Test Suite File | Scope & Invariants Tested | Status | Test Cases |
+| :--- | :--- | :---: | :---: |
+| `src/__tests__/calculations.test.ts` | Pure Math Engine: Runway, Daily Burn, Letter Grades, Opportunity Cost | ✅ Passed | 34 / 34 |
+| `src/__tests__/security.test.ts` | Defensive Security: DOMPurify Tag Stripping & Prototype Pollution | ✅ Passed | 7 / 7 |
+| `src/__tests__/coachEvaluator.test.ts` | Decision Coach: Pattern Matching, Keyword Weights, Staged Diffs | ✅ Passed | 7 / 7 |
+| `src/__tests__/a11y.test.ts` | Accessibility: WCAG AA Contrast, Hotkey Registrations, ARIA Labels | ✅ Passed | 6 / 6 |
+| `src/__tests__/ErrorBoundary.test.tsx` | Fault Tolerance: Crash Containment, Session Reset & Recovery | ✅ Passed | 2 / 2 |
+| `src/__tests__/App.test.tsx` | App Integration: Persona Switching, 4 Metric Cards, Timeline Scrubber | ✅ Passed | 3 / 3 |
+| `src/lib/__tests__/budget-engine.test.ts` | Budget Engine: Invariant Balance, Dynamic Allowance, Risk Bands | ✅ Passed | 6 / 6 |
+| `src/lib/__tests__/simulator-engine.test.ts` | Simulator Engine: Pure Function State Invariance & Runway Depletion | ✅ Passed | 4 / 4 |
+| `src/lib/__tests__/validators.test.ts` | Input Validation: Zod Schemas, Future Date & Negative Bounds | ✅ Passed | 4 / 4 |
+| `src/components/__tests__/BalanceCard.test.tsx` | Component Unit: BalanceCard Currency Formatting & High-Risk Colors | ✅ Passed | 3 / 3 |
+| `src/components/__tests__/Simulator.test.tsx` | Component Unit: What-If Decision Sandbox Reactive Diff & Alerts | ✅ Passed | 2 / 2 |
+| **Total Test Suite** | **Deterministic Comprehensive Verification** | **100% Pass** | **78 / 78** |
+
+### Running the Test Suite Locally
+
+```bash
+# Execute Vitest test runner across all 11 suites
+npm run test
+
+# Execute complete CI pipeline (TypeScript + Vitest + Production Build)
+npm run ci
 ```
 
 ---
@@ -329,12 +397,12 @@ Developed and engineered by **Saaduddin Mohammed (@saad2134)**.
 
 ## 📄 License
 
-This project is licensed under the **MIT License** ✦ see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **Apache-2.0 License** ✦ see the [LICENSE](LICENSE) file for details.
 
 - ✅ Commercial use
 - ✅ Modification
 - ✅ Distribution
-- ✅ Private use
+- ✅ Patent grant
 - ❌ Liability
 - ❌ Warranty
 

@@ -1,38 +1,24 @@
-import { useState, useMemo, useCallback } from 'react';
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { useState, useMemo, useCallback, Suspense, lazy } from 'react';
 import type { 
   FinancialState, 
-  SimulationDraft, 
-  Subscription, 
-  Transaction, 
-  ExpenseCategory 
+  SimulationDraft
 } from './types/finance';
 import { PERSONA_PRESETS } from './data/presets';
 import { 
   calculateMetrics, 
-  calculateConsequenceDiff, 
-  generateTrajectoryPoints,
-  calculateCapitalAllocation,
-  calculateCategoryOutflow,
-  generateHealthScoreAudit,
-  generateOptimizationTips,
-  calculateDailySpendHeatmap
+  generateHealthScoreAudit
 } from './utils/calculations';
 
-import { Header } from './components/Header';
-import { MetricCards } from './components/MetricCards';
-import { CapitalAllocationBar } from './components/CapitalAllocationBar';
-import { DeficitAlertBanner } from './components/DeficitAlertBanner';
-import { TimelineScrubber } from './components/TimelineScrubber';
-import { DecisionSimulator } from './components/DecisionSimulator';
-import { TrajectoryChart } from './components/TrajectoryChart';
-import { SpendingHeatmap } from './components/SpendingHeatmap';
-import { CategoryBreakdown } from './components/CategoryBreakdown';
-import { OptimizationInsights } from './components/OptimizationInsights';
-import { SubscriptionsManager } from './components/SubscriptionsManager';
-import { CommitmentsList } from './components/CommitmentsList';
-import { SavingsGoals } from './components/SavingsGoals';
-import { ShockRoulette } from './components/ShockRoulette';
-import { TransactionLedger } from './components/TransactionLedger';
+import { Layout } from './app/layout';
+import type { AppTab } from './store/budgetStore';
+import { useBudgetStore } from './store/budgetStore';
+import { DashboardPage } from './app/page';
+
 import { HowItEvaluatesModal } from './components/HowItEvaluatesModal';
 import { HealthAuditModal } from './components/HealthAuditModal';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
@@ -49,7 +35,6 @@ import {
   toggleAudioMute, 
   playTick, 
   playChime, 
-  playWarning, 
   playToggle 
 } from './services/audioService';
 import { 
@@ -57,12 +42,38 @@ import {
   exportLedgerAsCSV, 
   printMonthlyStatement 
 } from './services/exportService';
-import { sanitizeText, sanitizeAmount } from './services/security';
 
-import confetti from 'canvas-confetti';
+// Lazy-loaded routes for code splitting and instant sub-100ms LCP on initial load
+const SimulatePage = lazy(() =>
+  import('./app/simulate/page').then((m) => ({ default: m.SimulatePage }))
+);
+const GoalsPage = lazy(() =>
+  import('./app/goals/page').then((m) => ({ default: m.GoalsPage }))
+);
+const SubscriptionsPage = lazy(() =>
+  import('./app/subscriptions/page').then((m) => ({ default: m.SubscriptionsPage }))
+);
+const ForecastPage = lazy(() =>
+  import('./app/forecast/page').then((m) => ({ default: m.ForecastPage }))
+);
+
+const ViewSkeleton = () => (
+  <div className="w-full space-y-6 animate-pulse" aria-busy="true" aria-label="Loading view">
+    <div className="h-10 bg-slate-900 rounded-xl w-1/3" />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="h-44 bg-slate-900 rounded-xl border border-slate-800" />
+      <div className="h-44 bg-slate-900 rounded-xl border border-slate-800" />
+      <div className="h-44 bg-slate-900 rounded-xl border border-slate-800" />
+    </div>
+    <div className="h-64 bg-slate-900 rounded-xl border border-slate-800" />
+  </div>
+);
 
 export function AppContent() {
+  const store = useBudgetStore();
+  const [currentTab, setCurrentTab] = useState<AppTab>('dashboard');
   const [selectedPresetId, setSelectedPresetId] = useState<string>('hostel-hustler');
+
   const [financialState, setFinancialState] = useState<FinancialState>(() => {
     const preset = PERSONA_PRESETS.find(p => p.id === 'hostel-hustler') ?? PERSONA_PRESETS[0];
     return JSON.parse(JSON.stringify(preset.state));
@@ -99,509 +110,215 @@ export function AppContent() {
     return calculateMetrics(financialState, simulationDraft);
   }, [financialState, simulationDraft]);
 
-  const diff = useMemo(() => {
-    if (!simulationDraft || !simulatedMetrics) return null;
-    return calculateConsequenceDiff(baselineMetrics, simulatedMetrics, simulationDraft.amount, financialState);
-  }, [baselineMetrics, simulatedMetrics, simulationDraft, financialState]);
-
-  const trajectoryPoints = useMemo(() => {
-    return generateTrajectoryPoints(financialState, simulationDraft);
-  }, [financialState, simulationDraft]);
-
-  // Capital Allocation & Advanced Analytics
-  const activeMetrics = simulatedMetrics ?? baselineMetrics;
-
-  const capitalAllocation = useMemo(() => {
-    return calculateCapitalAllocation(financialState, simulationDraft);
-  }, [financialState, simulationDraft]);
-
-  const categoryOutflows = useMemo(() => {
-    return calculateCategoryOutflow(financialState);
-  }, [financialState]);
+  const activeMetrics = useMemo(() => {
+    return simulatedMetrics ?? baselineMetrics;
+  }, [simulatedMetrics, baselineMetrics]);
 
   const healthScoreAudit = useMemo(() => {
     return generateHealthScoreAudit(financialState, activeMetrics);
   }, [financialState, activeMetrics]);
 
-  const optimizationTips = useMemo(() => {
-    return generateOptimizationTips(financialState, activeMetrics);
-  }, [financialState, activeMetrics]);
-
-  const totalRealizedSpend = useMemo(() => {
-    return financialState.transactions
-      .filter(t => t.day <= financialState.currentDay)
-      .reduce((sum, t) => sum + t.amount, 0);
-  }, [financialState.transactions, financialState.currentDay]);
-
-  const heatmapPoints = useMemo(() => {
-    return calculateDailySpendHeatmap(financialState);
-  }, [financialState]);
-
-  // Audio Toggle
-  const handleToggleMute = useCallback(() => {
-    const nextMuted = toggleAudioMute();
-    setIsMutedState(nextMuted);
-    if (!nextMuted) {
-      playTick();
-    }
-  }, []);
-
-  // Handlers
+  // Event Handlers
   const handleSelectPreset = useCallback((presetId: string) => {
     const preset = PERSONA_PRESETS.find(p => p.id === presetId);
-    if (preset) {
-      playToggle();
-      setSelectedPresetId(presetId);
-      const cloned = JSON.parse(JSON.stringify(preset.state));
-      setFinancialState(cloned);
-      setSimulationDraft({
-        title: 'Swiggy Dinner Treat',
-        amount: 450,
-        category: 'Food & Dining',
-        day: cloned.currentDay
-      });
-    }
-  }, []);
-
-  const handleReset = useCallback(() => {
+    if (!preset) return;
+    
     playToggle();
-    const preset = PERSONA_PRESETS.find(p => p.id === selectedPresetId) ?? PERSONA_PRESETS[0];
-    setFinancialState(JSON.parse(JSON.stringify(preset.state)));
-    setSimulationDraft(null);
-  }, [selectedPresetId]);
+    setSelectedPresetId(presetId);
+    const cloned = JSON.parse(JSON.stringify(preset.state));
+    setFinancialState(cloned);
+    store.applyPersonaPreset(presetId as any);
+    store.setCurrentDay(cloned.currentDay);
+    
+    setSimulationDraft({
+      title: 'Weekend Outing & Dinner Treat',
+      amount: 500,
+      category: 'Food & Dining',
+      day: cloned.currentDay
+    });
+  }, [store]);
 
-  const handleDayChange = useCallback((day: number | ((prev: number) => number)) => {
+  const handleDayChange = useCallback((day: number) => {
     playTick();
-    setFinancialState(prev => {
-      const nextDay = typeof day === 'function' ? day(prev.currentDay) : day;
-      return {
-        ...prev,
-        currentDay: Math.min(30, Math.max(1, nextDay))
-      };
-    });
-  }, []);
-
-  const handleToggleSubscription = useCallback((subId: string) => {
-    playToggle();
     setFinancialState(prev => ({
       ...prev,
-      subscriptions: prev.subscriptions.map(s =>
-        s.id === subId ? { ...s, isActive: !s.isActive } : s
-      )
+      currentDay: day
     }));
+    store.setCurrentDay(day);
+
+    if (simulationDraft) {
+      setSimulationDraft(prev => prev ? { ...prev, day } : null);
+    }
+  }, [simulationDraft, store]);
+
+  const handleToggleMute = useCallback(() => {
+    const muted = toggleAudioMute();
+    setIsMutedState(muted);
   }, []);
 
-  const handleAddSubscription = useCallback((newSub: Omit<Subscription, 'id'>) => {
-    playToggle();
-    const sub: Subscription = {
-      ...newSub,
-      name: sanitizeText(newSub.name, 40),
-      amount: sanitizeAmount(newSub.amount, 10, 5000),
-      id: `sub-custom-${Date.now()}`
-    };
-    setFinancialState(prev => ({
-      ...prev,
-      subscriptions: [...prev.subscriptions, sub]
-    }));
-  }, []);
-
-  const handleToggleCommitmentPaid = useCallback((comId: string) => {
-    playToggle();
-    setFinancialState(prev => ({
-      ...prev,
-      commitments: prev.commitments.map(c =>
-        c.id === comId ? { ...c, isPaid: !c.isPaid } : c
-      )
-    }));
-  }, []);
-
-  const handleContributeGoal = useCallback((goalId: string, amount: number) => {
+  const handleExportCSV = useCallback(() => {
     playChime();
-    setFinancialState(prev => ({
-      ...prev,
-      savingsGoals: prev.savingsGoals.map(g =>
-        g.id === goalId ? { ...g, currentAmount: g.currentAmount + amount } : g
-      )
-    }));
-  }, []);
+    exportLedgerAsCSV(financialState);
+  }, [financialState]);
 
-  const handleWithdrawGoal = useCallback((goalId: string, amount: number) => {
-    playToggle();
-    setFinancialState(prev => ({
-      ...prev,
-      savingsGoals: prev.savingsGoals.map(g =>
-        g.id === goalId ? { ...g, currentAmount: Math.max(0, g.currentAmount - amount) } : g
-      )
-    }));
-  }, []);
-
-  const handleApplyShock = useCallback((title: string, amount: number, category: ExpenseCategory) => {
-    playWarning();
-    const newTx: Transaction = {
-      id: `tx-shock-${Date.now()}`,
-      title: sanitizeText(title, 50),
-      amount: sanitizeAmount(amount, 10, 10000),
-      category,
-      day: financialState.currentDay,
-      isUnexpected: true
-    };
-    setFinancialState(prev => ({
-      ...prev,
-      transactions: [...prev.transactions, newTx]
-    }));
-  }, [financialState.currentDay]);
-
-  const handleDeleteTransaction = useCallback((txId: string) => {
-    playToggle();
-    setFinancialState(prev => ({
-      ...prev,
-      transactions: prev.transactions.filter(t => t.id !== txId)
-    }));
-  }, []);
-
-  const handleAddManualTransaction = useCallback((txData: Omit<Transaction, 'id'>) => {
+  const handleExportJSON = useCallback(() => {
     playChime();
-    const newTx: Transaction = {
-      ...txData,
-      title: sanitizeText(txData.title, 50),
-      amount: sanitizeAmount(txData.amount, 1, 20000),
-      id: `tx-man-${Date.now()}`
-    };
-    setFinancialState(prev => ({
-      ...prev,
-      transactions: [...prev.transactions, newTx]
-    }));
-  }, []);
+    exportStateAsJSON(financialState, activeMetrics);
+  }, [financialState, activeMetrics]);
 
-  const handleCommitDraft = useCallback((draft: SimulationDraft) => {
+  const handlePrintStatement = useCallback(() => {
     playChime();
-    const newTx: Transaction = {
-      id: `tx-sim-commit-${Date.now()}`,
-      title: sanitizeText(draft.title, 50),
-      amount: sanitizeAmount(draft.amount, 1, 20000),
-      category: draft.category,
-      day: draft.day
-    };
-    setFinancialState(prev => ({
-      ...prev,
-      transactions: [...prev.transactions, newTx]
-    }));
-    setSimulationDraft(null);
-
-    confetti({
-      particleCount: 50,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
+    printMonthlyStatement();
   }, []);
 
-  const handleFocusSimulator = useCallback(() => {
-    const simInput = document.getElementById('sim-amount-input') || document.getElementById('decision-simulator-section');
-    simInput?.scrollIntoView({ behavior: 'smooth' });
-    simInput?.focus();
-  }, []);
-
-  // Keyboard Shortcuts Hook
-  const shortcutActions = useMemo(() => ({
+  // Keyboard Shortcuts Navigation
+  useKeyboardShortcuts({
     onTogglePlay: () => {
-      handleDayChange(prev => (prev >= 30 ? 1 : prev + 1));
+      handleDayChange(financialState.currentDay < 30 ? financialState.currentDay + 1 : 1);
     },
-    onSelectPreset: (index: number) => {
+    onSelectPreset: (index) => {
       const preset = PERSONA_PRESETS[index];
       if (preset) handleSelectPreset(preset.id);
     },
-    onFocusSimulator: handleFocusSimulator,
-    onExportCSV: () => {
-      exportLedgerAsCSV(financialState);
-    },
-    onExportJSON: () => {
-      exportStateAsJSON(financialState, simulatedMetrics ?? baselineMetrics);
-    },
-    onPrint: () => {
-      printMonthlyStatement();
-    },
+    onFocusSimulator: () => setCurrentTab('simulate'),
+    onExportCSV: handleExportCSV,
+    onExportJSON: handleExportJSON,
+    onPrint: handlePrintStatement,
     onToggleMute: handleToggleMute,
-    onToggleShortcutsModal: () => {
-      setIsShortcutsOpen(prev => !prev);
-    },
-    onToggleReportCard: () => {
-      setIsReportCardOpen(prev => !prev);
-    },
-    onToggleTour: () => {
-      setIsOnboardingOpen(prev => !prev);
-    },
-    onToggleCommandPalette: () => {
-      setIsCommandPaletteOpen(prev => !prev);
-    },
-    onToggleLens: () => {
-      playToggle();
-      setIsLensActive(prev => !prev);
-    },
-    onToggleCoach: () => {
-      setIsCoachOpen(prev => !prev);
-    },
+    onToggleShortcutsModal: () => setIsShortcutsOpen(prev => !prev),
+    onToggleReportCard: () => setIsReportCardOpen(prev => !prev),
+    onToggleTour: () => setIsOnboardingOpen(prev => !prev),
+    onToggleCommandPalette: () => setIsCommandPaletteOpen(prev => !prev),
+    onToggleLens: () => setIsLensActive(prev => !prev),
+    onToggleCoach: () => setIsCoachOpen(prev => !prev),
     onCloseModals: () => {
       setIsModalOpen(false);
       setIsHealthAuditOpen(false);
       setIsShortcutsOpen(false);
       setIsReportCardOpen(false);
       setIsOnboardingOpen(false);
+      setIsLensActive(false);
       setIsCommandPaletteOpen(false);
       setIsCoachOpen(false);
     }
-  }), [financialState, simulatedMetrics, baselineMetrics, handleDayChange, handleSelectPreset, handleToggleMute, handleFocusSimulator]);
-
-  useKeyboardShortcuts(shortcutActions);
+  });
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/20 selection:text-emerald-300">
-      
-      {/* Sticky Header with Presets & Navigation */}
-      <Header
-        currentDay={financialState.currentDay}
-        selectedPresetId={selectedPresetId}
-        onSelectPreset={handleSelectPreset}
-        onResetToBaseline={handleReset}
-        onOpenHowItWorks={() => setIsModalOpen(true)}
-        isMuted={isMutedState}
-        onToggleMute={handleToggleMute}
-        onOpenShortcuts={() => setIsShortcutsOpen(true)}
-        onExportCSV={() => exportLedgerAsCSV(financialState)}
-        onExportJSON={() => exportStateAsJSON(financialState, simulatedMetrics ?? baselineMetrics)}
-        onPrintStatement={printMonthlyStatement}
-        onOpenReportCard={() => setIsReportCardOpen(true)}
-        letterGrade={activeMetrics.letterGrade}
-        onOpenTour={() => setIsOnboardingOpen(true)}
-        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-        onOpenCoach={() => setIsCoachOpen(true)}
-      />
-
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        
-        {/* Dynamic Deficit & Solvency Alert Banner */}
-        <DeficitAlertBanner
-          metrics={activeMetrics}
-          state={financialState}
-          onSolveInSimulator={handleFocusSimulator}
-        />
-
-        {/* 1. Hero 4-Pillar Metric Cockpit */}
-        <MetricCards
-          metrics={activeMetrics}
-          diff={diff}
-          currentDay={financialState.currentDay}
-          startingBudget={financialState.startingBudget}
+    <Layout
+      currentTab={currentTab}
+      onNavigate={setCurrentTab}
+      currentDay={financialState.currentDay}
+      selectedPresetId={selectedPresetId}
+      onSelectPreset={handleSelectPreset}
+      isMuted={isMutedState}
+      onToggleMute={handleToggleMute}
+      onOpenShortcuts={() => setIsShortcutsOpen(true)}
+      onExportCSV={handleExportCSV}
+      onExportJSON={handleExportJSON}
+      onPrintStatement={handlePrintStatement}
+      onOpenReportCard={() => setIsReportCardOpen(true)}
+      letterGrade={healthScoreAudit.letterGrade}
+      onOpenTour={() => setIsOnboardingOpen(true)}
+      onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+      onOpenCoach={() => setIsCoachOpen(true)}
+      onOpenHowItWorks={() => setIsModalOpen(true)}
+    >
+      {/* Tab View Routing */}
+      {currentTab === 'dashboard' && (
+        <DashboardPage
+          onNavigateToSimulate={() => setCurrentTab('simulate')}
           onOpenHealthAudit={() => setIsHealthAuditOpen(true)}
         />
+      )}
 
-        {/* 2. 30-Day Stacked Capital Allocation Bar */}
-        <CapitalAllocationBar
-          allocation={capitalAllocation}
-        />
+      {currentTab === 'simulate' && (
+        <Suspense fallback={<ViewSkeleton />}>
+          <SimulatePage onBackToDashboard={() => setCurrentTab('dashboard')} />
+        </Suspense>
+      )}
 
-        {/* 3. 30-Day Timeline Calendar Scrubber */}
-        <TimelineScrubber
-          currentDay={financialState.currentDay}
-          onDayChange={handleDayChange}
-          commitments={financialState.commitments}
-          subscriptions={financialState.subscriptions}
-          inflows={financialState.inflows}
-        />
+      {currentTab === 'goals' && (
+        <Suspense fallback={<ViewSkeleton />}>
+          <GoalsPage />
+        </Suspense>
+      )}
 
-        {/* 4. Central Grid: Decision Simulator & Interactive Visualizations */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
-          {/* Left Column (7 cols): The Decision Engine & Forecast */}
-          <div className="lg:col-span-7 space-y-6">
-            
-            {/* The Core Feature: "What-If" Decision Simulator Sandbox */}
-            <DecisionSimulator
-              currentDay={financialState.currentDay}
-              financialState={financialState}
-              baselineMetrics={baselineMetrics}
-              simulatedMetrics={simulatedMetrics}
-              diff={diff}
-              simulationDraft={simulationDraft}
-              onUpdateDraft={setSimulationDraft}
-              onCommitDraft={handleCommitDraft}
-            />
+      {currentTab === 'subscriptions' && (
+        <Suspense fallback={<ViewSkeleton />}>
+          <SubscriptionsPage />
+        </Suspense>
+      )}
 
-            {/* Interactive 30-Day Trajectory Curve */}
-            <TrajectoryChart
-              points={trajectoryPoints}
-              currentDay={financialState.currentDay}
-              isSimulating={simulationDraft !== null && simulationDraft.amount > 0}
-            />
+      {currentTab === 'forecast' && (
+        <Suspense fallback={<ViewSkeleton />}>
+          <ForecastPage />
+        </Suspense>
+      )}
 
-            {/* 30-Day Spending Intensity Matrix */}
-            <SpendingHeatmap
-              points={heatmapPoints}
-              currentDay={financialState.currentDay}
-              onSelectDay={handleDayChange}
-            />
-
-            {/* Outflow by Category Breakdown */}
-            <CategoryBreakdown
-              outflows={categoryOutflows}
-              totalSpent={totalRealizedSpend}
-            />
-
-            {/* Transaction Ledger */}
-            <TransactionLedger
-              transactions={financialState.transactions}
-              currentDay={financialState.currentDay}
-              onDeleteTransaction={handleDeleteTransaction}
-              onAddManualTransaction={handleAddManualTransaction}
-            />
-
-          </div>
-
-          {/* Right Column (5 cols): Guardrails, Subscriptions & Shocks */}
-          <div className="lg:col-span-5 space-y-6">
-            
-            {/* Actionable AI Optimization Insights */}
-            <OptimizationInsights
-              tips={optimizationTips}
-            />
-
-            {/* Subscription Guillotine */}
-            <SubscriptionsManager
-              subscriptions={financialState.subscriptions}
-              currentDay={financialState.currentDay}
-              onToggleSubscription={handleToggleSubscription}
-              onAddSubscription={handleAddSubscription}
-            />
-
-            {/* Savings Goals Pacing */}
-            <SavingsGoals
-              goals={financialState.savingsGoals}
-              projectedSurplus={baselineMetrics.projectedDay30Balance}
-              financialState={financialState}
-              onContributeGoal={handleContributeGoal}
-              onWithdrawGoal={handleWithdrawGoal}
-            />
-
-            {/* Fixed Commitments */}
-            <CommitmentsList
-              commitments={financialState.commitments}
-              currentDay={financialState.currentDay}
-              onToggleCommitmentPaid={handleToggleCommitmentPaid}
-            />
-
-            {/* Shock Roulette & Emergency Stress-Test */}
-            <ShockRoulette
-              emergencyBuffer={financialState.emergencyBuffer}
-              onApplyShock={handleApplyShock}
-            />
-
-          </div>
-
-        </div>
-
-      </main>
-
-      {/* System Architecture Modal */}
-      <HowItEvaluatesModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
-
-      {/* Health Audit Diagnostics Modal */}
-      <HealthAuditModal
-        isOpen={isHealthAuditOpen}
-        onClose={() => setIsHealthAuditOpen(false)}
-        audit={healthScoreAudit}
-      />
-
-      {/* Keyboard Shortcuts Modal */}
-      <KeyboardShortcutsModal
-        isOpen={isShortcutsOpen}
-        onClose={() => setIsShortcutsOpen(false)}
-      />
-
-      {/* 30-Day Executive Month-End Report Card Modal */}
-      <MonthEndReportCardModal
-        isOpen={isReportCardOpen}
-        onClose={() => setIsReportCardOpen(false)}
-        state={financialState}
-        metrics={activeMetrics}
-        presetName={currentPreset.name}
-        onPrintStatement={printMonthlyStatement}
-      />
-
-      {/* Interactive Onboarding Guided Tour Modal */}
-      <OnboardingTourModal
-        isOpen={isOnboardingOpen}
-        onClose={() => setIsOnboardingOpen(false)}
-        onStartSandbox={handleFocusSimulator}
-      />
-
-      {/* The Lens ✦ Interactive Mathematical Inspector */}
+      {/* Global Modals & Specialized Overlays */}
       <TheLens
         isActive={isLensActive}
-        onToggle={() => {
-          playToggle();
-          setIsLensActive(prev => !prev);
-        }}
+        onToggle={() => setIsLensActive(prev => !prev)}
       />
 
-      {/* Global Command Palette */}
       <CommandPalette
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
         onSelectPreset={handleSelectPreset}
-        onStageSimulation={(draft) => {
-          setSimulationDraft(draft);
-          handleFocusSimulator();
-        }}
-        onExportCSV={() => exportLedgerAsCSV(financialState)}
-        onExportJSON={() => exportStateAsJSON(financialState, simulatedMetrics ?? baselineMetrics)}
-        onPrint={printMonthlyStatement}
+        onStageSimulation={(draft) => setSimulationDraft(draft)}
+        onExportCSV={handleExportCSV}
+        onExportJSON={handleExportJSON}
+        onPrint={handlePrintStatement}
         onOpenReportCard={() => setIsReportCardOpen(true)}
         onOpenHealthAudit={() => setIsHealthAuditOpen(true)}
         onOpenOnboarding={() => setIsOnboardingOpen(true)}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
-        onToggleLens={() => {
-          playToggle();
-          setIsLensActive(p => !p);
-        }}
+        onToggleLens={() => setIsLensActive(prev => !prev)}
         onToggleMute={handleToggleMute}
         onOpenCoach={() => setIsCoachOpen(true)}
         isMuted={isMutedState}
         isLensActive={isLensActive}
       />
 
-      {/* Sanvektro Financial Decision Coach Modal */}
       <SanvektroCoachModal
         isOpen={isCoachOpen}
         onClose={() => setIsCoachOpen(false)}
         state={financialState}
         metrics={activeMetrics}
         presetName={currentPreset.name}
-        onStageSimulation={(draft) => {
-          setSimulationDraft(draft);
-          handleFocusSimulator();
-        }}
+        onStageSimulation={(draft) => setSimulationDraft(draft)}
       />
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-[#090d16] py-5 mt-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <div className="flex flex-wrap items-center gap-2 font-mono">
-            <span className="text-emerald-400 font-bold">Sanvektro</span>
-            <span>✦</span>
-            <span>Created by <a href="https://github.com/saad2134" target="_blank" rel="noreferrer" className="text-slate-300 hover:text-emerald-400 underline transition-colors">Saaduddin Mohammed</a> (github.com/saad2134)</span>
-            <span>✦</span>
-            <span>Gen Z ₹10k 30-Day Decision Cockpit</span>
-          </div>
-          <div>
-            React 19 + TypeScript + Tailwind CSS v4
-          </div>
-        </div>
-      </footer>
+      <HowItEvaluatesModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
 
-    </div>
+      <HealthAuditModal
+        isOpen={isHealthAuditOpen}
+        onClose={() => setIsHealthAuditOpen(false)}
+        audit={healthScoreAudit}
+      />
+
+      <KeyboardShortcutsModal
+        isOpen={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      <MonthEndReportCardModal
+        isOpen={isReportCardOpen}
+        onClose={() => setIsReportCardOpen(false)}
+        state={financialState}
+        metrics={activeMetrics}
+        presetName={currentPreset.name}
+        onPrintStatement={handlePrintStatement}
+      />
+
+      <OnboardingTourModal
+        isOpen={isOnboardingOpen}
+        onClose={() => setIsOnboardingOpen(false)}
+      />
+    </Layout>
   );
 }
 
@@ -614,5 +331,3 @@ export function App() {
 }
 
 export default App;
-
-

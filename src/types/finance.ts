@@ -173,6 +173,7 @@ export interface PillarScore {
 
 export interface HealthScoreAudit {
   overallScore: number;
+  letterGrade?: string;
   riskLevel: RiskLevel;
   pillars: {
     runway: PillarScore;

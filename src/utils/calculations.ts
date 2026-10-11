@@ -401,7 +401,7 @@ export function calculateGoalFeasibility(
 export function calculateConsequenceDiff(
   baseline: ConsequenceMetrics,
   simulated: ConsequenceMetrics,
-  draftAmount: number,
+  draftAmount: number = Math.abs(simulated.balance - baseline.balance),
   state?: FinancialState
 ): ConsequenceDiff {
   const balanceDelta = simulated.balance - baseline.balance;
@@ -820,6 +820,7 @@ export function generateHealthScoreAudit(
 
   return {
     overallScore: metrics.healthScore,
+    letterGrade: getHealthLetterGrade(metrics.healthScore).grade,
     riskLevel: metrics.riskLevel,
     pillars: {
       runway: {
