@@ -1,5 +1,5 @@
 import React from 'react';
-import type { CapitalAllocation } from '../types/finance';
+import type { CapitalAllocation } from '../../types/finance';
 import { PieChart, Info } from 'lucide-react';
 
 interface CapitalAllocationBarProps {

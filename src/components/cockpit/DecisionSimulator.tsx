@@ -5,8 +5,8 @@ import type {
   ConsequenceMetrics, 
   ConsequenceDiff,
   FinancialState
-} from '../types/finance';
-import { generateComparisonScenarios, calculateOpportunityCost } from '../utils/calculations';
+} from '../../types/finance';
+import { generateComparisonScenarios, calculateOpportunityCost } from '../../utils/calculations';
 import { 
   SlidersHorizontal, 
   Sparkles, 

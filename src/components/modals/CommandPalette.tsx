@@ -20,7 +20,7 @@ import {
   Activity,
   Bot
 } from 'lucide-react';
-import type { SimulationDraft, ExpenseCategory } from '../types/finance';
+import type { SimulationDraft, ExpenseCategory } from '../../types/finance';
 
 export interface CommandItem {
   id: string;

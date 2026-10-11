@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, ChevronLeft, ChevronRight, Calendar, AlertCircle } from 'lucide-react';
-import type { Commitment, Subscription, Inflow } from '../types/finance';
+import type { Commitment, Subscription, Inflow } from '../../types/finance';
 
 interface TimelineScrubberProps {
   currentDay: number;

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { DailyHeatmapPoint } from '../types/finance';
+import type { DailyHeatmapPoint } from '../../types/finance';
 import { Calendar, Flame, Sparkles } from 'lucide-react';
 
 interface SpendingHeatmapProps {

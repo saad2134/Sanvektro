@@ -5,10 +5,8 @@
 
 import React from 'react';
 import { useBudgetStore } from '../../store/budgetStore';
-import { TrajectoryChart } from '../../components/TrajectoryChart';
-import { SpendingHeatmap } from '../../components/SpendingHeatmap';
-import { TransactionLedger } from '../../components/TransactionLedger';
-import { ShockRoulette } from '../../components/ShockRoulette';
+import { TrajectoryChart, TransactionLedger, ShockRoulette } from '../../components';
+import { SpendingHeatmap } from '../../components/cockpit/SpendingHeatmap';
 import { TrendingUp, Calendar, AlertTriangle, ShieldCheck } from 'lucide-react';
 import {
   generateTrajectoryPoints,
@@ -113,7 +111,7 @@ export const ForecastPage: React.FC = () => {
             transactions={financialState.transactions}
             currentDay={financialState.currentDay}
             onDeleteTransaction={deleteTransaction}
-            onAddManualTransaction={(t) => addTransaction({
+            onAddManualTransaction={(t: any) => addTransaction({
               title: t.title,
               amount: t.amount,
               day: t.day,

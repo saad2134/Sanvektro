@@ -5,8 +5,7 @@
 
 import React from 'react';
 import { useBudgetStore } from '../../store/budgetStore';
-import { DecisionSimulator } from '../../components/DecisionSimulator';
-import { OptimizationInsights } from '../../components/OptimizationInsights';
+import { DecisionSimulator, OptimizationInsights } from '../../components';
 import { Sparkles, ArrowLeft } from 'lucide-react';
 import {
   calculateConsequenceDiff,

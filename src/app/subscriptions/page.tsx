@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { useBudgetStore } from '../../store/budgetStore';
-import { SubscriptionsManager } from '../../components/SubscriptionsManager';
+import { SubscriptionsManager } from '../../components';
 import { Tv, CheckCircle2, PauseCircle, ShieldAlert } from 'lucide-react';
 
 export const SubscriptionsPage: React.FC = () => {
@@ -70,7 +70,7 @@ export const SubscriptionsPage: React.FC = () => {
       <SubscriptionsManager
         subscriptions={financialState.subscriptions}
         onToggleSubscription={toggleSubscription}
-        onAddSubscription={(newSub) => store.addSubscription(newSub as any)}
+        onAddSubscription={(newSub: any) => store.addSubscription(newSub)}
         currentDay={financialState.currentDay}
       />
     </div>

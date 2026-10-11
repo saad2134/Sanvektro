@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, CheckCircle2, AlertTriangle, Scale, Activity } from 'lucide-react';
-import type { HealthScoreAudit } from '../types/finance';
+import type { HealthScoreAudit } from '../../types/finance';
 
 interface HealthAuditModalProps {
   isOpen: boolean;

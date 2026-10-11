@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { CategoryOutflow } from '../types/finance';
+import type { CategoryOutflow } from '../../types/finance';
 import { Layers, AlertCircle, ShieldAlert } from 'lucide-react';
 
 interface CategoryBreakdownProps {

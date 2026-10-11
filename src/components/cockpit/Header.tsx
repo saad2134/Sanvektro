@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PERSONA_PRESETS } from '../data/presets';
+import { PERSONA_PRESETS } from '../../data/presets';
 import { 
   Sparkles, 
   RotateCcw, 

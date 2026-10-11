@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Transaction, ExpenseCategory } from '../types/finance';
+import type { Transaction, ExpenseCategory } from '../../types/finance';
 import { Receipt, Trash2, Plus, Search } from 'lucide-react';
 
 interface TransactionLedgerProps {

@@ -1,11 +1,6 @@
 {
   "name": "Sanvektro",
-  "description": "A predictive 30-day personal finance simulation cockpit for Gen Z with dynamic daily safe-to-spend allowance, pre-spend sandbox, and opportunity cost advisor.",
+  "description": "Gen Z personal finance cockpit with a ₹10,000 / 30-day budget engine and instant ripple-effect decision simulator.",
   "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_CLIENT_SIDE_FINANCIAL_SIMULATION",
-    "MAJOR_CAPABILITY_DETERMINISTIC_MATHEMATICS",
-    "MAJOR_CAPABILITY_WEB_AUDIO_SYNTHESIZER",
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

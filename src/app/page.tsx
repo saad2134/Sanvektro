@@ -5,19 +5,21 @@
 
 import React from 'react';
 import { useBudgetStore } from '../store/budgetStore';
-import { DeficitAlertBanner } from '../components/DeficitAlertBanner';
-import { MetricCards } from '../components/MetricCards';
-import { CapitalAllocationBar } from '../components/CapitalAllocationBar';
-import { TimelineScrubber } from '../components/TimelineScrubber';
-import { DecisionSimulator } from '../components/DecisionSimulator';
-import { TrajectoryChart } from '../components/TrajectoryChart';
-import { SpendingHeatmap } from '../components/SpendingHeatmap';
-import { CategoryBreakdown } from '../components/CategoryBreakdown';
-import { TransactionLedger } from '../components/TransactionLedger';
-import { OptimizationInsights } from '../components/OptimizationInsights';
-import { SubscriptionsManager } from '../components/SubscriptionsManager';
-import { SavingsGoals } from '../components/SavingsGoals';
-import { ShockRoulette } from '../components/ShockRoulette';
+import {
+  DeficitAlertBanner,
+  MetricCards,
+  CapitalAllocationBar,
+  TimelineScrubber,
+  DecisionSimulator,
+  TrajectoryChart,
+  CategoryBreakdown,
+  TransactionLedger,
+  OptimizationInsights,
+  SubscriptionsManager,
+  SavingsGoals,
+  ShockRoulette
+} from '../components';
+import { SpendingHeatmap } from '../components/cockpit/SpendingHeatmap';
 import {
   calculateCapitalAllocation,
   calculateCategoryOutflow,
@@ -153,7 +155,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             transactions={financialState.transactions}
             currentDay={financialState.currentDay}
             onDeleteTransaction={deleteTransaction}
-            onAddManualTransaction={(t) => addTransaction({
+            onAddManualTransaction={(t: any) => addTransaction({
               title: t.title,
               amount: t.amount,
               day: t.day,
@@ -169,7 +171,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           <SubscriptionsManager
             subscriptions={financialState.subscriptions}
             onToggleSubscription={toggleSubscription}
-            onAddSubscription={(newSub) => store.addSubscription(newSub as any)}
+            onAddSubscription={(newSub: any) => store.addSubscription(newSub)}
             currentDay={financialState.currentDay}
           />
 

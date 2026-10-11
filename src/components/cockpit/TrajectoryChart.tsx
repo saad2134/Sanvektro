@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { TrajectoryPoint } from '../utils/calculations';
+import type { TrajectoryPoint } from '../../utils/calculations';
 import { TrendingDown, Calendar, Layers } from 'lucide-react';
 
 interface TrajectoryChartProps {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { UNEXPECTED_SHOCKS_POOL } from '../data/presets';
+import { UNEXPECTED_SHOCKS_POOL } from '../../data/presets';
 import { Dices, AlertOctagon, Zap } from 'lucide-react';
-import type { ExpenseCategory } from '../types/finance';
+import type { ExpenseCategory } from '../../types/finance';
 
 interface ShockRouletteProps {
   emergencyBuffer: number;

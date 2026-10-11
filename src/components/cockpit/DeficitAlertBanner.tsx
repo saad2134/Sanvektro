@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertCircle, ArrowRight } from 'lucide-react';
-import type { ConsequenceMetrics, FinancialState } from '../types/finance';
+import type { ConsequenceMetrics, FinancialState } from '../../types/finance';
 
 interface DeficitAlertBannerProps {
   metrics: ConsequenceMetrics;

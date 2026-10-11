@@ -7,8 +7,8 @@ import {
   ArrowRight, 
   SlidersHorizontal
 } from 'lucide-react';
-import type { FinancialState, ConsequenceMetrics, SimulationDraft, CoachEvaluationResult } from '../types/finance';
-import { evaluateCoachQuery } from '../utils/coachEvaluator';
+import type { FinancialState, ConsequenceMetrics, SimulationDraft, CoachEvaluationResult } from '../../types/finance';
+import { evaluateCoachQuery } from '../../utils/coachEvaluator';
 
 interface Message {
   id: string;

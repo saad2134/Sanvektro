@@ -196,6 +196,44 @@ export const safeAdd = (a: number, b: number): number => paiseToRupees(rupeesToP
 export const safeSub = (a: number, b: number): number => Math.max(0, paiseToRupees(rupeesToPaise(a) - rupeesToPaise(b)));
 ```
 
+## 🔒 Security & Data Integrity
+
+1. **Zero External Data Leaks**: Pure client-side execution. Zero user financial data or PII leaves the browser.
+2. **Comprehensive Validation & Sanitization**:
+   - `DOMPurify` HTML tag stripping across all user-entered transaction titles, notes, and custom goal labels.
+   - Recursive prototype pollution defense intercepting `__proto__`, `constructor`, and `prototype` property mutations.
+   - Arithmetic range clamping guarding against negative balance floors and floating-point paise drift.
+   - Comprehensive Zod validation parsing expense bounds (`₹1` ✦ `₹10,000`).
+3. **Resilient LocalStorage Persistence**:
+   - Versioned storage engine (`STORAGE_VERSION = '1.0'`) with graceful in-memory fallback on corrupted storage payloads.
+4. **Defensive Form Protection**:
+   - Double-submit prevention and reactive locking across all modals, ledger additions, and simulation commit triggers.
+
+---
+
+## ♿ Accessibility (WCAG AA Compliance)
+
+- **Skip Navigation Link**: Accessible `<a href="#main-content">` jump link available on initial tab.
+- **Hands-Free Keyboard Navigation**: Full suite of keyboard shortcuts (`Space`, `1-3`, `S`, `E`, `J`, `P`, `M`, `?`, `Esc`) with visual shortcut guide modal.
+- **Accessible State Announcements**:
+  - Live ARIA announcements (`aria-live="polite"`, `aria-atomic="true"`) for simulation ripples and deficit alerts.
+  - Semantic `<div role="meter">` with `aria-valuenow`, `aria-valuemin`, and `aria-valuemax` for Financial Health Score.
+  - Role-based status banners (`role="status"`, `role="alert"`) for runway velocity alerts.
+- **Screen-Reader Data Tables**: Hidden alternative tabular structures for all interactive SVG charts and circular meters.
+- **Color-Blind Resilient Design**: Status indicators combine semantic HSL hues with distinct geometric icons and tabular numerals.
+- **High-Contrast Focus Indicators**: Global `focus-visible:ring-2 focus-visible:ring-emerald-500` outline on all interactive buttons and inputs.
+
+---
+
+## 🎨 Design Philosophy & Aesthetics
+
+Sanvektro follows the **Universal Frontend Design Constitution**:
+- **Obsidian Dark Surface Palette**: Clean `#07090e` base canvas, `#0d121e` elevated cards, and `#1a2333` hairline borders.
+- **Tabular Monospace Numerals**: Every rupee currency amount, count, and date is styled with `tabular-nums font-mono` to prevent typographic jitter during timeline scrubbing.
+- **Square Squircle Icon Frames**: All badge and icon containers maintain a strict 1:1 aspect ratio (`aspect-square`) with rounded squircle geometry (`rounded-xl` / `rounded-2xl`).
+- **Zero-Pill Discipline**: Metadata is presented through quiet unboxed typography and subtle `✦` typographic separators, avoiding cluttered badge sandwiches.
+- **Single-Line Top Bar Contract**: Sticky header with single-line controls, accessible tab navigation, and zero wrapped labels.
+
 ---
 
 ## 🛠️ Tech Stack

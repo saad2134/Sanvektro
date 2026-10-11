@@ -12,15 +12,17 @@ import type { AppTab } from './store/budgetStore';
 import { useBudgetStore } from './store/budgetStore';
 import { DashboardPage } from './app/page';
 
-import { HowItEvaluatesModal } from './components/HowItEvaluatesModal';
-import { HealthAuditModal } from './components/HealthAuditModal';
-import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
-import { MonthEndReportCardModal } from './components/MonthEndReportCardModal';
-import { OnboardingTourModal } from './components/OnboardingTourModal';
-import { TheLens } from './components/TheLens';
-import { CommandPalette } from './components/CommandPalette';
-import { SanvektroCoachModal } from './components/SanvektroCoachModal';
-import { ErrorBoundary } from './components/ErrorBoundary';
+import {
+  HowItEvaluatesModal,
+  HealthAuditModal,
+  KeyboardShortcutsModal,
+  MonthEndReportCardModal,
+  OnboardingTourModal,
+  TheLens,
+  CommandPalette,
+  SanvektroCoachModal,
+  ErrorBoundary
+} from './components';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
 import { 
@@ -228,7 +230,7 @@ export function AppContent() {
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
         onSelectPreset={handleSelectPreset}
-        onStageSimulation={(draft) => setSimulationDraft(draft)}
+        onStageSimulation={(draft: any) => setSimulationDraft(draft)}
         onExportCSV={handleExportCSV}
         onExportJSON={handleExportJSON}
         onPrint={handlePrintStatement}
@@ -249,7 +251,7 @@ export function AppContent() {
         state={financialState}
         metrics={activeMetrics}
         presetName={currentPreset.name}
-        onStageSimulation={(draft) => setSimulationDraft(draft)}
+        onStageSimulation={(draft: any) => setSimulationDraft(draft)}
       />
 
       <HowItEvaluatesModal

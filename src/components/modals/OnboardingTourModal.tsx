@@ -12,7 +12,7 @@ import {
   CheckCircle2,
   Sparkles
 } from 'lucide-react';
-import { playTick, playChime } from '../services/audioService';
+import { playTick, playChime } from '../../services/audioService';
 
 interface OnboardingTourModalProps {
   isOpen: boolean;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import type { SavingsGoal, FinancialState } from '../types/finance';
-import { calculateSavingsLockboxRipple, calculateGoalFeasibility } from '../utils/calculations';
+import type { SavingsGoal, FinancialState } from '../../types/finance';
+import { calculateSavingsLockboxRipple, calculateGoalFeasibility } from '../../utils/calculations';
 import { Target, Plus, CheckCircle2, Lock, ShieldCheck, AlertTriangle, Clock } from 'lucide-react';
 import confetti from 'canvas-confetti';
 

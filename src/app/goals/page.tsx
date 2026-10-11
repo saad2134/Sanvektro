@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { useBudgetStore } from '../../store/budgetStore';
-import { SavingsGoals } from '../../components/SavingsGoals';
+import { SavingsGoals } from '../../components';
 import { Target, ShieldCheck, PiggyBank } from 'lucide-react';
 
 export const GoalsPage: React.FC = () => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { OptimizationTip } from '../types/finance';
+import type { OptimizationTip } from '../../types/finance';
 import { Sparkles, TrendingUp, Scissors, ShieldAlert, Info } from 'lucide-react';
 
 interface OptimizationInsightsProps {

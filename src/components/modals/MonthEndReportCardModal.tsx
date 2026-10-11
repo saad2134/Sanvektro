@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { FinancialState, ConsequenceMetrics } from '../types/finance';
+import type { FinancialState, ConsequenceMetrics } from '../../types/finance';
 import { 
   X, 
   Award, 
@@ -14,8 +14,8 @@ import {
   BookOpen,
   Compass
 } from 'lucide-react';
-import { playTick, playChime } from '../services/audioService';
-import { calculateMoneyPersonality } from '../utils/calculations';
+import { playTick, playChime } from '../../services/audioService';
+import { calculateMoneyPersonality } from '../../utils/calculations';
 
 interface MonthEndReportCardModalProps {
   isOpen: boolean;

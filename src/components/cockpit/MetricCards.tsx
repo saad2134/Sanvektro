@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ConsequenceMetrics, ConsequenceDiff } from '../types/finance';
+import type { ConsequenceMetrics, ConsequenceDiff } from '../../types/finance';
 import { 
   Wallet, 
   Flame, 

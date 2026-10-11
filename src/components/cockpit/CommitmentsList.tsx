@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Commitment } from '../types/finance';
+import type { Commitment } from '../../types/finance';
 import { ShieldAlert, CheckCircle2, Landmark, Clock } from 'lucide-react';
-import { calculateCashPressureRadar } from '../utils/calculations';
+import { calculateCashPressureRadar } from '../../utils/calculations';
 
 interface CommitmentsListProps {
   commitments: Commitment[];

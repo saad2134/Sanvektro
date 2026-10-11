@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Subscription } from '../types/finance';
+import type { Subscription } from '../../types/finance';
 import { Scissors, Check, X, Plus, Music, Tv, Dumbbell, Cloud, Cpu, Palette, Sparkles } from 'lucide-react';
 
 interface SubscriptionsManagerProps {
